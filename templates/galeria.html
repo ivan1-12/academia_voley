@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1><i class="fas fa-images"></i> {{ _('Galería de la Academia') }}</h1>
+            <p class="lead">{{ _('Momentos destacados de nuestros partidos, entrenamientos y logros') }}</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <div class="btn-group justify-content-center" role="group">
+                <button class="btn btn-primary active" data-filter="all">{{ _('Todos') }}</button>
+                <button class="btn btn-outline-primary" data-filter="partido">{{ _('Partidos') }}</button>
+                <button class="btn btn-outline-primary" data-filter="trofeo">{{ _('Trofeos') }}</button>
+                <button class="btn btn-outline-primary" data-filter="equipo">{{ _('Equipos') }}</button>
+                <button class="btn btn-outline-primary" data-filter="entrenamiento">{{ _('Entrenamientos') }}</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Galería -->
+    <div class="row justify-content-center gallery-grid">
+        {% if galeria %}
+            {% for item in galeria %}
+            <div class="col-md-4 mb-4 gallery-item" data-type="{{ item.tipo }}">
+                <div class="card h-100">
+                    {% if item.imagen_url %}
+                        <img src="{{ item.imagen_url }}" class="card-img-top gallery-img" alt="{{ item.titulo }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/400x300?text=Sin+Imagen" class="card-img-top" alt="{{ _('Placeholder') }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.titulo }}</h5>
+                        <p class="card-text">{{ item.descripcion or _('Sin descripción') }}</p>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt"></i> {{ item.fecha_subida.strftime('%d/%m/%Y') }}
+                        </small>
+                        <div class="mt-2">
+                            <span class="badge bg-info">
+                                {{ item.tipo|capitalize }}
+                            </span>
+                            {% if current_user.is_authenticated and current_user.rol in ['entrenador', 'super_usuario'] %}
+                            <form action="{{ url_for('trainer.eliminar_imagen', imagen_id=item.id) }}" method="POST" style="display:inline" onsubmit="return confirm('{{ _('Eliminar imagen') }} {{ item.titulo }}?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-danger ms-2"> <i class="fas fa-trash"></i> {{ _('Eliminar') }}</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                    <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle"></i> {{ _('No hay imágenes en la galería aún.') }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Filtro de galería
+document.querySelectorAll('[data-filter]').forEach(button => {
+    button.addEventListener('click', function() {
+        const filter = this.getAttribute('data-filter');
+        
+        // Actualizar estilo de botones
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.classList.remove('active');
+            btn.classList.add('btn-outline-primary');
+        });
+        this.classList.add('active');
+        this.classList.remove('btn-outline-primary');
+        
+        // Filtrar elementos
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            if (filter === 'all' || item.getAttribute('data-type') === filter) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

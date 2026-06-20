@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4">{{ _('Nuestro Staff Académico') }}</h1>
+        <p class="lead">{{ _('Conoce a los profesionales detrás del éxito de nuestra academia.') }}</p>
+        {% if current_user.is_authenticated and current_user.rol == 'super_usuario' and allow_create_trainers %}
+        <div class="mt-3">
+            <a href="{{ url_for('trainer.agregar_staff') }}" class="btn btn-success btn-lg">
+                <i class="fas fa-user-plus"></i> {{ _('Agregar Nuevo Entrenador') }}
+            </a>
+        </div>
+        {% elif current_user.is_authenticated and current_user.rol == 'super_usuario' and not allow_create_trainers %}
+        <div class="mt-3">
+            <button class="btn btn-secondary btn-lg" disabled title="{{ _('Creación de entrenadores deshabilitada') }}">
+                <i class="fas fa-user-lock"></i> {{ _('Creación de entrenadores deshabilitada') }}
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        {% if staff_members %}
+            {% for member in staff_members %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-user-tie fa-4x text-primary"></i>
+                        </div>
+                        <h3 class="card-title h4">{{ member.nombre }} {{ member.apellido }}</h3>
+                        <p class="text-muted mb-3"><i class="fas fa-envelope"></i> {{ member.email }}</p>
+                        <p class="card-text">{{ member.descripcion or _('Entrenador profesional con amplia experiencia en la formación de talentos de voleybol.') }}</p>
+                        
+                        <div class="social-member-links mt-3">
+                            {% if member.link_facebook %}
+                                <a href="{{ member.link_facebook }}" target="_blank" class="text-primary me-2"><i class="fab fa-facebook fa-2x"></i></a>
+                            {% endif %}
+                            {% if member.link_instagram %}
+                                <a href="{{ member.link_instagram }}" target="_blank" class="text-danger"><i class="fab fa-instagram fa-2x"></i></a>
+                            {% endif %}
+                        </div>
+
+                        {% set trainer_horarios = horarios_map.get(member.id, []) %}
+                        {% if trainer_horarios %}
+                        <div class="mt-4 text-start">
+                            <h6 class="fw-bold">{{ _('Horarios disponibles') }}</h6>
+                            <ul class="list-unstyled small mb-0">
+                                {% for horario in trainer_horarios %}
+                                <li>
+                                    <strong>{{ horario.dias }}</strong> | {{ horario.horario }} | <span class="text-success">{{ horario.precio }}</span>
+                                    {% if horario.descripcion %}<br><small>{{ horario.descripcion }}</small>{% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="{{ url_for('public.solicitar_unirse', trainer_id=member.id) }}" class="btn btn-success btn-sm me-2">
+                                <i class="fas fa-handshake"></i> {{ _('Solicitar unirse') }}
+                            </a>
+                        </div>
+                        
+                        {% if current_user.is_authenticated and (current_user.rol == 'super_usuario' or (current_user.rol == 'entrenador' and current_user.id == member.id)) %}
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="{{ url_for('trainer.editar_staff', staff_id=member.id) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-edit"></i> {{ _('Editar Perfil de Staff') }}
+                                </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <p class="lead text-muted">{{ _('No hay miembros del staff registrados actualmente.') }}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

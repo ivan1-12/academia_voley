@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-edit"></i> {{ _('Editar Información de Staff') }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Nombre') }}</label>
+                            <input type="text" name="nombre" class="form-control" value="{{ staff.nombre }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Apellido') }}</label>
+                            <input type="text" name="apellido" class="form-control" value="{{ staff.apellido }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Email') }}</label>
+                            <input type="email" name="email" class="form-control" value="{{ staff.email }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Descripción / Biografía Profesional') }}</label>
+                            <textarea id="descripcion" name="descripcion" class="form-control" rows="4" maxlength="150" placeholder="{{ _('Escribe tu experiencia, logros o especialidad (límite estricto de 150 caracteres)...') }}">{{ staff.descripcion or '' }}</textarea>
+                            <div class="form-text text-end text-muted" id="charCount">{{ _('150 caracteres restantes') }}</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="fab fa-facebook text-primary"></i> {{ _('Link Facebook') }}</label>
+                                <input type="url" name="link_facebook" class="form-control" placeholder="https://facebook.com/usuario" value="{{ staff.link_facebook or '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="fab fa-instagram text-danger"></i> {{ _('Link Instagram') }}</label>
+                                <input type="url" name="link_instagram" class="form-control" placeholder="https://instagram.com/usuario" value="{{ staff.link_instagram or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <small><i class="fas fa-info-circle"></i> {{ _('Solo puedes editar el nombre, apellido, correo y biografía. Para cambiar la contraseña, contacta al administrador de la base de datos.') }}</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ url_for('public.perfil_academico') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> {{ _('Cancelar') }}
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {{ _('Guardar Cambios') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const textarea = document.getElementById("descripcion");
+    const counter = document.getElementById("charCount");
+    
+    function updateCounter() {
+        const remaining = 150 - textarea.value.length;
+        counter.textContent = `${remaining} caracteres restantes`;
+        if (remaining <= 10) {
+            counter.classList.add("text-danger");
+            counter.classList.remove("text-muted");
+        } else {
+            counter.classList.remove("text-danger");
+            counter.classList.add("text-muted");
+        }
+    }
+    
+    textarea.addEventListener("input", updateCounter);
+    updateCounter(); // Inicializar contador
+});
+</script>
+{% endblock %}

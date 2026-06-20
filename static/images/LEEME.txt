@@ -1,0 +1,12 @@
+Coloca aquí tu logo con el nombre: logo.png
+(También acepta logo.jpg, logo.jpeg, logo.webp o logo.svg)
+
+Pasos:
+1. Copia tu imagen descargada a esta carpeta.
+2. Renómbrala a logo.png (recomendado).
+3. Recarga la página en el navegador.
+
+También puedes subir el logo desde el panel del superadministrador:
+Mi Panel → Branding / Logo
+
+Si no hay logo personalizado, se usa logo.svg por defecto.

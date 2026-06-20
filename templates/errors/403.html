@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Acceso denegado') }}{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-1 text-muted">403</h1>
+    <h2>{{ _('Acceso denegado') }}</h2>
+    <p class="lead">{{ _('No tienes permiso para ver esta página.') }}</p>
+    <a href="{{ url_for('public.index') }}" class="btn btn-primary">{{ _('Volver al inicio') }}</a>
+</div>
+{% endblock %}

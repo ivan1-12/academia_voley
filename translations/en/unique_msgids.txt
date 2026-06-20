@@ -1,0 +1,368 @@
+2: 
+18: Agregar Nuevo Entrenador
+24: Nombre
+29: Apellido
+36: Email
+41: Contraseña
+45: Confirmar Contraseña
+51: Descripción
+55: Máximo 150 caracteres.
+59: Facebook
+63: Instagram
+68: Volver
+72: Agregar Entrenador
+76: Academia de Voleybol
+80: Juventud Global Sport
+85: Inicio
+89: Staff
+93: Galería
+97: Reportes
+101: Gestión de usuarios
+105: Mi Panel
+109: Cerrar sesión
+113: Iniciar sesión
+117: Registrarse
+121: Español
+125: English
+129: Português
+133: Français
+138: Cerrar
+142: Branding / Logo
+146: Logo de la academia
+150: Vista previa actual
+154: Logo
+158: Subir nuevo logo
+162: Formatos: PNG, JPG, WEBP o SVG. Recomendado: PNG con fondo transparente.
+166: También puedes copiar tu archivo manualmente a
+170: y recargar la página.
+174: Guardar logo
+178: Cambiar contraseña
+182: Contraseña actual
+186: Nueva contraseña
+190: 8-16 caracteres con al menos un carácter especial.
+194: Confirmar nueva contraseña
+198: Actualizar contraseña
+202: Panel Administrativo
+206: Panel del Entrenador
+210: Bienvenido,
+214: Total Jugadores
+218: Fotos Subidas
+222: Acciones Rápidas
+226: Entrenamientos
+231: Nutrición
+235: Logros
+239: Horarios
+243: Solicitudes
+248: Subir Foto
+252: Nuevo Entrenador
+257: Gestionar Usuarios
+261: Logo / Branding
+266: Gestión de Jugadores
+273: Acciones
+277: Asignar Rutina
+282: Eliminar
+286: Asignar Entrenamiento a
+290: Seleccione un entrenamiento...
+295: Asignar
+299: Asignar Nutrición a
+303: Seleccione un plan...
+307: Galería de la Academia
+311: ¿Borrar foto?
+315: Título
+319: Archivo
+323: Subir
+327: Panel de control - Jugador de Voleybol
+332: Descargar Rutinas PDF
+337: Mi Perfil
+341: Posición:
+345: No especificada
+349: Altura:
+353: Peso:
+357: No especificado
+361: Completa tu perfil haciendo clic en el botón de editar
+365: Mis Entrenamientos
+369: Duración:
+374: minutos
+378: Dificultad:
+382: Completado
+386: Marcar como Completado
+390: No tienes entrenamientos asignados aún.
+394: Mi Plan Nutricional
+398: Desayuno
+402: Almuerzo
+406: Cena
+410: Merienda
+414: Hidratación
+418: Aún no tienes un plan nutricional asignado.
+422: Editar Mi Perfil
+426: Posición
+430: Altura (cm)
+434: Peso (kg)
+439: Cancelar
+443: Guardar
+447: Editar Información de Staff
+451: Descripción / Biografía Profesional
+461: 150 caracteres restantes
+465: Link Facebook
+469: Link Instagram
+479: Guardar Cambios
+484: Editar Usuario
+488: Descripción / Biografía
+498: Guardar cambios
+502: Momentos destacados de nuestros partidos, entrenamientos y logros
+506: Todos
+510: Partidos
+514: Trofeos
+518: Equipos
+522: Sin descripción
+527: Eliminar imagen
+531: No hay imágenes en la galería aún.
+536: Gestión de Cuentas
+540: Administra entrenadores y jugadores desde un solo lugar.
+544: ¿Eliminar este entrenador?
+548: Horarios del entrenador
+553: Días
+557: Lunes, Miércoles, Viernes
+562: Horario
+566: 18:00 - 20:00
+571: Precio
+575: $120
+579: Entrenamiento para nivel intermedio, técnica y fuerza
+583: Agregar horario
+587: Entrenador
+592: ¿Eliminar este horario?
+602: Formando los mejores atletas con pasión, disciplina y excelencia
+606: Únete a la Academia
+610: ¿Quiénes Somos?
+620: Metodología Profesional
+624: Entrenamientos basados en técnicas modernas y adaptadas a cada nivel
+628: Competencias Oficiales
+632: Participamos en torneos locales y nacionales
+636: Formación Integral
+640: Desarrollo deportivo, nutricional y personal
+644: Últimos Momentos
+648: Ver Galería Completa
+652: Nuestros Logros
+656: Nuestros Valores
+660: Respeto
+664: Disciplina
+668: Trabajo en Equipo
+672: Superación
+677: Iniciar Sesión
+681: Correo Electrónico
+685: ¿No tienes cuenta?
+690: Regístrate aquí
+695: Gestión de Logros
+700: Registrar Nuevo Logro
+704: Título del Logro
+708: Ej: MVP del Torneo
+712: Detalla el logro obtenido...
+716: Asignar a Jugador
+720: Seleccione un jugador...
+724: Guardar Logro
+728: Muro de Éxitos
+733: Jugador:
+738: ¿Eliminar este logro?
+743: Gestión Nutricional
+748: Gestión de Nutrición
+752: Crear Nuevo Plan Alimenticio
+756: Título del Plan
+760: Ej: Dieta para Competencia
+764: Meriendas / Hidratación
+768: Guardar Plan Nutricional
+772: Planes Disponibles
+776: Desayuno:
+780: Almuerzo:
+784: Cena:
+788: Otros/Merienda:
+793: ¿Eliminar este plan nutricional?
+798: Eliminar Plan
+802: No hay planes nutricionales registrados.
+806: Nuestro Staff Académico
+810: Conoce a los profesionales detrás del éxito de nuestra academia.
+820: Horarios disponibles
+824: Solicitar unirse
+828: Editar Perfil de Staff
+832: No hay miembros del staff registrados actualmente.
+837: Registro de Jugador
+841: Fecha de Nacimiento
+845: La edad se calculará automáticamente
+849: Género
+853: Seleccione...
+857: Masculino
+861: Femenino
+865: Otro
+869: Cédula de Identidad
+873: Únicamente números
+877: Usaremos este email para iniciar sesión
+893: ¿Ya tienes cuenta?
+898: Inicia Sesión aquí
+902: Panel de Reportes y Estadísticas
+912: Jugadores Activos (hace 5 minutos)
+916: Entrenadores Activos (hace 5 minutos)
+920: Total Descargas de PDF
+924: Usuarios en Tiempo Real
+928: Control de Recomendaciones
+933: Registro de Descargas
+937: Sesiones Activas
+941: Usuarios que han interactuado con la plataforma en los últimos 5 minutos.
+945: Rol
+949: Estado
+953: Última Actividad
+957: Activo
+961: Asignación de Rutinas y Nutrición
+972: Jugador
+976: Recomendación Rutinas
+980: Recomendación Nutrición
+984: Ir a Asignar
+988: Historial de Descargas Recientes
+998: Rango:
+1002: Mes
+1006: Semana
+1010: Hora
+1014: Filtrar
+1019: Eliminar historial (rango)
+1024: Fecha de Descarga
+1028: Aún no se registran descargas en el sistema.
+1033: Ranking de Descargas
+1037: Jugadores con mayor interacción y descargas en la plataforma.
+1042: descargas
+1046: Solicitud para unirse al equipo
+1050: Entrenador profesional disponible para nuevas incorporaciones.
+1054: Email:
+1058: Volver al staff
+1062: Horarios y precios
+1066: Formulario de solicitud
+1070: Nombre completo
+1074: Correo electrónico
+1078: Teléfono / WhatsApp
+1082: Mensaje
+1086: Cuéntale por qué quieres unirte y qué esperas aportar al equipo.
+1090: Enviar solicitud
+1094: Consejos antes de enviar
+1098: Incluye tu experiencia en voley y disponibilidad horaria.
+1102: Especifica tu nivel actual y metas de entrenamiento.
+1106: Usa un correo válido para que el entrenador pueda contactarte.
+1110: Solicitudes para unirse al equipo
+1114: Solicitante
+1118: Telefono
+1122: Aceptar
+1126: Rechazar
+1130: Sin acciones
+1134: No hay solicitudes de equipo en este momento.
+1138: Acceso denegado
+1142: No tienes permiso para ver esta página.
+1147: Volver al inicio
+1151: Página no encontrada
+1155: La página que buscas no existe o fue movida.
+1159: Error del servidor
+1163: Ocurrió un problema inesperado. Intenta de nuevo más tarde.
+1167: d
+1172: {editor}: Editing failed
+1177: {editor}: Editing failed: {e}
+1183: Windows error: {error}
+1187: deprecated
+1191: Options
+1196: Got unexpected extra argument ({args})
+1203: DeprecationWarning: The command {name!r} is deprecated.{extra_message}
+1207: Aborted!
+1211: Commands
+1215: Missing command.
+1219: Value must be an iterable.
+1224: Takes {nargs} values but 1 was given.
+1238: Name '{name}' defined twice
+1243: Boolean option {decl!r} cannot use the same flag for true/false.
+1248: Could not determine name for option with declarations {decls!r}
+1260: env var: {var}
+1265: default: {default}
+1269: required
+1273: (dynamic)
+1278: Arguments take exactly one parameter declaration, got {length}: {decls}.
+1282: Do you want to continue?
+1286: Confirm the action without prompting.
+1291: %(prog)s, version %(version)s
+1295: Show the version and exit.
+1299: Show this message and exit.
+1304: Did you mean {possibility}?
+1313: Error: {message}
+1318: Try '{command} {option}' for help.
+1323: Invalid value: {message}
+1328: Invalid value for {param_hint}: {message}
+1332: Missing argument
+1336: Missing option
+1340: Missing parameter
+1345: Missing {param_type}
+1350: Missing parameter: {param_name}
+1355: No such option {name!r}.
+1360: No such command {name!r}.
+1364: unknown error
+1369: Could not open file {filename!r}: {message}
+1373: Usage:
+1378: Invalid start character for option ({option})
+1383: Argument {name!r} takes {nargs} values.
+1388: Option {name!r} does not take a value.
+1393: Option {name!r} requires an argument.
+1399: Shell completion is not supported for Bash versions older than 4.4.
+1403: Couldn't detect Bash version, shell completion is not supported.
+1407: Repeat for confirmation
+1411: Error: The two entered values do not match.
+1415: Error: invalid input
+1421: Unknown color {colour!r}
+1425: Press any key to continue...
+1437: {value!r} is not {choice}.
+1444: Choice({choices})
+1449: {value!r} does not match the format {format}.
+1456: {value!r} is not a valid {number_type}.
+1461: {value} is not in the range {range}.
+1466: {value!r} is not a valid boolean. Recognized values: {states}
+1471: {value!r} is not a valid UUID.
+1476: file
+1480: directory
+1484: path
+1489: {name} {filename!r} does not exist.
+1494: {name} {filename!r} is a file.
+1499: {name} {filename!r} is a directory.
+1504: {name} {filename!r} is not readable.
+1509: {name} {filename!r} is not writable.
+1514: {name} {filename!r} is not executable.
+1519: {len_type} values are required, but {len_value} was given.
+1527: Unknown standard stream '{name}'
+1533: This field is required.
+1538: File does not have an approved extension: {extensions}
+1542: File does not have an approved extension.
+1547: File must be between {min_size} and {max_size} bytes.
+1552: Invalid field name '%s'.
+1557: Field must be equal to %(other_name)s.
+1562: Field must be at least %(min)d character long.
+1569: Field cannot be longer than %(max)d character.
+1576: Field must be exactly %(max)d character long.
+1583: Field must be between %(min)d and %(max)d characters long.
+1588: Number must be at least %(min)s.
+1593: Number must be at most %(max)s.
+1598: Number must be between %(min)s and %(max)s.
+1602: Invalid input.
+1606: Invalid email address.
+1610: Invalid IP address.
+1614: Invalid Mac address.
+1618: Invalid URL.
+1622: Invalid UUID.
+1627: Invalid value, must be one of: %(values)s.
+1632: Invalid value, can't be any of: %(values)s.
+1636: This field cannot be edited.
+1640: This field is disabled and cannot have a value.
+1644: Invalid CSRF Token.
+1648: CSRF token missing.
+1652: CSRF failed.
+1656: CSRF token expired.
+1660: Invalid Choice: could not coerce.
+1665: Choices cannot be None.
+1669: Not a valid choice.
+1673: Invalid choice(s): one or more data inputs could not be coerced.
+1678: '%(value)s' is not a valid choice for this field.
+1684: Not a valid datetime value.
+1688: Not a valid date value.
+1692: Not a valid time value.
+1696: Not a valid week value.
+1701: Not a valid integer value.
+1705: Not a valid decimal value.
+1709: Not a valid float value.

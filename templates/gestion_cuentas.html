@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0"><i class="fas fa-user-lock"></i> {{ _('Gestión de Cuentas') }}</h3>
+                        <small class="text-muted">{{ _('Administra entrenadores y jugadores desde un solo lugar.') }}</small>
+                    </div>
+                    <a href="{{ url_for('trainer.dashboard_entrenador') }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> {{ _('Volver') }}
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">{{ _('Buscar') }}</label>
+                            <input type="text" name="search" value="{{ search or '' }}" class="form-control" placeholder="{{ _('Nombre, apellido o email') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{{ _('Rol') }}</label>
+                            <select name="rol" class="form-select">
+                                <option value="">{{ _('Todos') }}</option>
+                                <option value="entrenador" {% if rol_filter == 'entrenador' %}selected{% endif %}>{{ _('Entrenador') }}</option>
+                                <option value="jugador" {% if rol_filter == 'jugador' %}selected{% endif %}>{{ _('Jugador') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{{ _('Estado') }}</label>
+                            <select name="estado" class="form-select">
+                                <option value="">{{ _('Todos') }}</option>
+                                <option value="activo" {% if estado_filter == 'activo' %}selected{% endif %}>{{ _('Activo') }}</option>
+                                <option value="inactivo" {% if estado_filter == 'inactivo' %}selected{% endif %}>{{ _('Inactivo') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">{{ _('Filtrar') }}</button>
+                        </div>
+                    </form>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('Nombre') }}</th>
+                                    <th>{{ _('Email') }}</th>
+                                    <th>{{ _('Rol') }}</th>
+                                    <th>{{ _('Estado') }}</th>
+                                    <th>{{ _('Acciones') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios %}
+                                <tr>
+                                    <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                                    <td>{{ usuario.email }}</td>
+                                    <td class="text-capitalize">{{ usuario.rol }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if usuario.activo == 1 else 'secondary' }}">
+                                            {{ _('Activo') if usuario.activo == 1 else _('Inactivo') }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('trainer.editar_usuario', usuario_id=usuario.id) }}" class="btn btn-sm btn-outline-info" aria-label="{{ _('Editar usuario') }}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ usuario.id }}" aria-label="{{ _('Cambiar contraseña') }}">
+                                                <i class="fas fa-key"></i>
+                                            </button>
+                                            <form method="POST" action="{{ url_for('trainer.toggle_cuenta', usuario_id=usuario.id) }}" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-{{ 'secondary' if usuario.activo == 1 else 'success' }}" aria-label="{{ _('Cambiar estado de la cuenta') }}">
+                                                    <i class="fas fa-toggle-{{ 'on' if usuario.activo == 1 else 'off' }}"></i>
+                                                </button>
+                                            </form>
+                                            {% if usuario.rol == 'entrenador' and current_user.has_permission('modificar_entrenadores') and usuario.id != current_user.id %}
+                                            <form method="POST" action="{{ url_for('trainer.eliminar_entrenador', usuario_id=usuario.id) }}" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar este entrenador?') }}');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="{{ _('Eliminar entrenador') }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">{{ _('No se encontraron usuarios con esos criterios.') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for usuario in usuarios %}
+<div class="modal fade" id="resetPasswordModal{{ usuario.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Cambiar contraseña de') }} {{ usuario.nombre }} {{ usuario.apellido }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('trainer.cambiar_password_usuario', usuario_id=usuario.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Nueva contraseña') }}</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Confirmar contraseña') }}</label>
+                        <input type="password" name="confirm_password" class="form-control" required>
+                    </div>
+                    <small class="text-muted">{{ _('Asegúrate de usar entre 8 y 16 caracteres e incluir un símbolo especial.') }}</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancelar') }}</button>
+                    <button type="submit" class="btn btn-warning">{{ _('Actualizar contraseña') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

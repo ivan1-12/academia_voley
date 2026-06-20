@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Gestión de Entrenamientos') }} - Vieracademia{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-dumbbell"></i> {{ _('Gestión de Entrenamientos') }}
+                </h3>
+                <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalNuevoEntrenamiento">
+                    <i class="fas fa-plus"></i> {{ _('Nuevo Entrenamiento') }}
+                </button>
+            </div>
+            <div class="card-body">
+                    
+                    <!-- Filtros y búsqueda -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <input type="text" id="buscarEntrenamiento" class="form-control" placeholder="{{ _('🔍 Buscar entrenamiento...') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filtroDificultad" class="form-select">
+                                <option value="">{{ _('Todas las dificultades') }}</option>
+                                <option value="Principiante">{{ _('Principiante') }}</option>
+                                <option value="Intermedio">{{ _('Intermedio') }}</option>
+                                <option value="Avanzado">{{ _('Avanzado') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select id="filtroDuracion" class="form-select">
+                                <option value="">{{ _('Todas las duraciones') }}</option>
+                                <option value="0-30">{{ _('Menos de 30 min') }}</option>
+                                <option value="30-60">{{ _('30 - 60 min') }}</option>
+                                <option value="60+">{{ _('Más de 60 min') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-secondary w-100" onclick="limpiarFiltros()">
+                                <i class="fas fa-eraser"></i> {{ _('Limpiar') }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Panel de entrenamientos en tarjetas -->
+                    <div id="contenedorEntrenamientos" class="row">
+                        {% if entrenamientos %}
+                            {% for ent in entrenamientos %}
+                            <div class="col-md-6 col-lg-4 mb-4 tarjeta-entrenamiento" 
+                                 data-titulo="{{ ent.titulo|lower }}"
+                                 data-dificultad="{{ ent.dificultad }}"
+                                 data-duracion="{{ ent.duracion_minutos }}"
+                                 data-imagen="{{ ent.imagen_url or '' }}">
+                                <div class="card h-100 shadow-sm hover-card">
+                                    <div class="card-header bg-gradient-{{ get_color_dificultad(ent.dificultad) }} text-white">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">{{ ent.titulo }}</h5>
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-clock"></i> {{ ent.duracion_minutos }} min
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if ent.imagen_url %}
+                                        <div class="mb-3 text-center">
+                                            <img src="{{ ent.imagen_url }}" class="img-fluid rounded" alt="Imagen de {{ ent.titulo }}" style="max-height: 180px; object-fit: cover; width: 100%;">
+                                        </div>
+                                        {% endif %}
+                                        <p class="card-text">
+                                            <strong><i class="fas fa-align-left"></i> {{ _('Descripción:') }}</strong><br>
+                                            {{ ent.descripcion|truncate(100) }}
+                                        </p>
+                                        <p class="card-text">
+                                            <strong><i class="fas fa-list-check"></i> {{ _('Ejercicios:') }}</strong><br>
+                                            <small class="text-muted">{{ ent.ejercicios|truncate(80) }}</small>
+                                        </p>
+                                        <div class="mb-2">
+                                            <span class="badge bg-{{ get_badge_dificultad(ent.dificultad) }}">
+                                                <i class="fas fa-chart-line"></i> {{ ent.dificultad }}
+                                            </span>
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-calendar"></i> {{ ent.fecha_creacion.strftime('%d/%m/%Y') if ent.fecha_creacion else _('Reciente') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-transparent">
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="verDetalle(this.closest('.tarjeta-entrenamiento'))">
+                                                <i class="fas fa-eye"></i> {{ _('Ver') }}
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success flex-grow-1" onclick="seleccionarParaAsignar({{ ent.id }}, '{{ ent.titulo }}')" data-bs-toggle="modal" data-bs-target="#modalAsignarEntrenamiento">
+                                                <i class="fas fa-user-plus"></i> {{ _('Asignar') }}
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="eliminarEntrenamiento({{ ent.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-12">
+                                <div class="alert alert-info text-center">
+                                    <i class="fas fa-info-circle"></i> {{ _('No hay entrenamientos registrados. Haz clic en "Nuevo Entrenamiento" para crear el primero.') }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Crear Nuevo Entrenamiento -->
+<div class="modal fade" id="modalNuevoEntrenamiento" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-plus-circle"></i> {{ _('Crear Nuevo Entrenamiento') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="titulo" class="form-label">{{ _('Título del entrenamiento *') }}</label>
+                            <input type="text" class="form-control" id="titulo" name="titulo" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="duracion" class="form-label">{{ _('Duración (minutos) *') }}</label>
+                            <input type="number" class="form-control" id="duracion" name="duracion" min="1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="dificultad" class="form-label">{{ _('Dificultad *') }}</label>
+                            <select class="form-select" id="dificultad" name="dificultad" required>
+                                <option value="Principiante">{{ _('⭐ Principiante') }}</option>
+                                <option value="Intermedio">{{ _('⭐⭐ Intermedio') }}</option>
+                                <option value="Avanzado">{{ _('⭐⭐⭐ Avanzado') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="imagen" class="form-label">{{ _('Imagen explicativa') }}</label>
+                            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*">
+                            <small class="text-muted">{{ _('Sube una imagen para ayudar a los jugadores a entender la rutina.') }}</small>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="descripcion" class="form-label">{{ _('Descripción *') }}</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="ejercicios" class="form-label">{{ _('Ejercicios detallados *') }}</label>
+                            <textarea class="form-control" id="ejercicios" name="ejercicios" rows="5" 
+                                placeholder="{{ _('Ejemplo:\n1️⃣ Calentamiento (10 min): Trote suave + movilidad articular\n2️⃣ Parte principal (30 min):\n   - Ejercicio 1: Sentadillas (3x15)\n   - Ejercicio 2: Flexiones (3x12)\n   - Ejercicio 3: Plancha (3x30 seg)\n3️⃣ Vuelta a la calma (5 min): Estiramientos') }}" required></textarea>
+                            <small class="text-muted">{{ _('Describe cada ejercicio con detalle, incluyendo series, repeticiones y tiempos.') }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancelar') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Crear Entrenamiento') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Ver Detalle -->
+<div class="modal fade" id="modalDetalle" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-clipboard-list"></i> {{ _('Detalle del Entrenamiento') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="detalleTitulo"></h4>
+                <hr>
+                <p><strong>📝 {{ _('Descripción:') }}</strong></p>
+                <p id="detalleDescripcion"></p>
+                <p><strong>📋 {{ _('Ejercicios:') }}</strong></p>
+                <div id="detalleEjercicios" style="white-space: pre-line;"></div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>⏱️ {{ _('Duración:') }}</strong> <span id="detalleDuracion"></span> {{ _('minutos') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>📊 {{ _('Dificultad:') }}</strong> <span id="detalleDificultad"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cerrar') }}</button>
+                <button type="button" class="btn btn-success" id="btnAsignarDesdeDetalle" onclick="asignarDesdeDetalle()">{{ _('Asignar a Jugador') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Asignar a Jugador -->
+<div class="modal fade" id="modalAsignarEntrenamiento" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-user-check"></i> {{ _('Asignar Entrenamiento') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('trainer.asignar_entrenamiento') }}">
+                <div class="modal-body">
+                    <p>{{ _('Asignar entrenamiento:') }} <strong id="asignarTitulo"></strong></p>
+                    <input type="hidden" id="asignarEntrenamientoId" name="entrenamiento_id">
+                    <div class="mb-3">
+                        <label for="jugador_id" class="form-label">{{ _('Seleccionar Jugador') }}</label>
+                        <select class="form-select" id="jugador_id" name="jugador_id" required>
+                            <option value="">{{ _('-- Seleccionar jugador --') }}</option>
+                            <!-- Los jugadores se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancelar') }}</button>
+                    <button type="submit" class="btn btn-success">{{ _('Asignar') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+}
+.bg-gradient-principiante {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+.bg-gradient-intermedio {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+.bg-gradient-avanzado {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+</style>
+
+<script>
+// Variables globales para almacenar el entrenamiento seleccionado
+let entrenamientoSeleccionado = null;
+
+// Filtros en tiempo real
+const buscarEntrenamiento = document.getElementById('buscarEntrenamiento');
+    const filtroDificultad = document.getElementById('filtroDificultad');
+    const filtroDuracion = document.getElementById('filtroDuracion');
+    buscarEntrenamiento.addEventListener('keyup', filtrarTarjetas);
+    filtroDificultad.addEventListener('change', filtrarTarjetas);
+    filtroDuracion.addEventListener('change', filtrarTarjetas);
+
+function filtrarTarjetas() {
+    const busqueda = document.getElementById('buscarEntrenamiento').value.toLowerCase();
+    const dificultad = document.getElementById('filtroDificultad').value;
+    const duracion = document.getElementById('filtroDuracion').value;
+    
+    const tarjetas = document.querySelectorAll('.tarjeta-entrenamiento');
+    
+    tarjetas.forEach(tarjeta => {
+        const titulo = tarjeta.dataset.titulo;
+        const dificultadTarjeta = tarjeta.dataset.dificultad;
+        const duracionTarjeta = parseInt(tarjeta.dataset.duracion);
+        
+        let mostrar = true;
+        
+        // Filtro búsqueda
+        if (busqueda && !titulo.includes(busqueda)) {
+            mostrar = false;
+        }
+        
+        // Filtro dificultad
+        if (dificultad && dificultadTarjeta !== dificultad) {
+            mostrar = false;
+        }
+        
+        // Filtro duración
+        if (duracion) {
+            if (duracion === '0-30' && (duracionTarjeta < 0 || duracionTarjeta > 30)) mostrar = false;
+            else if (duracion === '30-60' && (duracionTarjeta < 30 || duracionTarjeta > 60)) mostrar = false;
+            else if (duracion === '60+' && duracionTarjeta < 60) mostrar = false;
+        }
+        
+        tarjeta.style.display = mostrar ? '' : 'none';
+    });
+}
+
+function limpiarFiltros() {
+    document.getElementById('buscarEntrenamiento').value = '';
+    document.getElementById('filtroDificultad').value = '';
+    document.getElementById('filtroDuracion').value = '';
+    filtrarTarjetas();
+}
+
+function verDetalle(card) {
+    const titulo = card.dataset.titulo || '';
+    const descripcion = card.querySelector('.card-text strong + br') ? card.querySelector('.card-text').innerText : '';
+    const ejercicios = card.dataset.ejercicios || '';
+    const duracion = card.dataset.duracion || '';
+    const dificultad = card.dataset.dificultad || '';
+    const imagen = card.dataset.imagen || '';
+
+    entrenamientoSeleccionado = { id: card.dataset.id, titulo };
+    document.getElementById('detalleTitulo').innerHTML = '<i class="fas fa-dumbbell"></i> ' + titulo;
+    document.getElementById('detalleDescripcion').innerText = descripcion;
+    document.getElementById('detalleEjercicios').innerHTML = ejercicios.replace(/\n/g, '<br>');
+    document.getElementById('detalleDuracion').innerText = duracion;
+    document.getElementById('detalleDificultad').innerHTML = obtenerEstrellasDificultad(dificultad);
+
+    const detalleImagen = document.getElementById('detalleImagen');
+    const detalleImagenSrc = document.getElementById('detalleImagenSrc');
+    if (imagen) {
+        detalleImagen.style.display = 'block';
+        detalleImagenSrc.src = imagen;
+    } else {
+        detalleImagen.style.display = 'none';
+        detalleImagenSrc.src = '';
+    }
+    
+    new bootstrap.Modal(document.getElementById('modalDetalle')).show();
+}
+
+function obtenerEstrellasDificultad(dificultad) {
+    const dificultadPrincipiante = "{{ _('⭐ Principiante') }}";
+    const dificultadIntermedio = "{{ _('⭐⭐ Intermedio') }}";
+    const dificultadAvanzado = "{{ _('⭐⭐⭐ Avanzado') }}";
+    if (dificultad === 'Principiante') return dificultadPrincipiante;
+    if (dificultad === 'Intermedio') return dificultadIntermedio;
+    if (dificultad === 'Avanzado') return dificultadAvanzado;
+    return dificultad;
+}
+
+function seleccionarParaAsignar(id, titulo) {
+    document.getElementById('asignarTitulo').innerText = titulo;
+    document.getElementById('asignarEntrenamientoId').value = id;
+    cargarJugadores();
+}
+
+function asignarDesdeDetalle() {
+    if (entrenamientoSeleccionado) {
+        document.getElementById('modalDetalle').style.display = 'none';
+        seleccionarParaAsignar(entrenamientoSeleccionado.id, entrenamientoSeleccionado.titulo);
+        new bootstrap.Modal(document.getElementById('modalAsignarEntrenamiento')).show();
+    }
+}
+
+function cargarJugadores() {
+    fetch('/api/jugadores')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('jugador_id');
+            select.innerHTML = '<option value="">{{ _('-- Seleccionar jugador --') }}</option>';
+            data.jugadores.forEach(jugador => {
+                select.innerHTML += `<option value="${jugador.id}">${jugador.nombre} ${jugador.apellido}</option>`;
+            });
+        })
+        .catch(error => console.error('{{ _('Error cargando jugadores:') }}', error));
+}
+
+function eliminarEntrenamiento(id) {
+    if (confirm('{{ _('¿Estás seguro de eliminar este entrenamiento? Esta acción no se puede deshacer.') }}')) {
+        const csrfToken = '{{ csrf_token() }}';
+        fetch(`/eliminar_entrenamiento/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('{{ _('Error al eliminar el entrenamiento') }}');
+                }
+            })
+            .catch(error => {
+                console.error('{{ _('Error:') }}', error);
+                alert('{{ _('Error al eliminar el entrenamiento') }}');
+            });
+    }
+}
+</script>
+    </div> <!-- card-body -->
+</div> <!-- card -->
+</div> <!-- col-12 -->
+</div> <!-- row -->
+{% endblock %}

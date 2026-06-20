@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container text-center">
+        <div class="brand-logo-circle brand-logo-circle--lg mb-3">
+            <img src="{{ brand_logo_url }}" alt="{{ _('Academia de Voleybol') }}">
+        </div>
+        <h1 class="display-4">{{ _('Academia de Voleybol') }}</h1>
+        <h2 class="display-6">{{ _('Juventud Global Sports') }}</h2>
+        <p class="lead mt-3">{{ _('Formando los mejores atletas con pasión, disciplina y excelencia') }}</p>
+        {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('auth.registro') }}" class="btn btn-light btn-lg mt-3">
+                <i class="fas fa-user-plus"></i> {{ _('Únete a la Academia') }}
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Información de la Academia -->
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h2><i class="fas fa-info-circle"></i> {{ _('¿Quiénes Somos?') }}</h2>
+            <p class="lead">{{ _('Somos una academia comprometida con el desarrollo integral de jóvenes talentos en el voleybol') }}</p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-chalkboard-user fa-3x text-primary"></i>
+            <h4 class="mt-3">{{ _('Metodología Profesional') }}</h4>
+            <p>{{ _('Entrenamientos basados en técnicas modernas y adaptadas a cada nivel') }}</p>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-trophy fa-3x text-warning"></i>
+            <h4 class="mt-3">{{ _('Competencias Oficiales') }}</h4>
+            <p>{{ _('Participamos en torneos locales y nacionales') }}</p>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <i class="fas fa-heart fa-3x text-danger"></i>
+            <h4 class="mt-3">{{ _('Formación Integral') }}</h4>
+            <p>{{ _('Desarrollo deportivo, nutricional y personal') }}</p>
+        </div>
+    </div>
+
+    <!-- Últimas Fotos -->
+    {% if galeria %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4"><i class="fas fa-images"></i> {{ _('Últimos Momentos') }}</h3>
+            <div class="row">
+                {% for foto in galeria[:3] %}
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <img src="{{ foto.imagen_url or 'https://via.placeholder.com/400x300' }}" 
+                             class="card-img-top" alt="{{ foto.titulo }}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ foto.titulo }}</h6>
+                            <small class="text-muted">{{ foto.fecha_subida.strftime('%d/%m/%Y') }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+                 <a href="{{ url_for('public.galeria_publica') }}" class="btn btn-primary">{{ _('Ver Galería Completa') }}</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Logros de la Academia -->
+    {% if logros %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4"><i class="fas fa-trophy text-warning"></i> {{ _('Nuestros Logros') }}</h3>
+            <div class="row">
+                {% for logro in logros %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ logro.titulo }}</h5>
+                            <p class="card-text text-muted">{{ logro.descripcion or '' }}</p>
+                            {% if logro.fecha_logro %}
+                            <small class="text-primary">
+                                <i class="fas fa-calendar"></i>
+                                {{ logro.fecha_logro.strftime('%d/%m/%Y') if logro.fecha_logro.strftime is defined else logro.fecha_logro }}
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Valores -->
+    <div class="row bg-light py-5 rounded">
+        <div class="col-12 text-center mb-4">
+            <h3><i class="fas fa-star"></i> {{ _('Nuestros Valores') }}</h3>
+        </div>
+        <div class="col-md-3 text-center">
+            <i class="fas fa-handshake fa-2x text-success"></i>
+            <p class="mt-2">{{ _('Respeto') }}</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <i class="fas fa-fist-raised fa-2x text-danger"></i>
+            <p class="mt-2">{{ _('Disciplina') }}</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <i class="fas fa-users fa-2x text-primary"></i>
+            <p class="mt-2">{{ _('Trabajo en Equipo') }}</p>
+        </div>
+        <div class="col-md-3 text-center">
+            <i class="fas fa-chart-line fa-2x text-info"></i>
+            <p class="mt-2">{{ _('Superación') }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

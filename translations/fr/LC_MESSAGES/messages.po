@@ -1,0 +1,2243 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Academia Voley\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-06-20 10:27-0400\n"
+"PO-Revision-Date: 2026-06-19 00:00+0000\n"
+"Last-Translator: Auto Generated\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app.py:136
+msgid "Español"
+msgstr "Espagnol"
+
+#: app.py:137
+msgid "English"
+msgstr "Anglais"
+
+#: app.py:138
+msgid "Português"
+msgstr "portugais"
+
+#: app.py:139
+msgid "Français"
+msgstr "Français"
+
+#: extensions.py:14
+msgid "Por favor inicia sesión para acceder a esta página"
+msgstr "Veuillez vous connecter pour accéder à cette page"
+
+#: models.py:157 models.py:175
+msgid "Por favor inicia sesión para acceder a esta sección."
+msgstr "Veuillez vous connecter pour accéder à cette section."
+
+#: validators.py:29
+msgid "La contraseña no puede estar vacía."
+msgstr "Le mot de passe ne peut pas être vide."
+
+#: templates/registro.html:167 validators.py:33
+msgid "La contraseña debe tener obligatoriamente entre 8 y 16 caracteres."
+msgstr "Le mot de passe doit comporter entre 8 et 16 caractères."
+
+#: validators.py:43
+msgid ""
+"La contraseña debe incluir al menos un carácter especial (ej. @, #, $, %, "
+"etc.)."
+msgstr ""
+"Le mot de passe doit inclure au moins un caractère spécial (par exemple @, "
+"#, $, %, etc.)."
+
+#: routes/auth.py:64 validators.py:91
+msgid "El correo electrónico es obligatorio."
+msgstr "Un e-mail est requis."
+
+#: routes/auth.py:66 routes/trainer.py:221 validators.py:94
+msgid "El formato del correo electrónico no es válido."
+msgstr "Le format de l'e-mail n'est pas valide."
+
+#: validators.py:101
+msgid "El correo electrónico ya está registrado."
+msgstr "L'email est déjà enregistré."
+
+#: validators.py:111
+msgid ""
+"El dominio del correo electrónico no parece existir o no tiene registros DNS"
+" activos."
+msgstr ""
+"Le domaine de messagerie ne semble pas exister ou n'a aucun enregistrement "
+"DNS actif."
+
+#: validators.py:113
+msgid "Email válido y disponible (Verificación online completada)."
+msgstr "Email valide et disponible (Vérification en ligne terminée)."
+
+#: validators.py:118
+msgid ""
+"Email con formato válido. Nota: Sin conexión a internet, se omitió la "
+"verificación de dominio en línea."
+msgstr ""
+"E-mail avec un format valide. Remarque : Sans connexion Internet, la "
+"vérification du domaine en ligne a été ignorée."
+
+#: routes/auth.py:47
+msgid ""
+"El nombre y el apellido deben contener letras, espacios, guiones o "
+"apóstrofes."
+msgstr ""
+"Le prénom et le nom doivent contenir des lettres, des espaces, des traits "
+"d'union ou des apostrophes."
+
+#: routes/auth.py:51
+msgid "El campo Cédula debe contener única y estrictamente números."
+msgstr "Le champ ID doit contenir uniquement et strictement des chiffres."
+
+#: routes/auth.py:57 routes/trainer.py:304 routes/trainer.py:650
+#: templates/registro.html:160
+msgid "Las contraseñas no coinciden."
+msgstr "Les mots de passe ne correspondent pas."
+
+#: routes/auth.py:59
+msgid "La fecha de nacimiento es obligatoria."
+msgstr "La date de naissance est obligatoire."
+
+#: routes/auth.py:61
+msgid "Seleccione un género."
+msgstr "Sélectionnez un genre."
+
+#: routes/auth.py:106
+msgid "El correo electrónico ya está registrado. Por favor inicia sesión."
+msgstr "L'email est déjà enregistré. Veuillez vous connecter."
+
+#: routes/auth.py:137
+msgid ""
+"Tu solicitud aún está pendiente. Espera a que el entrenador la revise y "
+"acepte."
+msgstr ""
+"Votre candidature est toujours en attente. Attendez que l'entraîneur "
+"l'examine et l'accepte."
+
+#: routes/auth.py:152
+msgid ""
+"Tu solicitud ya fue aceptada. Inicia sesión con tu correo para completar tu "
+"perfil."
+msgstr ""
+"Votre demande a déjà été acceptée. Connectez-vous avec votre email pour "
+"compléter votre profil."
+
+#: routes/auth.py:158
+msgid "Selecciona un entrenador para solicitar la creación de tu perfil."
+msgstr "Sélectionnez un coach pour demander la création de votre profil."
+
+#: routes/auth.py:179
+msgid ""
+"Solicitud enviada. Fue colocada en el apartado Jugadores de la academia."
+msgstr "Demande envoyée. Elle a été placée dans la section Academy Players."
+
+#: routes/auth.py:222
+msgid ""
+"Perfil creado correctamente. Ahora puedes iniciar sesión con el mismo "
+"correo."
+msgstr ""
+"Profil créé avec succès. Vous pouvez désormais vous connecter avec le même "
+"e-mail."
+
+#: routes/auth.py:229
+msgid "Selecciona un entrenador para tu solicitud."
+msgstr "Sélectionnez un coach pour votre candidature."
+
+#: routes/auth.py:248
+msgid ""
+"Tu solicitud fue enviada correctamente. Cuando el entrenador la acepte, "
+"podrás crear tu perfil con el mismo correo."
+msgstr ""
+"Votre demande a été envoyée avec succès. Lorsque le coach l'accepte, vous "
+"pouvez créer votre profil avec le même email."
+
+#: routes/auth.py:256
+msgid "Error al registrarse. Verifica los datos o contacta al administrador."
+msgstr ""
+"Erreur d'enregistrement. Vérifiez les données ou contactez l'administrateur."
+
+#: routes/auth.py:278 routes/auth.py:286
+msgid "Email o contraseña incorrectos"
+msgstr "Email ou mot de passe incorrect"
+
+#: routes/auth.py:282
+msgid "La cuenta está inactiva. Contacta al administrador."
+msgstr "Le compte est inactif. Contactez l'administrateur."
+
+#: routes/auth.py:337
+msgid "Ocurrió un error al iniciar sesión. Intenta nuevamente."
+msgstr "Une erreur s'est produite lors de la connexion. Réessayez."
+
+#: routes/auth.py:348
+msgid "Has cerrado sesión exitosamente"
+msgstr "Vous vous êtes déconnecté avec succès"
+
+#: routes/auth.py:361
+msgid "Las contraseñas nuevas no coinciden."
+msgstr "Les nouveaux mots de passe ne correspondent pas."
+
+#: routes/auth.py:377
+msgid "La contraseña actual no es correcta."
+msgstr "Le mot de passe actuel n'est pas correct."
+
+#: routes/auth.py:386 routes/trainer.py:672
+msgid "Contraseña actualizada correctamente."
+msgstr "Mot de passe mis à jour avec succès."
+
+#: routes/auth.py:393
+msgid "No se pudo actualizar la contraseña."
+msgstr "Impossible de mettre à jour le mot de passe."
+
+#: routes/player.py:79
+msgid "¡Felicidades! Has completado el entrenamiento"
+msgstr "Félicitations! Vous avez terminé la formation"
+
+#: routes/player.py:83
+msgid "Error al completar entrenamiento"
+msgstr "Erreur lors de la fin de la formation"
+
+#: routes/player.py:105
+msgid "Debe especificar el jugador a editar."
+msgstr "Vous devez spécifier le joueur à modifier."
+
+#: routes/player.py:117
+msgid "Altura o peso inválidos. Por favor use números."
+msgstr "Taille ou poids invalide. Veuillez utiliser des chiffres."
+
+#: routes/player.py:145
+msgid "Perfil actualizado correctamente"
+msgstr "Profil mis à jour avec succès"
+
+#: routes/player.py:149
+msgid "Error al actualizar perfil"
+msgstr "Erreur lors de la mise à jour du profil"
+
+#: routes/player.py:213
+msgid "Academia Juventud Global Sport"
+msgstr "Académie mondiale de la jeunesse sportive"
+
+#: routes/player.py:222
+msgid "Plan de Entrenamiento y Nutricion"
+msgstr "Plan de formation et de nutrition"
+
+#: routes/player.py:259
+msgid "  Mis Entrenamientos Asignados"
+msgstr "Mes entraînements assignés"
+
+#: routes/player.py:297
+msgid "descripcion"
+msgstr "description"
+
+#: routes/player.py:302
+msgid "Ejercicios:"
+msgstr "Exercices :"
+
+#: routes/player.py:319
+msgid "No tienes entrenamientos asignados aun."
+msgstr "Vous n'avez pas encore de formation assignée."
+
+#: routes/player.py:332
+msgid "  Mi Plan Nutricional"
+msgstr "  Mon plan nutritionnel"
+
+#: routes/player.py:341
+msgid "Plan Nutricional"
+msgstr "Plan nutritionnel"
+
+#: routes/player.py:348 templates/dashboard_jugador.html:105
+#: templates/nutricion.html:28
+msgid "Desayuno"
+msgstr "Petit-déjeuner"
+
+#: routes/player.py:349 templates/dashboard_jugador.html:113
+#: templates/nutricion.html:32
+msgid "Almuerzo"
+msgstr "Déjeuner"
+
+#: routes/player.py:350 templates/dashboard_jugador.html:121
+#: templates/nutricion.html:36
+msgid "Cena"
+msgstr "Dîner"
+
+#: routes/player.py:351 templates/dashboard_jugador.html:129
+msgid "Merienda"
+msgstr "Collation"
+
+#: routes/player.py:352
+msgid "Hidratacion"
+msgstr "Hydratation"
+
+#: routes/player.py:365
+msgid "  No especificado"
+msgstr "non spécifié"
+
+#: routes/player.py:372
+msgid "No tienes un plan nutricional asignado aun."
+msgstr "Vous n'avez pas encore de plan nutritionnel attribué."
+
+#: routes/player.py:384
+msgid "Academia Juventud Global Sport - Documento generado automaticamente"
+msgstr "Global Sport Youth Academy - Document généré automatiquement"
+
+#: routes/public.py:64 routes/trainer.py:1293
+msgid "Entrenador no encontrado."
+msgstr "Entraîneur introuvable."
+
+#: routes/public.py:82
+msgid "El nombre es obligatorio."
+msgstr "Le nom est obligatoire."
+
+#: routes/public.py:84
+msgid "El email es obligatorio."
+msgstr "Le courrier électronique est obligatoire."
+
+#: routes/public.py:86 routes/trainer.py:302 routes/trainer.py:564
+msgid "El correo electrónico no tiene un formato válido."
+msgstr "L'e-mail n'est pas dans un format valide."
+
+#: routes/public.py:88
+msgid "Describe brevemente por qué quieres unirte al equipo."
+msgstr "Décrivez brièvement pourquoi vous souhaitez rejoindre l'équipe."
+
+#: routes/public.py:119
+msgid ""
+"Solicitud enviada correctamente. El entrenador revisará tu petición pronto."
+msgstr ""
+"Demande envoyée avec succès. Le coach examinera votre demande prochainement."
+
+#: routes/public.py:126
+msgid "Error al enviar la solicitud. Intenta nuevamente."
+msgstr "Erreur lors de l'envoi de la demande. Essayer à nouveau."
+
+#: routes/trainer.py:135
+msgid "Jugador eliminado correctamente"
+msgstr "Joueur éliminé avec succès"
+
+#: routes/trainer.py:139
+msgid "Error al eliminar jugador"
+msgstr "Échec de la suppression du joueur"
+
+#: routes/trainer.py:169
+msgid "Imagen eliminada correctamente"
+msgstr "Image supprimée avec succès"
+
+#: routes/trainer.py:173
+msgid "Error al eliminar imagen"
+msgstr "Erreur lors de la suppression de l'image"
+
+#: routes/trainer.py:188
+msgid "No estás autorizado a editar el perfil de otro entrenador."
+msgstr "Vous n'êtes pas autorisé à modifier le profil d'un autre formateur."
+
+#: routes/trainer.py:208 routes/trainer.py:562
+msgid "Nombre y apellido son obligatorios."
+msgstr "Le prénom et le nom sont obligatoires."
+
+#: routes/trainer.py:212 templates/registro.html:145
+msgid "El nombre y el apellido deben contener únicamente letras y espacios."
+msgstr ""
+"Le prénom et le nom doivent contenir uniquement des lettres et des espaces."
+
+#: routes/trainer.py:217
+msgid ""
+"La descripción o biografía profesional no debe superar los 150 caracteres."
+msgstr ""
+"La description professionnelle ou la biographie ne doit pas dépasser 150 "
+"caractères."
+
+#: routes/trainer.py:248
+msgid "Información del staff actualizada"
+msgstr "Informations mises à jour sur le personnel"
+
+#: routes/trainer.py:253
+msgid "Error al actualizar información"
+msgstr "Erreur lors de la mise à jour des informations"
+
+#: routes/trainer.py:267
+msgid "Staff no encontrado"
+msgstr "Personnel introuvable"
+
+#: routes/trainer.py:281
+msgid "La creación de entrenadores está deshabilitada en la configuración."
+msgstr "La création de coach est désactivée dans les paramètres."
+
+#: routes/trainer.py:299
+msgid ""
+"Nombre y apellido deben contener letras, espacios, guiones o apóstrofes."
+msgstr ""
+"Le prénom et le nom doivent contenir des lettres, des espaces, des traits "
+"d’union ou des apostrophes."
+
+#: routes/trainer.py:309
+msgid "La descripción no debe superar los 150 caracteres."
+msgstr "La description ne doit pas dépasser 150 caractères."
+
+#: routes/trainer.py:343
+msgid "Ese correo ya está registrado."
+msgstr "Cet e-mail est déjà enregistré."
+
+#: routes/trainer.py:377
+msgid "Entrenador agregado correctamente al staff."
+msgstr "Formateur ajouté avec succès au personnel."
+
+#: routes/trainer.py:383
+msgid ""
+"No se pudo crear el entrenador porque falta el rol entrenador en la base de "
+"datos. Contacta al administrador."
+msgstr ""
+"Le coach n'a pas pu être créé car le rôle de coach est absent de la base de "
+"données. Contactez l'administrateur."
+
+#: routes/trainer.py:387
+msgid "Error al agregar el entrenador. Intenta nuevamente."
+msgstr "Erreur lors de l'ajout de l'entraîneur. Essayer à nouveau."
+
+#: routes/trainer.py:433
+msgid ""
+"Ocurrió un error al cargar los usuarios. Intenta nuevamente o revisa los "
+"logs."
+msgstr ""
+"Une erreur s'est produite lors du chargement des utilisateurs. Réessayez ou "
+"vérifiez les journaux."
+
+#: routes/trainer.py:458 routes/trainer.py:591 routes/trainer.py:636
+#: routes/trainer.py:663
+msgid "Usuario no encontrado."
+msgstr "Utilisateur introuvable."
+
+#: routes/trainer.py:466
+msgid "Estado de la cuenta actualizado."
+msgstr "Statut du compte mis à jour."
+
+#: routes/trainer.py:470
+msgid "No se pudo actualizar el estado de la cuenta."
+msgstr "Impossible de mettre à jour le statut du compte."
+
+#: routes/trainer.py:486
+msgid "Entrada de descarga eliminada."
+msgstr "Entrée de téléchargement supprimée."
+
+#: routes/trainer.py:490
+msgid "No se pudo eliminar la entrada de descarga."
+msgstr "Impossible de supprimer l'entrée de téléchargement."
+
+#: routes/trainer.py:528
+msgid "Historial de descargas eliminado para el rango seleccionado."
+msgstr "Historique de téléchargement supprimé pour la plage sélectionnée."
+
+#: routes/trainer.py:532
+msgid "No se pudo eliminar el historial de descargas."
+msgstr "Impossible de supprimer l'historique des téléchargements."
+
+#: routes/trainer.py:581
+msgid "El correo electrónico ya está en uso por otro usuario."
+msgstr "L'e-mail est déjà utilisé par un autre utilisateur."
+
+#: routes/trainer.py:622
+msgid "Perfil actualizado correctamente."
+msgstr "Profil mis à jour avec succès."
+
+#: routes/trainer.py:627
+msgid "No se pudo actualizar el usuario. Intenta nuevamente."
+msgstr "Impossible de mettre à jour l'utilisateur. Essayer à nouveau."
+
+#: routes/trainer.py:676
+msgid "Error al actualizar la contraseña. Intenta nuevamente."
+msgstr "Erreur lors de la mise à jour du mot de passe. Essayer à nouveau."
+
+#: routes/trainer.py:704
+msgid "Todos los campos son obligatorios"
+msgstr "Tous les champs sont obligatoires"
+
+#: routes/trainer.py:718
+msgid "El archivo de imagen no tiene un formato compatible."
+msgstr "Le fichier image n'est pas dans un format pris en charge."
+
+#: routes/trainer.py:729
+msgid "Entrenamiento creado exitosamente"
+msgstr "Formation créée avec succès"
+
+#: routes/trainer.py:733
+msgid "Error al crear entrenamiento"
+msgstr "Erreur lors de la création de la formation"
+
+#: routes/trainer.py:761
+msgid "Este entrenamiento ya estaba asignado a ese jugador."
+msgstr "Cette formation était déjà assignée à ce joueur."
+
+#: routes/trainer.py:769
+msgid "Entrenamiento asignado exitosamente"
+msgstr "Formation attribuée avec succès"
+
+#: routes/trainer.py:773
+msgid "Error al asignar entrenamiento"
+msgstr "Erreur lors de l'attribution de la formation"
+
+#: routes/trainer.py:801
+msgid "Plan nutricional creado exitosamente"
+msgstr "Plan nutritionnel créé avec succès"
+
+#: routes/trainer.py:805
+msgid "Error al crear plan nutricional"
+msgstr "Erreur lors de la création du plan nutritionnel"
+
+#: routes/trainer.py:826
+msgid "Solo los entrenadores pueden agregar horarios."
+msgstr "Seuls les coachs peuvent ajouter des horaires."
+
+#: routes/trainer.py:837
+msgid "Los campos Días, Horario y Precio son obligatorios."
+msgstr "Les champs Jours, Horaires et Prix sont obligatoires."
+
+#: routes/trainer.py:847
+msgid "Horario agregado correctamente."
+msgstr "Calendrier ajouté avec succès."
+
+#: routes/trainer.py:851
+msgid "Error al guardar el horario."
+msgstr "Erreur lors de l'enregistrement du planning."
+
+#: routes/trainer.py:882
+msgid "Horario no encontrado."
+msgstr "Horaire introuvable."
+
+#: routes/trainer.py:891
+msgid "Horario eliminado correctamente."
+msgstr "Planification supprimée avec succès."
+
+#: routes/trainer.py:895
+msgid "Error al eliminar el horario."
+msgstr "Erreur lors de la suppression de l'horaire."
+
+#: routes/trainer.py:941
+msgid "Acción inválida."
+msgstr "Action invalide."
+
+#: routes/trainer.py:950
+msgid "Solicitud no encontrada."
+msgstr "Demande introuvable."
+
+#: routes/trainer.py:964
+msgid "Solicitud rechazada correctamente."
+msgstr "Demande rejetée avec succès."
+
+#: routes/trainer.py:975
+msgid ""
+"Solicitud aceptada. El solicitante podrá crear su perfil usando el mismo "
+"correo."
+msgstr ""
+"Candidature acceptée. Le candidat peut créer son profil en utilisant le même"
+" email."
+
+#: routes/trainer.py:979
+msgid ""
+"Solicitud aceptada. El jugador de la academia fue puesto en espera para la "
+"creación de perfil."
+msgstr ""
+"Candidature acceptée. Le joueur de l'académie a été mis en attente pour la "
+"création de profil."
+
+#: routes/trainer.py:985
+msgid "Error al procesar la solicitud. Intenta nuevamente."
+msgstr "Erreur lors du traitement de la demande. Essayer à nouveau."
+
+#: routes/trainer.py:1018
+msgid "Plan nutricional asignado exitosamente"
+msgstr "Plan nutritionnel attribué avec succès"
+
+#: routes/trainer.py:1022
+msgid "Error al asignar plan nutricional"
+msgstr "Erreur lors de l'attribution du plan nutritionnel"
+
+#: routes/trainer.py:1034 routes/trainer.py:1043
+msgid "No se seleccionó ninguna foto"
+msgstr "Aucune photo sélectionnée"
+
+#: routes/trainer.py:1065
+msgid "Foto subida exitosamente"
+msgstr "Photo téléchargée avec succès"
+
+#: routes/trainer.py:1069
+msgid "Error al subir foto"
+msgstr "Erreur lors du téléchargement de la photo"
+
+#: routes/trainer.py:1073
+msgid "Formato de archivo no permitido"
+msgstr "Format de fichier non autorisé"
+
+#: routes/trainer.py:1095
+msgid "Logro agregado exitosamente"
+msgstr "Réalisation ajoutée avec succès"
+
+#: routes/trainer.py:1099
+msgid "Error al agregar logro"
+msgstr "Erreur lors de l'ajout du succès"
+
+#: routes/trainer.py:1143
+msgid "Logro eliminado correctamente"
+msgstr "Succès supprimé avec succès"
+
+#: routes/trainer.py:1147
+msgid "Error al eliminar logro"
+msgstr "Erreur lors de la suppression de la réussite"
+
+#: routes/trainer.py:1166
+msgid "Plan nutricional eliminado correctamente"
+msgstr "Plan nutritionnel supprimé correctement"
+
+#: routes/trainer.py:1170
+msgid "Error al eliminar plan nutricional"
+msgstr "Erreur lors de la suppression du plan nutritionnel"
+
+#: routes/trainer.py:1199
+msgid "Selecciona un archivo de logo."
+msgstr "Sélectionnez un fichier de logo."
+
+#: routes/trainer.py:1203
+msgid "Formato no permitido. Usa PNG, JPG, WEBP o SVG."
+msgstr "Format non autorisé. Utilisez PNG, JPG, WEBP ou SVG."
+
+#: routes/trainer.py:1250 routes/trainer.py:1263
+msgid "Logo actualizado correctamente."
+msgstr "Logo mis à jour correctement."
+
+#: routes/trainer.py:1257
+msgid "Logo actualizado (sin procesar)."
+msgstr "Logo mis à jour (brut)."
+
+#: routes/trainer.py:1273
+msgid "Error al guardar el logo. Intenta nuevamente."
+msgstr "Erreur lors de l'enregistrement du logo. Essayer à nouveau."
+
+#: routes/trainer.py:1284
+msgid "No puedes eliminar tu propia cuenta desde aquí."
+msgstr "Vous ne pouvez pas supprimer votre propre compte à partir d'ici."
+
+#: routes/trainer.py:1306
+msgid "Entrenador eliminado correctamente."
+msgstr "Entraîneur supprimé avec succès."
+
+#: routes/trainer.py:1310
+msgid "Error al eliminar entrenador."
+msgstr "Échec de la suppression de l'entraîneur."
+
+#: templates/agregar_staff.html:9 templates/perfil_academico.html:11
+msgid "Agregar Nuevo Entrenador"
+msgstr "Ajouter un nouveau formateur"
+
+#: templates/agregar_staff.html:16 templates/dashboard_entrenador.html:122
+#: templates/editar_staff.html:16 templates/editar_usuario.html:20
+#: templates/gestion_cuentas.html:48 templates/registro.html:16
+#: templates/reportes.html:91
+msgid "Nombre"
+msgstr "Nom"
+
+#: templates/agregar_staff.html:23 templates/editar_staff.html:21
+#: templates/editar_usuario.html:24 templates/registro.html:23
+msgid "Apellido"
+msgstr "Nom de famille"
+
+#: templates/agregar_staff.html:32 templates/dashboard_entrenador.html:123
+#: templates/editar_staff.html:26 templates/editar_usuario.html:30
+#: templates/gestion_cuentas.html:49 templates/reportes.html:92
+#: templates/reportes.html:142 templates/solicitudes_equipo.html:24
+msgid "Email"
+msgstr "E-mail"
+
+#: templates/agregar_staff.html:41 templates/base.html:54
+#: templates/login.html:19 templates/registro.html:87
+msgid "Contraseña"
+msgstr "Mot de passe"
+
+#: templates/agregar_staff.html:44 templates/login.html:22
+#: templates/login.html:58 templates/registro.html:93
+msgid "Mostrar contraseña"
+msgstr "Afficher le mot de passe"
+
+#: templates/agregar_staff.html:56 templates/registro.html:104
+msgid "Confirmar Contraseña"
+msgstr "Confirmez le mot de passe"
+
+#: templates/agregar_staff.html:65 templates/horarios_entrenador.html:28
+#: templates/horarios_entrenador.html:48 templates/logros.html:28
+#: templates/solicitud_unirse.html:35
+msgid "Descripción"
+msgstr "Description"
+
+#: templates/agregar_staff.html:67 templates/editar_usuario.html:38
+msgid "Máximo 150 caracteres."
+msgstr "150 caractères maximum."
+
+#: templates/agregar_staff.html:72 templates/branding.html:34
+#: templates/editar_usuario.html:11
+msgid "Volver"
+msgstr "Retour"
+
+#: templates/agregar_staff.html:75
+msgid "Agregar Entrenador"
+msgstr "Ajouter un formateur"
+
+#: templates/base.html:21 templates/index.html:8 templates/index.html:10
+msgid "Academia de Voleybol"
+msgstr "Académie de volley-ball"
+
+#: templates/base.html:23 templates/index.html:11
+msgid "Juventud Global Sport"
+msgstr "Sport mondial de la jeunesse"
+
+# UI
+#: templates/base.html:31
+msgid "Inicio"
+msgstr "Accueil"
+
+#: templates/base.html:34
+msgid "Staff"
+msgstr "Personnel"
+
+#: templates/base.html:37
+msgid "Galería"
+msgstr "Galerie"
+
+#: templates/base.html:44
+msgid "Reportes"
+msgstr "Rapports"
+
+#: templates/base.html:49
+msgid "Gestión de usuarios"
+msgstr "Gestion des utilisateurs"
+
+#: templates/base.html:58 templates/base.html:60
+msgid "Mi Panel"
+msgstr "Mon tableau de bord"
+
+#: templates/base.html:64
+msgid "Cerrar sesión"
+msgstr "Déconnexion"
+
+#: templates/base.html:68
+msgid "Iniciar sesión"
+msgstr "Connexion"
+
+#: templates/base.html:71 templates/registro.html:120
+msgid "Registrarse"
+msgstr "S'inscrire"
+
+#: templates/base.html:78
+msgid "Seleccionar idioma"
+msgstr "Sélectionner la langue"
+
+#: templates/base.html:104
+msgid "Cerrar"
+msgstr "Fermer"
+
+#: templates/branding.html:3
+msgid "Branding / Logo"
+msgstr "Image de marque/logo"
+
+#: templates/branding.html:10
+msgid "Logo de la academia"
+msgstr "logo de l'académie"
+
+#: templates/branding.html:14
+msgid "Vista previa actual"
+msgstr "Aperçu actuel"
+
+#: templates/branding.html:16
+msgid "Logo"
+msgstr "Logo"
+
+#: templates/branding.html:20
+msgid "Subir nuevo logo"
+msgstr "Télécharger un nouveau logo"
+
+#: templates/branding.html:23
+msgid ""
+"Formatos: PNG, JPG, WEBP o SVG. Recomendado: PNG con fondo transparente."
+msgstr ""
+"Formats : PNG, JPG, WEBP ou SVG. Recommandé : PNG avec fond transparent."
+
+#: templates/branding.html:28
+msgid "También puedes copiar tu archivo manualmente a"
+msgstr "Vous pouvez également copier votre fichier manuellement vers"
+
+#: templates/branding.html:30
+msgid "y recargar la página."
+msgstr "et rechargez la page."
+
+#: templates/branding.html:37
+msgid "Guardar logo"
+msgstr "Enregistrer le logo"
+
+#: templates/cambiar_password.html:3 templates/cambiar_password.html:10
+#: templates/gestion_cuentas.html:71
+msgid "Cambiar contraseña"
+msgstr "Changer le mot de passe"
+
+#: templates/cambiar_password.html:16
+msgid "Contraseña actual"
+msgstr "Mot de passe actuel"
+
+#: templates/cambiar_password.html:20
+msgid "Nueva contraseña"
+msgstr "Nouveau mot de passe"
+
+#: templates/cambiar_password.html:22
+msgid "8-16 caracteres con al menos un carácter especial."
+msgstr "8 à 16 caractères avec au moins un caractère spécial."
+
+#: templates/cambiar_password.html:25
+msgid "Confirmar nueva contraseña"
+msgstr "Confirmer le nouveau mot de passe"
+
+#: templates/cambiar_password.html:28
+msgid "Actualizar contraseña"
+msgstr "Mettre à jour le mot de passe"
+
+#: templates/dashboard_entrenador.html:9
+msgid "Panel Administrativo"
+msgstr "Panneau d'administration"
+
+#: templates/dashboard_entrenador.html:11
+msgid "Panel del Entrenador"
+msgstr "Tableau de bord de l'entraîneur"
+
+#: templates/dashboard_entrenador.html:14 templates/dashboard_jugador.html:9
+msgid "Bienvenido,"
+msgstr "Accueillir,"
+
+#: templates/dashboard_entrenador.html:23
+msgid "Total Jugadores"
+msgstr "Total des joueurs"
+
+#: templates/dashboard_entrenador.html:32
+msgid "Fotos Subidas"
+msgstr "Photos téléchargées"
+
+#: templates/dashboard_entrenador.html:45
+msgid "Acciones Rápidas"
+msgstr "Actions rapides"
+
+#: templates/dashboard_entrenador.html:51 templates/galeria.html:21
+msgid "Entrenamientos"
+msgstr "Entraînements"
+
+#: templates/dashboard_entrenador.html:56
+#: templates/dashboard_entrenador.html:138
+msgid "Nutrición"
+msgstr "Nutrition"
+
+#: templates/dashboard_entrenador.html:61
+msgid "Logros"
+msgstr "Réalisations"
+
+#: templates/dashboard_entrenador.html:66
+msgid "Horarios"
+msgstr "Horaires"
+
+#: templates/dashboard_entrenador.html:71
+msgid "Solicitudes"
+msgstr "Demandes"
+
+#: templates/dashboard_entrenador.html:76
+#: templates/dashboard_entrenador.html:242
+msgid "Subir Foto"
+msgstr "Télécharger une photo"
+
+#: templates/dashboard_entrenador.html:82
+msgid "Nuevo Entrenador"
+msgstr "Nouvel entraîneur"
+
+#: templates/dashboard_entrenador.html:88
+msgid "Creación deshabilitada"
+msgstr "Création désactivée"
+
+#: templates/dashboard_entrenador.html:95
+msgid "Gestionar Usuarios"
+msgstr "Gérer les utilisateurs"
+
+#: templates/dashboard_entrenador.html:100
+msgid "Logo / Branding"
+msgstr "Logo/image de marque"
+
+#: templates/dashboard_entrenador.html:115
+msgid "Gestión de Jugadores"
+msgstr "Gestion des utilisateurs"
+
+#: templates/dashboard_entrenador.html:124 templates/gestion_cuentas.html:52
+#: templates/horarios_entrenador.html:49 templates/reportes.html:145
+#: templates/reportes.html:228 templates/solicitudes_equipo.html:29
+msgid "Acciones"
+msgstr "Actions rapides"
+
+#: templates/dashboard_entrenador.html:135
+msgid "Asignar Rutina"
+msgstr "Attribuer une routine"
+
+#: templates/dashboard_entrenador.html:142
+#: templates/horarios_entrenador.html:63 templates/reportes.html:240
+msgid "Eliminar"
+msgstr "Supprimer"
+
+#: templates/dashboard_entrenador.html:153
+msgid "Asignar Entrenamiento a"
+msgstr "Attribuer une formation à"
+
+#: templates/dashboard_entrenador.html:161
+msgid "Seleccione un entrenamiento..."
+msgstr "Sélectionnez un entraînement..."
+
+#: templates/dashboard_entrenador.html:168
+#: templates/dashboard_entrenador.html:194
+msgid "Asignar"
+msgstr "Attribuer"
+
+#: templates/dashboard_entrenador.html:179
+msgid "Asignar Nutrición a"
+msgstr "Attribuer la nutrition à"
+
+#: templates/dashboard_entrenador.html:187
+msgid "Seleccione un plan..."
+msgstr "Sélectionnez un forfait..."
+
+#: templates/dashboard_entrenador.html:214 templates/galeria.html:7
+msgid "Galería de la Academia"
+msgstr "Galerie de l'Académie"
+
+#: templates/dashboard_entrenador.html:223
+msgid "¿Borrar foto?"
+msgstr "Supprimer la photo ?"
+
+#: templates/dashboard_entrenador.html:249
+msgid "Título"
+msgstr "Qualification"
+
+#: templates/dashboard_entrenador.html:253 templates/reportes.html:227
+msgid "Archivo"
+msgstr "Archive"
+
+#: templates/dashboard_entrenador.html:259
+msgid "Subir"
+msgstr "Augmenter"
+
+#: templates/dashboard_jugador.html:11
+msgid "Panel de control - Jugador de Voleybol"
+msgstr "Panneau de configuration - Joueur de volley-ball"
+
+#: templates/dashboard_jugador.html:14
+msgid "Descargar Rutinas PDF"
+msgstr "Télécharger les routines PDF"
+
+#: templates/dashboard_jugador.html:24
+msgid "Mi Perfil"
+msgstr "Mon profil"
+
+#: templates/dashboard_jugador.html:31
+msgid "Posición:"
+msgstr "Position:"
+
+#: templates/dashboard_jugador.html:31 templates/dashboard_jugador.html:32
+msgid "No especificada"
+msgstr "Non spécifié"
+
+#: templates/dashboard_jugador.html:32
+msgid "Altura:"
+msgstr "Hauteur:"
+
+#: templates/dashboard_jugador.html:33
+msgid "Peso:"
+msgstr "Poids:"
+
+#: templates/dashboard_jugador.html:33
+msgid "No especificado"
+msgstr "non spécifié"
+
+#: templates/dashboard_jugador.html:35
+msgid "Completa tu perfil haciendo clic en el botón de editar"
+msgstr "Complétez votre profil en cliquant sur le bouton Modifier"
+
+#: templates/dashboard_jugador.html:46
+msgid "Mis Entrenamientos"
+msgstr "Mes entraînements"
+
+#: templates/dashboard_jugador.html:57
+msgid "Duración:"
+msgstr "Durée:"
+
+#: templates/dashboard_jugador.html:57
+msgid "minutos"
+msgstr "minutes"
+
+#: templates/dashboard_jugador.html:58
+msgid "Dificultad:"
+msgstr "Difficulté:"
+
+#: templates/dashboard_jugador.html:68
+msgid "Completado"
+msgstr "Rempli"
+
+#: templates/dashboard_jugador.html:74
+msgid "Marcar como Completado"
+msgstr "Marquer comme terminé"
+
+#: templates/dashboard_jugador.html:84
+msgid "No tienes entrenamientos asignados aún."
+msgstr "Vous n'avez pas encore de formation assignée."
+
+#: templates/dashboard_jugador.html:96
+msgid "Mi Plan Nutricional"
+msgstr "Mon plan nutritionnel"
+
+#: templates/dashboard_jugador.html:137
+msgid "Hidratación"
+msgstr "Hydratation"
+
+#: templates/dashboard_jugador.html:144
+msgid "Aún no tienes un plan nutricional asignado."
+msgstr "Vous n’avez pas encore de plan nutritionnel attribué."
+
+#: templates/dashboard_jugador.html:157
+msgid "Editar Mi Perfil"
+msgstr "Modifier mon profil"
+
+#: templates/dashboard_jugador.html:164
+msgid "Posición"
+msgstr "Position"
+
+#: templates/dashboard_jugador.html:176
+msgid "Altura (cm)"
+msgstr "Hauteur (cm)"
+
+#: templates/dashboard_jugador.html:180
+msgid "Peso (kg)"
+msgstr "Poids (kg)"
+
+#: templates/dashboard_jugador.html:185 templates/editar_staff.html:53
+#: templates/editar_usuario.html:73
+msgid "Cancelar"
+msgstr "Annuler"
+
+#: templates/dashboard_jugador.html:186
+msgid "Guardar"
+msgstr "Garder"
+
+#: templates/editar_staff.html:9
+msgid "Editar Información de Staff"
+msgstr "Modifier les informations sur le personnel"
+
+#: templates/editar_staff.html:31
+msgid "Descripción / Biografía Profesional"
+msgstr "Description / Biographie professionnelle"
+
+#: templates/editar_staff.html:32
+msgid ""
+"Escribe tu experiencia, logros o especialidad (límite estricto de 150 "
+"caracteres)..."
+msgstr ""
+"Écrivez votre expérience, vos réalisations ou votre spécialité (limite "
+"stricte de 150 caractères)..."
+
+#: templates/editar_staff.html:33
+msgid "150 caracteres restantes"
+msgstr "150 caractères restants"
+
+#: templates/editar_staff.html:38 templates/editar_usuario.html:42
+msgid "Link Facebook"
+msgstr "Lien Facebook"
+
+#: templates/editar_staff.html:42 templates/editar_usuario.html:46
+msgid "Link Instagram"
+msgstr "Lien Instagram"
+
+#: templates/editar_staff.html:48
+msgid ""
+"Solo puedes editar el nombre, apellido, correo y biografía. Para cambiar la "
+"contraseña, contacta al administrador de la base de datos."
+msgstr ""
+"Vous pouvez uniquement modifier le prénom, le nom, l'e-mail et la "
+"biographie. Pour modifier votre mot de passe, contactez votre administrateur"
+" de base de données."
+
+#: templates/editar_staff.html:56
+msgid "Guardar Cambios"
+msgstr "Enregistrer les modifications"
+
+#: templates/editar_usuario.html:9
+msgid "Editar Usuario"
+msgstr "Modifier l'utilisateur"
+
+#: templates/editar_usuario.html:36
+msgid "Descripción / Biografía"
+msgstr "Description / Biographie"
+
+#: templates/editar_usuario.html:68
+msgid ""
+"Solo se pueden editar los datos del perfil. Para cambiar la contraseña, "
+"utiliza la opción \"Gestionar Cuentas\" o contacta al superusuario."
+msgstr ""
+"Seules les données de profil peuvent être modifiées. Pour changer votre mot "
+"de passe, utilisez l'option \"Gérer les comptes\" ou contactez le "
+"superutilisateur."
+
+#: templates/editar_usuario.html:76
+msgid "Guardar cambios"
+msgstr "Enregistrer les modifications"
+
+#: templates/galeria.html:8
+msgid "Momentos destacados de nuestros partidos, entrenamientos y logros"
+msgstr "Faits saillants de nos matchs, entraînements et réalisations"
+
+#: templates/galeria.html:17 templates/gestion_cuentas.html:26
+#: templates/gestion_cuentas.html:34 templates/reportes.html:205
+msgid "Todos"
+msgstr "Tous"
+
+#: templates/galeria.html:18
+msgid "Partidos"
+msgstr "Matchs"
+
+#: templates/galeria.html:19
+msgid "Trofeos"
+msgstr "Trophées"
+
+#: templates/galeria.html:20
+msgid "Equipos"
+msgstr "Équipes"
+
+#: templates/galeria.html:39
+msgid "Sin descripción"
+msgstr "Pas de description"
+
+#: templates/galeria.html:48
+msgid "Eliminar imagen"
+msgstr "Supprimer l'image"
+
+#: templates/galeria.html:61
+msgid "No hay imágenes en la galería aún."
+msgstr "Il n'y a pas encore d'images dans la galerie."
+
+#: templates/gestion_cuentas.html:10
+msgid "Gestión de Cuentas"
+msgstr "Gestion des utilisateurs"
+
+#: templates/gestion_cuentas.html:11
+msgid "Administra entrenadores y jugadores desde un solo lugar."
+msgstr "Gérez les entraîneurs et les joueurs à partir d’un seul endroit."
+
+#: templates/gestion_cuentas.html:20
+msgid "Buscar"
+msgstr "Rechercher"
+
+#: templates/gestion_cuentas.html:21
+msgid "Nombre, apellido o email"
+msgstr "Prénom, nom ou email"
+
+#: templates/gestion_cuentas.html:24 templates/gestion_cuentas.html:50
+#: templates/reportes.html:93
+msgid "Rol"
+msgstr "Rôle"
+
+#: templates/gestion_cuentas.html:27 templates/horarios_entrenador.html:44
+#: templates/registro.html:71 templates/solicitudes_equipo.html:23
+msgid "Entrenador"
+msgstr "Entraîneur"
+
+#: templates/gestion_cuentas.html:28 templates/reportes.html:141
+#: templates/reportes.html:226
+msgid "Jugador"
+msgstr "Joueur"
+
+#: templates/gestion_cuentas.html:32 templates/gestion_cuentas.html:51
+#: templates/reportes.html:94 templates/solicitudes_equipo.html:28
+msgid "Estado"
+msgstr "État"
+
+#: templates/gestion_cuentas.html:35 templates/gestion_cuentas.html:63
+#: templates/reportes.html:115
+msgid "Activo"
+msgstr "Actif"
+
+#: templates/gestion_cuentas.html:36 templates/gestion_cuentas.html:63
+msgid "Inactivo"
+msgstr "Inactif"
+
+#: templates/gestion_cuentas.html:40 templates/reportes.html:211
+msgid "Filtrar"
+msgstr "Filtre"
+
+#: templates/gestion_cuentas.html:68
+msgid "Editar usuario"
+msgstr "Modifier l’utilisateur"
+
+#: templates/gestion_cuentas.html:76
+msgid "Cambiar estado de la cuenta"
+msgstr "Changer le statut du compte"
+
+#: templates/gestion_cuentas.html:81
+msgid "¿Eliminar este entrenador?"
+msgstr "Supprimer cet entraîneur ?"
+
+#: templates/gestion_cuentas.html:83
+msgid "Eliminar entrenador"
+msgstr "Supprimer l’entraîneur"
+
+#: templates/gestion_cuentas.html:93
+msgid "No se encontraron usuarios con esos criterios."
+msgstr "Aucun utilisateur n'a été trouvé avec ces critères."
+
+#: templates/horarios_entrenador.html:9
+msgid "Horarios del entrenador"
+msgstr "Horaires des autocars"
+
+#: templates/horarios_entrenador.html:16 templates/horarios_entrenador.html:45
+#: templates/reportes.html:208 templates/solicitud_unirse.html:32
+msgid "Días"
+msgstr "Jours"
+
+#: templates/horarios_entrenador.html:17
+msgid "Lunes, Miércoles, Viernes"
+msgstr "Lundi, mercredi, vendredi"
+
+#: templates/horarios_entrenador.html:20 templates/horarios_entrenador.html:46
+#: templates/solicitud_unirse.html:33
+msgid "Horario"
+msgstr "Calendrier"
+
+#: templates/horarios_entrenador.html:21
+msgid "18:00 - 20:00"
+msgstr "18h00 - 20h00"
+
+#: templates/horarios_entrenador.html:24 templates/horarios_entrenador.html:47
+#: templates/solicitud_unirse.html:34
+msgid "Precio"
+msgstr "Prix"
+
+#: templates/horarios_entrenador.html:25
+msgid "$120"
+msgstr "120 $"
+
+#: templates/horarios_entrenador.html:29
+msgid "Entrenamiento para nivel intermedio, técnica y fuerza"
+msgstr "Entraînement pour niveau intermédiaire, technique et force"
+
+#: templates/horarios_entrenador.html:34
+msgid "Agregar horario"
+msgstr "Ajouter un horaire"
+
+#: templates/horarios_entrenador.html:61
+msgid "¿Eliminar este horario?"
+msgstr "Effacer l'historique"
+
+#: templates/horarios_entrenador.html:72
+msgid ""
+"No hay horarios registrados aún. Agrega tu primer horario para que los "
+"jugadores puedan solicitar unirse."
+msgstr ""
+"Il n'y a pas encore d'horaires enregistrés. Ajoutez votre premier créneau "
+"horaire pour que les joueurs puissent demander à rejoindre."
+
+#: templates/index.html:12
+msgid "Formando los mejores atletas con pasión, disciplina y excelencia"
+msgstr "Former les meilleurs athlètes avec passion, discipline et excellence"
+
+#: templates/index.html:15
+msgid "Únete a la Academia"
+msgstr "Rejoignez l'Académie"
+
+#: templates/index.html:25
+msgid "¿Quiénes Somos?"
+msgstr "Qui sommes-nous ?"
+
+#: templates/index.html:26
+msgid ""
+"Somos una academia comprometida con el desarrollo integral de jóvenes "
+"talentos en el voleybol"
+msgstr ""
+"Nous sommes une académie engagée dans le développement global des jeunes "
+"talents du volleyball."
+
+#: templates/index.html:33
+msgid "Metodología Profesional"
+msgstr "Méthodologie professionnelle"
+
+#: templates/index.html:34
+msgid "Entrenamientos basados en técnicas modernas y adaptadas a cada nivel"
+msgstr ""
+"Formation basée sur des techniques modernes et adaptée à chaque niveau"
+
+#: templates/index.html:38
+msgid "Competencias Oficiales"
+msgstr "Compétitions officielles"
+
+#: templates/index.html:39
+msgid "Participamos en torneos locales y nacionales"
+msgstr "Nous participons à des tournois locaux et nationaux"
+
+#: templates/index.html:43
+msgid "Formación Integral"
+msgstr "Formation complète"
+
+#: templates/index.html:44
+msgid "Desarrollo deportivo, nutricional y personal"
+msgstr "Sport, nutrition et développement personnel"
+
+#: templates/index.html:52
+msgid "Últimos Momentos"
+msgstr "Derniers instants"
+
+#: templates/index.html:68
+msgid "Ver Galería Completa"
+msgstr "Voir la galerie complète"
+
+#: templates/index.html:78
+msgid "Nuestros Logros"
+msgstr "Nos réalisations"
+
+#: templates/index.html:104
+msgid "Nuestros Valores"
+msgstr "Nos valeurs"
+
+#: templates/index.html:108
+msgid "Respeto"
+msgstr "je respecte"
+
+#: templates/index.html:112
+msgid "Disciplina"
+msgstr "Discipline"
+
+#: templates/index.html:116
+msgid "Trabajo en Equipo"
+msgstr "Travail d'équipe"
+
+#: templates/index.html:120
+msgid "Superación"
+msgstr "Surmonter"
+
+#: templates/login.html:9 templates/login.html:28
+msgid "Iniciar Sesión"
+msgstr "Connexion"
+
+#: templates/login.html:15 templates/registro.html:62
+msgid "Correo Electrónico"
+msgstr "E-mail"
+
+#: templates/login.html:37
+msgid "Email y contraseña son obligatorios."
+msgstr "L'e-mail et le mot de passe sont requis."
+
+#: templates/login.html:42
+msgid "La contraseña debe tener entre 8 y 16 caracteres."
+msgstr "Le mot de passe doit comporter entre 8 et 16 caractères."
+
+#: templates/login.html:53
+msgid "Ocultar contraseña"
+msgstr "Masquer le mot de passe"
+
+#: templates/login.html:64
+msgid "¿No tienes cuenta?"
+msgstr "Vous n'avez pas de compte ?"
+
+#: templates/login.html:64
+msgid "Regístrate aquí"
+msgstr "S'inscrire"
+
+#: templates/logros.html:3 templates/logros.html:8
+msgid "Gestión de Logros"
+msgstr "Gestion des utilisateurs"
+
+#: templates/logros.html:18
+msgid "Registrar Nuevo Logro"
+msgstr "S'inscrire"
+
+#: templates/logros.html:24
+msgid "Título del Logro"
+msgstr "Titre de la réussite"
+
+#: templates/logros.html:25
+msgid "Ej: MVP del Torneo"
+msgstr "Ex : MVP du tournoi"
+
+#: templates/logros.html:29
+msgid "Detalla el logro obtenido..."
+msgstr "Détaille le succès obtenu..."
+
+#: templates/logros.html:32
+msgid "Asignar a Jugador"
+msgstr "Attribuer au joueur"
+
+#: templates/logros.html:34
+msgid "Seleccione un jugador..."
+msgstr "Sélectionnez un joueur..."
+
+#: templates/logros.html:41
+msgid "Guardar Logro"
+msgstr "Enregistrer le succès"
+
+#: templates/logros.html:53
+msgid "Muro de Éxitos"
+msgstr "Mur des réussites"
+
+#: templates/logros.html:63
+msgid "Jugador:"
+msgstr "Joueur :"
+
+#: templates/logros.html:68
+msgid "¿Eliminar este logro?"
+msgstr "Supprimer ce succès ?"
+
+#: templates/nutricion.html:3
+msgid "Gestión Nutricional"
+msgstr "Gestion des utilisateurs"
+
+#: templates/nutricion.html:8
+msgid "Gestión de Nutrición"
+msgstr "Gestion des utilisateurs"
+
+#: templates/nutricion.html:18
+msgid "Crear Nuevo Plan Alimenticio"
+msgstr "Créer un nouveau plan de régime"
+
+#: templates/nutricion.html:24
+msgid "Título del Plan"
+msgstr "Titre du régime"
+
+#: templates/nutricion.html:25
+msgid "Ej: Dieta para Competencia"
+msgstr "Ex : Régime de compétition"
+
+#: templates/nutricion.html:40
+msgid "Meriendas / Hidratación"
+msgstr "Collations/Hydratation"
+
+#: templates/nutricion.html:44
+msgid "Guardar Plan Nutricional"
+msgstr "Enregistrer le plan nutritionnel"
+
+#: templates/nutricion.html:56
+msgid "Planes Disponibles"
+msgstr "Forfaits disponibles"
+
+#: templates/nutricion.html:70
+msgid "Desayuno:"
+msgstr "Petit-déjeuner:"
+
+#: templates/nutricion.html:71
+msgid "Almuerzo:"
+msgstr "Déjeuner:"
+
+#: templates/nutricion.html:72
+msgid "Cena:"
+msgstr "Dîner:"
+
+#: templates/nutricion.html:73
+msgid "Otros/Merienda:"
+msgstr "Autres/Snack :"
+
+#: templates/nutricion.html:77
+msgid "¿Eliminar este plan nutricional?"
+msgstr "Supprimer ce plan nutritionnel ?"
+
+#: templates/nutricion.html:80
+msgid "Eliminar Plan"
+msgstr "Supprimer le plan"
+
+#: templates/nutricion.html:92
+msgid "No hay planes nutricionales registrados."
+msgstr "Il n’existe aucun plan nutritionnel enregistré."
+
+#: templates/perfil_academico.html:6
+msgid "Nuestro Staff Académico"
+msgstr "Notre personnel académique"
+
+#: templates/perfil_academico.html:7
+msgid "Conoce a los profesionales detrás del éxito de nuestra academia."
+msgstr "Rencontrez les professionnels derrière le succès de notre académie."
+
+#: templates/perfil_academico.html:17
+msgid "Creación de entrenadores deshabilitada"
+msgstr "Création de coach désactivée"
+
+#: templates/perfil_academico.html:36
+msgid ""
+"Entrenador profesional con amplia experiencia en la formación de talentos de"
+" voleybol."
+msgstr ""
+"Entraîneur professionnel possédant une vaste expérience dans la formation "
+"des talents du volleyball."
+
+#: templates/perfil_academico.html:50
+msgid "Horarios disponibles"
+msgstr "Horaires disponibles"
+
+#: templates/perfil_academico.html:64
+msgid "Solicitar unirse"
+msgstr "Demande d'adhésion"
+
+#: templates/perfil_academico.html:71
+msgid "Editar Perfil de Staff"
+msgstr "Modifier le profil du personnel"
+
+#: templates/perfil_academico.html:81
+msgid "No hay miembros del staff registrados actualmente."
+msgstr "Il n’y a actuellement aucun membre du personnel inscrit."
+
+#: templates/registro.html:9
+msgid "Registro de Jugador"
+msgstr "Enregistrement du joueur"
+
+#: templates/registro.html:32
+msgid "Fecha de Nacimiento"
+msgstr "Date de naissance"
+
+#: templates/registro.html:37
+msgid "La edad se calculará automáticamente"
+msgstr "L'âge sera calculé automatiquement"
+
+#: templates/registro.html:43
+msgid "Género"
+msgstr "Genre"
+
+#: templates/registro.html:45
+msgid "Seleccione..."
+msgstr "Sélectionner..."
+
+#: templates/registro.html:46
+msgid "Masculino"
+msgstr "Mâle"
+
+#: templates/registro.html:47
+msgid "Femenino"
+msgstr "Femelle"
+
+#: templates/registro.html:48
+msgid "Otro"
+msgstr "Autre"
+
+#: templates/registro.html:52
+msgid "Cédula de Identidad"
+msgstr "Carte d'identité"
+
+#: templates/registro.html:57
+msgid "Únicamente números"
+msgstr "Seulement des chiffres"
+
+#: templates/registro.html:67
+msgid ""
+"Usaremos este email para iniciar sesión y para asociar tu solicitud al "
+"entrenador."
+msgstr ""
+"Nous utiliserons cet email pour nous connecter et associer votre demande au "
+"formateur."
+
+#: templates/registro.html:73
+msgid "Selecciona un entrenador"
+msgstr "Sélectionnez un entraîneur"
+
+#: templates/registro.html:80
+msgid ""
+"Selecciona un entrenador para enviarle tu solicitud de ingreso al equipo. Si"
+" ya tienes una solicitud aceptada, podrás registrarte con el mismo correo."
+msgstr ""
+"Sélectionnez un coach pour envoyer votre candidature pour rejoindre "
+"l'équipe. Si vous avez déjà une candidature acceptée, vous pouvez vous "
+"inscrire avec le même email."
+
+#: templates/registro.html:100
+msgid ""
+"Entre 8 y 16 caracteres, con al menos un carácter especial (ej: @, #, $, %)"
+msgstr ""
+"Entre 8 et 16 caractères, avec au moins un caractère spécial (ex. @, #, $, "
+"%)"
+
+#: templates/registro.html:115
+msgid ""
+"Al registrarte, aceptas formar parte de nuestra comunidad deportiva. Un "
+"entrenador revisará tu solicitud."
+msgstr ""
+"En vous inscrivant, vous acceptez de faire partie de notre communauté "
+"sportive. Un coach examinera votre candidature."
+
+#: templates/registro.html:125
+msgid "¿Ya tienes cuenta?"
+msgstr "Avez-vous déjà un compte ?"
+
+#: templates/registro.html:125
+msgid "Inicia Sesión aquí"
+msgstr "Connectez-vous ici"
+
+#: templates/registro.html:153
+msgid ""
+"El campo Cédula de Identidad debe contener única y estrictamente números."
+msgstr ""
+"Le champ Carte d'Identité doit contenir uniquement et strictement des "
+"chiffres."
+
+#: templates/registro.html:175
+msgid ""
+"La contraseña debe incluir al menos un carácter especial (ej: @, #, $, %, "
+"etc.)."
+msgstr ""
+"Le mot de passe doit inclure au moins un caractère spécial (par exemple @, "
+"#, $, %, etc.)."
+
+#: templates/reportes.html:8
+msgid "Panel de Reportes y Estadísticas"
+msgstr "Panneau de rapports et de statistiques"
+
+#: templates/reportes.html:10
+msgid ""
+"Métricas del sistema en tiempo real y seguimiento de rendimiento deportivo."
+msgstr ""
+"Métriques du système en temps réel et suivi des performances sportives."
+
+#: templates/reportes.html:20
+msgid "Jugadores Activos (hace 5 minutos)"
+msgstr "Joueurs actifs (il y a 5 minutes)"
+
+#: templates/reportes.html:33
+msgid "Entrenadores Activos (hace 5 minutos)"
+msgstr "Entraîneurs actifs (il y a 5 minutes)"
+
+#: templates/reportes.html:46
+msgid "Total Descargas de PDF"
+msgstr "Total des téléchargements PDF"
+
+#: templates/reportes.html:63
+msgid "Usuarios en Tiempo Real"
+msgstr "Utilisateurs en temps réel"
+
+#: templates/reportes.html:68
+msgid "Control de Recomendaciones"
+msgstr "Contrôle des recommandations"
+
+#: templates/reportes.html:73
+msgid "Registro de Descargas"
+msgstr "Historique des téléchargements"
+
+#: templates/reportes.html:84
+msgid "Sesiones Activas"
+msgstr "Séances actives"
+
+#: templates/reportes.html:85
+msgid ""
+"Usuarios que han interactuado con la plataforma en los últimos 5 minutos."
+msgstr ""
+"Utilisateurs qui ont interagi avec la plateforme au cours des 5 dernières "
+"minutes."
+
+#: templates/reportes.html:95
+msgid "Última Actividad"
+msgstr "Dernière activité"
+
+#: templates/reportes.html:134
+msgid "Asignación de Rutinas y Nutrición"
+msgstr "Mission de routine et de nutrition"
+
+#: templates/reportes.html:135
+msgid ""
+"Verificación de si a los jugadores se les han recomendado y asignado sus "
+"entrenamientos y planes de alimentación."
+msgstr ""
+"Vérification si les joueurs ont été recommandés et attribués à leurs plans "
+"d'entraînement et de repas."
+
+#: templates/reportes.html:143
+msgid "Recomendación Rutinas"
+msgstr "Recommandation de routine"
+
+#: templates/reportes.html:144
+msgid "Recomendación Nutrición"
+msgstr "Recommandation nutritionnelle"
+
+#: templates/reportes.html:177
+msgid "Ir a Asignar"
+msgstr "Allez dans Attribuer"
+
+#: templates/reportes.html:197
+msgid "Historial de Descargas Recientes"
+msgstr "Historique des téléchargements récents"
+
+#: templates/reportes.html:198
+msgid ""
+"Registro cronológico de cuándo los jugadores descargaron su material "
+"deportivo/nutricional en PDF."
+msgstr ""
+"Enregistrement chronologique du moment où les joueurs ont téléchargé leur "
+"matériel sportif/nutritionnel au format PDF."
+
+#: templates/reportes.html:203
+msgid "Rango:"
+msgstr "Gamme:"
+
+#: templates/reportes.html:206
+msgid "Mes"
+msgstr "Mois"
+
+#: templates/reportes.html:207
+msgid "Semana"
+msgstr "Semaine"
+
+#: templates/reportes.html:209
+msgid "Hora"
+msgstr "Heure"
+
+#: templates/reportes.html:217
+msgid "Eliminar historial (rango)"
+msgstr "Supprimer l'historique (plage)"
+
+#: templates/reportes.html:229
+msgid "Fecha de Descarga"
+msgstr "Date de téléchargement"
+
+#: templates/reportes.html:252
+msgid "Aún no se registran descargas en el sistema."
+msgstr "Il n'y a pas encore de téléchargements enregistrés dans le système."
+
+#: templates/reportes.html:258
+msgid "Ranking de Descargas"
+msgstr "Classement des téléchargements"
+
+#: templates/reportes.html:259
+msgid "Jugadores con mayor interacción y descargas en la plataforma."
+msgstr ""
+"Joueurs avec le plus d’interactions et de téléchargements sur la plateforme."
+
+#: templates/reportes.html:269
+msgid "descargas"
+msgstr "téléchargements"
+
+#: templates/solicitud_unirse.html:9
+msgid "Solicitud para unirse al equipo"
+msgstr "Candidature pour rejoindre l'équipe"
+
+#: templates/solicitud_unirse.html:15
+msgid "Entrenador profesional disponible para nuevas incorporaciones."
+msgstr "Formateur professionnel disponible pour les nouvelles recrues."
+
+#: templates/solicitud_unirse.html:16
+msgid "Email:"
+msgstr "E-mail:"
+
+#: templates/solicitud_unirse.html:20
+msgid "Volver al staff"
+msgstr "Retour au personnel"
+
+#: templates/solicitud_unirse.html:27
+msgid "Horarios y precios"
+msgstr "Horaires et tarifs"
+
+#: templates/solicitud_unirse.html:56
+msgid "Formulario de solicitud"
+msgstr "Formulaire de candidature"
+
+#: templates/solicitud_unirse.html:61
+msgid "Nombre completo"
+msgstr "Nom et prénom"
+
+#: templates/solicitud_unirse.html:65
+msgid "Correo electrónico"
+msgstr "E-mail"
+
+#: templates/solicitud_unirse.html:69
+msgid "Teléfono / WhatsApp"
+msgstr "Téléphone/WhatsApp"
+
+#: templates/solicitud_unirse.html:73 templates/solicitudes_equipo.html:27
+msgid "Mensaje"
+msgstr "Message"
+
+#: templates/solicitud_unirse.html:75
+msgid "Cuéntale por qué quieres unirte y qué esperas aportar al equipo."
+msgstr ""
+"Dites-leur pourquoi vous souhaitez rejoindre l'équipe et ce que vous espérez"
+" apporter à l'équipe."
+
+#: templates/solicitud_unirse.html:78
+msgid "Enviar solicitud"
+msgstr "Envoyer la demande"
+
+#: templates/solicitud_unirse.html:88
+msgid "Por favor completa todos los campos obligatorios antes de enviar."
+msgstr "Veuillez remplir tous les champs obligatoires avant de soumettre."
+
+#: templates/solicitud_unirse.html:97
+msgid "Consejos antes de enviar"
+msgstr "Conseils avant d'envoyer"
+
+#: templates/solicitud_unirse.html:100
+msgid "Incluye tu experiencia en voley y disponibilidad horaria."
+msgstr ""
+"Incluez votre expérience en volleyball et votre disponibilité de temps."
+
+#: templates/solicitud_unirse.html:101
+msgid "Especifica tu nivel actual y metas de entrenamiento."
+msgstr "Précisez votre niveau actuel et vos objectifs de formation."
+
+#: templates/solicitud_unirse.html:102
+msgid "Usa un correo válido para que el entrenador pueda contactarte."
+msgstr ""
+"Utilisez une adresse e-mail valide pour que le coach puisse vous contacter."
+
+#: templates/solicitudes_equipo.html:9
+msgid "Solicitudes para unirse al equipo"
+msgstr "Demandes pour rejoindre l'équipe"
+
+#: templates/solicitudes_equipo.html:13
+msgid "Todas"
+msgstr "Tous"
+
+#: templates/solicitudes_equipo.html:14
+msgid "Nuevas"
+msgstr "Nouveau"
+
+#: templates/solicitudes_equipo.html:15 templates/solicitudes_equipo.html:40
+msgid "Jugadores de la academia"
+msgstr "Joueurs de l'Académie"
+
+#: templates/solicitudes_equipo.html:22
+msgid "Solicitante"
+msgstr "Demandeur"
+
+#: templates/solicitudes_equipo.html:25
+msgid "Tipo"
+msgstr "Gars"
+
+#: templates/solicitudes_equipo.html:26
+msgid "Telefono"
+msgstr "Téléphone"
+
+#: templates/solicitudes_equipo.html:40
+msgid "Nuevo"
+msgstr "Nouveau"
+
+#: templates/solicitudes_equipo.html:55
+msgid "Aceptar"
+msgstr "Accepter"
+
+#: templates/solicitudes_equipo.html:60
+msgid "Rechazar"
+msgstr "Déclin"
+
+#: templates/solicitudes_equipo.html:63
+msgid "Sin acciones"
+msgstr "Aucune action"
+
+#: templates/solicitudes_equipo.html:72
+msgid "No hay solicitudes de equipo en este momento."
+msgstr "Il n’y a aucune demande d’équipement pour le moment."
+
+#: templates/errors/403.html:2 templates/errors/403.html:6
+msgid "Acceso denegado"
+msgstr "Accès refusé"
+
+#: templates/errors/403.html:7
+msgid "No tienes permiso para ver esta página."
+msgstr "Vous n'êtes pas autorisé à afficher cette page."
+
+#: templates/errors/403.html:8 templates/errors/404.html:8
+#: templates/errors/500.html:8
+msgid "Volver al inicio"
+msgstr "Retour en haut"
+
+#: templates/errors/404.html:2 templates/errors/404.html:6
+msgid "Página no encontrada"
+msgstr "Page introuvable"
+
+#: templates/errors/404.html:7
+msgid "La página que buscas no existe o fue movida."
+msgstr "La page que vous recherchez n'existe pas ou a été déplacée."
+
+#: templates/errors/500.html:2 templates/errors/500.html:6
+msgid "Error del servidor"
+msgstr "Erreur de serveur"
+
+#: templates/errors/500.html:7
+msgid "Ocurrió un problema inesperado. Intenta de nuevo más tarde."
+msgstr "Un problème inattendu s'est produit. Réessayez plus tard."
+
+#~ msgid "Buscar"
+#~ msgstr "Rechercher"
+
+#~ msgid "Idioma"
+#~ msgstr "Langue"
+
+#~ msgid "Facebook"
+#~ msgstr ""
+
+#~ msgid "Instagram"
+#~ msgstr ""
+
+#~ msgid "Usaremos este email para iniciar sesión"
+#~ msgstr ""
+
+#~ msgid "d"
+#~ msgstr ""
+
+#~ msgid "{editor}: Editing failed"
+#~ msgstr ""
+
+#~ msgid "{editor}: Editing failed: {e}"
+#~ msgstr ""
+
+#~ msgid "Windows error: {error}"
+#~ msgstr ""
+
+#~ msgid "deprecated"
+#~ msgstr ""
+
+#~ msgid "Options"
+#~ msgstr ""
+
+#~ msgid "Got unexpected extra argument ({args})"
+#~ msgid_plural "Got unexpected extra arguments ({args})"
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+#~ msgstr ""
+
+#~ msgid "Aborted!"
+#~ msgstr ""
+
+#~ msgid "Commands"
+#~ msgstr ""
+
+#~ msgid "Missing command."
+#~ msgstr ""
+
+#~ msgid "Value must be an iterable."
+#~ msgstr ""
+
+#~ msgid "Takes {nargs} values but 1 was given."
+#~ msgid_plural "Takes {nargs} values but {len} were given."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid ""
+#~ "DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}"
+#~ msgstr ""
+
+#~ msgid "Name '{name}' defined twice"
+#~ msgstr ""
+
+#~ msgid "Boolean option {decl!r} cannot use the same flag for true/false."
+#~ msgstr ""
+
+#~ msgid "Could not determine name for option with declarations {decls!r}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "No options defined but a name was passed ({name}). Did you mean to declare "
+#~ "an argument instead? Did you mean to pass '--{name}'?"
+#~ msgstr ""
+
+#~ msgid "env var: {var}"
+#~ msgstr ""
+
+#~ msgid "default: {default}"
+#~ msgstr ""
+
+#~ msgid "required"
+#~ msgstr ""
+
+#~ msgid "(dynamic)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Arguments take exactly one parameter declaration, got {length}: {decls}."
+#~ msgstr ""
+
+#~ msgid "Do you want to continue?"
+#~ msgstr ""
+
+#~ msgid "Confirm the action without prompting."
+#~ msgstr ""
+
+#~ msgid "%(prog)s, version %(version)s"
+#~ msgstr ""
+
+#~ msgid "Show the version and exit."
+#~ msgstr ""
+
+#~ msgid "Show this message and exit."
+#~ msgstr ""
+
+#~ msgid "Did you mean {possibility}?"
+#~ msgid_plural "(Did you mean one of: {possibilities}?)"
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Error: {message}"
+#~ msgstr ""
+
+#~ msgid "Try '{command} {option}' for help."
+#~ msgstr ""
+
+#~ msgid "Invalid value: {message}"
+#~ msgstr ""
+
+#~ msgid "Invalid value for {param_hint}: {message}"
+#~ msgstr ""
+
+#~ msgid "Missing argument"
+#~ msgstr ""
+
+#~ msgid "Missing option"
+#~ msgstr ""
+
+#~ msgid "Missing parameter"
+#~ msgstr ""
+
+#~ msgid "Missing {param_type}"
+#~ msgstr ""
+
+#~ msgid "Missing parameter: {param_name}"
+#~ msgstr ""
+
+#~ msgid "No such option {name!r}."
+#~ msgstr ""
+
+#~ msgid "No such command {name!r}."
+#~ msgstr ""
+
+#~ msgid "unknown error"
+#~ msgstr ""
+
+#~ msgid "Could not open file {filename!r}: {message}"
+#~ msgstr ""
+
+#~ msgid "Usage:"
+#~ msgstr ""
+
+#~ msgid "Invalid start character for option ({option})"
+#~ msgstr ""
+
+#~ msgid "Argument {name!r} takes {nargs} values."
+#~ msgstr ""
+
+#~ msgid "Option {name!r} does not take a value."
+#~ msgstr ""
+
+#~ msgid "Option {name!r} requires an argument."
+#~ msgid_plural "Option {name!r} requires {nargs} arguments."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Shell completion is not supported for Bash versions older than 4.4."
+#~ msgstr ""
+
+#~ msgid "Couldn't detect Bash version, shell completion is not supported."
+#~ msgstr ""
+
+#~ msgid "Repeat for confirmation"
+#~ msgstr ""
+
+#~ msgid "Error: The two entered values do not match."
+#~ msgstr ""
+
+#~ msgid "Error: invalid input"
+#~ msgstr ""
+
+#~ msgid "Unknown color {colour!r}"
+#~ msgstr ""
+
+#~ msgid "Press any key to continue..."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Choose from:\n"
+#~ "\t{choices}"
+#~ msgstr ""
+
+#~ msgid "{value!r} is not {choice}."
+#~ msgid_plural "{value!r} is not one of {choices}."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Choice({choices})"
+#~ msgstr ""
+
+#~ msgid "{value!r} does not match the format {format}."
+#~ msgid_plural "{value!r} does not match the formats {formats}."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "{value!r} is not a valid {number_type}."
+#~ msgstr ""
+
+#~ msgid "{value} is not in the range {range}."
+#~ msgstr ""
+
+#~ msgid "{value!r} is not a valid boolean. Recognized values: {states}"
+#~ msgstr ""
+
+#~ msgid "{value!r} is not a valid UUID."
+#~ msgstr ""
+
+#~ msgid "file"
+#~ msgstr "Profil"
+
+#~ msgid "directory"
+#~ msgstr ""
+
+#~ msgid "path"
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} does not exist."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is a file."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is a directory."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not readable."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not writable."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not executable."
+#~ msgstr ""
+
+#~ msgid "{len_type} values are required, but {len_value} was given."
+#~ msgid_plural "{len_type} values are required, but {len_value} were given."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Unknown standard stream '{name}'"
+#~ msgstr ""
+
+#~ msgid "This field is required."
+#~ msgstr ""
+
+#~ msgid "File does not have an approved extension: {extensions}"
+#~ msgstr ""
+
+#~ msgid "File does not have an approved extension."
+#~ msgstr ""
+
+#~ msgid "File must be between {min_size} and {max_size} bytes."
+#~ msgstr ""
+
+#~ msgid "Invalid field name '%s'."
+#~ msgstr ""
+
+#~ msgid "Field must be equal to %(other_name)s."
+#~ msgstr ""
+
+#~ msgid "Field must be at least %(min)d character long."
+#~ msgid_plural "Field must be at least %(min)d characters long."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Field cannot be longer than %(max)d character."
+#~ msgid_plural "Field cannot be longer than %(max)d characters."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Field must be exactly %(max)d character long."
+#~ msgid_plural "Field must be exactly %(max)d characters long."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Field must be between %(min)d and %(max)d characters long."
+#~ msgstr ""
+
+#~ msgid "Number must be at least %(min)s."
+#~ msgstr ""
+
+#~ msgid "Number must be at most %(max)s."
+#~ msgstr ""
+
+#~ msgid "Number must be between %(min)s and %(max)s."
+#~ msgstr ""
+
+#~ msgid "Invalid input."
+#~ msgstr ""
+
+#~ msgid "Invalid email address."
+#~ msgstr ""
+
+#~ msgid "Invalid IP address."
+#~ msgstr ""
+
+#~ msgid "Invalid Mac address."
+#~ msgstr ""
+
+#~ msgid "Invalid URL."
+#~ msgstr ""
+
+#~ msgid "Invalid UUID."
+#~ msgstr ""
+
+#~ msgid "Invalid value, must be one of: %(values)s."
+#~ msgstr ""
+
+#~ msgid "Invalid value, can't be any of: %(values)s."
+#~ msgstr ""
+
+#~ msgid "This field cannot be edited."
+#~ msgstr ""
+
+#~ msgid "This field is disabled and cannot have a value."
+#~ msgstr ""
+
+#~ msgid "Invalid CSRF Token."
+#~ msgstr ""
+
+#~ msgid "CSRF token missing."
+#~ msgstr ""
+
+#~ msgid "CSRF failed."
+#~ msgstr ""
+
+#~ msgid "CSRF token expired."
+#~ msgstr ""
+
+#~ msgid "Invalid Choice: could not coerce."
+#~ msgstr ""
+
+#~ msgid "Choices cannot be None."
+#~ msgstr ""
+
+#~ msgid "Not a valid choice."
+#~ msgstr ""
+
+#~ msgid "Invalid choice(s): one or more data inputs could not be coerced."
+#~ msgstr ""
+
+#~ msgid "'%(value)s' is not a valid choice for this field."
+#~ msgid_plural "'%(value)s' are not valid choices for this field."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Not a valid datetime value."
+#~ msgstr ""
+
+#~ msgid "Not a valid date value."
+#~ msgstr ""
+
+#~ msgid "Not a valid time value."
+#~ msgstr ""
+
+#~ msgid "Not a valid week value."
+#~ msgstr ""
+
+#~ msgid "Not a valid integer value."
+#~ msgstr ""
+
+#~ msgid "Not a valid decimal value."
+#~ msgstr ""
+
+#~ msgid "Not a valid float value."
+#~ msgstr ""

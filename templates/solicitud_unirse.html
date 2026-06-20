@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="fas fa-handshake"></i> {{ _('Solicitud para unirse al equipo') }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h4>{{ trainer.nombre }} {{ trainer.apellido }}</h4>
+                            <p class="mb-1">{{ trainer.descripcion or _('Entrenador profesional disponible para nuevas incorporaciones.') }}</p>
+                            <p><strong>{{ _('Email:') }}</strong> {{ trainer.email }}</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="{{ url_for('public.perfil_academico') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> {{ _('Volver al staff') }}
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if horarios %}
+                    <div class="mb-4">
+                        <h5>{{ _('Horarios y precios') }}</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{{ _('Días') }}</th>
+                                        <th>{{ _('Horario') }}</th>
+                                        <th>{{ _('Precio') }}</th>
+                                        <th>{{ _('Descripción') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for horario in horarios %}
+                                    <tr>
+                                        <td>{{ horario.dias }}</td>
+                                        <td>{{ horario.horario }}</td>
+                                        <td>{{ horario.precio }}</td>
+                                        <td>{{ horario.descripcion or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-success mb-3">
+                                <div class="card-header bg-success text-white">{{ _('Formulario de solicitud') }}</div>
+                                <div class="card-body">
+                                    <form method="POST" id="joinRequestForm">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="mb-3">
+                                            <label class="form-label">{{ _('Nombre completo') }}</label>
+                                            <input type="text" name="nombre" class="form-control" value="{{ nombre or '' }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">{{ _('Correo electrónico') }}</label>
+                                            <input type="email" name="email" class="form-control" value="{{ email or '' }}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">{{ _('Teléfono / WhatsApp') }}</label>
+                                            <input type="text" name="telefono" class="form-control" value="{{ telefono or '' }}">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">{{ _('Mensaje') }}</label>
+                                            <textarea name="mensaje" class="form-control" rows="5" required>{{ mensaje or '' }}</textarea>
+                                            <small class="text-muted">{{ _('Cuéntale por qué quieres unirte y qué esperas aportar al equipo.') }}</small>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">
+                                            <i class="fas fa-paper-plane"></i> {{ _('Enviar solicitud') }}
+                                        </button>
+                                    </form>
+                                    <script>
+                                        document.getElementById('joinRequestForm').addEventListener('submit', function (e) {
+                                            const nombre = this.nombre.value.trim();
+                                            const email = this.email.value.trim();
+                                            const mensaje = this.mensaje.value.trim();
+                                            if (!nombre || !email || !mensaje) {
+                                                e.preventDefault();
+                                                alert('{{ _('Por favor completa todos los campos obligatorios antes de enviar.') }}');
+                                            }
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-secondary mb-3">
+                                <div class="card-header bg-secondary text-white">{{ _('Consejos antes de enviar') }}</div>
+                                <div class="card-body">
+                                    <ul class="mb-0">
+                                        <li>{{ _('Incluye tu experiencia en voley y disponibilidad horaria.') }}</li>
+                                        <li>{{ _('Especifica tu nivel actual y metas de entrenamiento.') }}</li>
+                                        <li>{{ _('Usa un correo válido para que el entrenador pueda contactarte.') }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

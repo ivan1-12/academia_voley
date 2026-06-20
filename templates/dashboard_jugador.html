@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row mb-4 dashboard-header">
+        <div class="col-12 d-flex flex-column flex-md-row justify-content-center align-items-center text-center gap-3">
+            <div>
+                <h1 class="display-5">
+                    <i class="fas fa-user-graduate"></i>
+                    {{ _('Bienvenido,') }} {{ current_user.nombre }}
+                </h1>
+                <p class="lead mb-0">{{ _('Panel de control - Jugador de Voleybol') }}</p>
+            </div>
+            <a href="{{ url_for('player.descargar_rutinas_pdf') }}" class="btn btn-danger btn-lg mt-3 mt-md-0">
+                <i class="fas fa-file-pdf"></i> {{ _('Descargar Rutinas PDF') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Perfil del Jugador -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-id-card"></i> {{ _('Mi Perfil') }}</h5>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editarPerfilModal">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if perfil %}
+                    <p><strong>{{ _('Posición:') }}</strong> {{ perfil.posicion or _('No especificada') }}</p>
+                    <p><strong>{{ _('Altura:') }}</strong> {{ perfil.altura_cm or _('No especificada') }} cm</p>
+                    <p><strong>{{ _('Peso:') }}</strong> {{ perfil.peso_kg or _('No especificado') }} kg</p>
+                    {% else %}
+                    <p class="text-muted">{{ _('Completa tu perfil haciendo clic en el botón de editar') }}</p>
+                    {% endif %}
+                    <p><strong>Email:</strong> {{ current_user.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entrenamientos Asignados -->
+        <div class="col-md-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-dumbbell"></i> {{ _('Mis Entrenamientos') }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if entrenamientos %}
+                        <div class="row">
+                            {% for entrenamiento in entrenamientos %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ entrenamiento.titulo }}</h5>
+                                        <p class="card-text">{{ entrenamiento.descripcion[:100] if entrenamiento.descripcion else '' }}</p>
+                                        <p><strong>{{ _('Duración:') }}</strong> {{ entrenamiento.duracion_minutos }} {{ _('minutos') }}</p>
+                                        <p><strong>{{ _('Dificultad:') }}</strong> 
+                                            <span class="badge 
+                                                {% if entrenamiento.dificultad in ['facil', 'Principiante', 'principiante'] %}bg-success
+                                                {% elif entrenamiento.dificultad in ['medio', 'Intermedio', 'intermedio'] %}bg-warning
+                                                {% else %}bg-danger{% endif %}">
+                                                {{ entrenamiento.dificultad }}
+                                            </span>
+                                        </p>
+                                        {% if entrenamiento.completado %}
+                                            <button class="btn btn-success" disabled>
+                                                <i class="fas fa-check-circle"></i> {{ _('Completado') }}
+                                            </button>
+                                        {% else %}
+                                            <form action="{{ url_for('player.completar_entrenamiento', entrenamiento_id=entrenamiento.id) }}" method="POST" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-completar">
+                                                    <i class="fas fa-check"></i> {{ _('Marcar como Completado') }}
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">{{ _('No tienes entrenamientos asignados aún.') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Plan Nutricional -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-apple-alt"></i> {{ _('Mi Plan Nutricional') }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if nutricion %}
+                        <h4>{{ nutricion.titulo }}</h4>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-sun"></i> {{ _('Desayuno') }}</h6>
+                                        <p>{{ nutricion.desayuno }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-utensils"></i> {{ _('Almuerzo') }}</h6>
+                                        <p>{{ nutricion.almuerzo }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-moon"></i> {{ _('Cena') }}</h6>
+                                        <p>{{ nutricion.cena }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-coffee"></i> {{ _('Merienda') }}</h6>
+                                        <p>{{ nutricion.merienda }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-tint"></i> {{ _('Hidratación') }}</h6>
+                                        <p>{{ nutricion.hidratacion }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">{{ _('Aún no tienes un plan nutricional asignado.') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Perfil -->
+<div class="modal fade" id="editarPerfilModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> {{ _('Editar Mi Perfil') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('player.editar_perfil_jugador') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Posición') }}</label>
+                        <select name="posicion" class="form-select">
+                            <option value="">{{ _('Seleccione...') }}</option>
+                            {% set pos_actual = perfil.posicion if perfil else '' %}
+                            <option value="Armador/a" {{ 'selected' if pos_actual == 'Armador/a' }}>{{ _('Armador/a') }}</option>
+                            <option value="Opuesto/a" {{ 'selected' if pos_actual == 'Opuesto/a' }}>{{ _('Opuesto/a') }}</option>
+                            <option value="Central" {{ 'selected' if pos_actual == 'Central' }}>{{ _('Central') }}</option>
+                            <option value="Receptor/a" {{ 'selected' if pos_actual == 'Receptor/a' }}>{{ _('Receptor/a-Punta') }}</option>
+                            <option value="Líbero" {{ 'selected' if pos_actual == 'Líbero' }}>{{ _('Líbero') }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Altura (cm)') }}</label>
+                        <input type="number" name="altura_cm" class="form-control" min="100" max="250" value="{{ perfil.altura_cm if perfil and perfil.altura_cm else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Peso (kg)') }}</label>
+                        <input type="number" name="peso_kg" class="form-control" min="30" max="200" step="0.1" value="{{ perfil.peso_kg if perfil and perfil.peso_kg else '' }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancelar') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Guardar') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

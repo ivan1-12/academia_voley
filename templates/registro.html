@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4><i class="fas fa-user-plus"></i> {{ _('Registro de Jugador') }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="registroForm" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">{{ _('Nombre') }}</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                    {% if form_errors and form_errors.get('nombre') %}
+                                    <div class="invalid-feedback d-block">{{ form_errors.get('nombre')|join(', ') }}</div>
+                                    {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="apellido" class="form-label">{{ _('Apellido') }}</label>
+                                <input type="text" class="form-control" id="apellido" name="apellido" required>
+                                    {% if form_errors and form_errors.get('apellido') %}
+                                    <div class="invalid-feedback d-block">{{ form_errors.get('apellido')|join(', ') }}</div>
+                                    {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="fecha_nacimiento" class="form-label">{{ _('Fecha de Nacimiento') }}</label>
+                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                    {% if form_errors and form_errors.get('fecha_nacimiento') %}
+                                    <div class="invalid-feedback d-block">{{ form_errors.get('fecha_nacimiento')|join(', ') }}</div>
+                                    {% endif %}
+                                <small class="text-muted">{{ _('La edad se calculará automáticamente') }}</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="genero" class="form-label">{{ _('Género') }}</label>
+                                <select class="form-control" id="genero" name="genero" required>
+                                    <option value="">{{ _('Seleccione...') }}</option>
+                                    <option value="masculino">{{ _('Masculino') }}</option>
+                                    <option value="femenino">{{ _('Femenino') }}</option>
+                                    <option value="otro">{{ _('Otro') }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cedula" class="form-label">{{ _('Cédula de Identidad') }}</label>
+                                <input type="text" class="form-control" id="cedula" name="cedula" required>
+                                    {% if form_errors and form_errors.get('cedula') %}
+                                    <div class="invalid-feedback d-block">{{ form_errors.get('cedula')|join(', ') }}</div>
+                                    {% endif %}
+                                <small class="text-muted">{{ _('Únicamente números') }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">{{ _('Correo Electrónico') }}</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                            {% if form_errors and form_errors.get('email') %}
+                            <div class="invalid-feedback d-block">{{ form_errors.get('email')|join(', ') }}</div>
+                            {% endif %}
+                            <small class="text-muted">{{ _('Usaremos este email para iniciar sesión y para asociar tu solicitud al entrenador.') }}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="entrenador_id" class="form-label">{{ _('Entrenador') }}</label>
+                            <select class="form-control" id="entrenador_id" name="entrenador_id">
+                                <option value="">{{ _('Selecciona un entrenador') }}</option>
+                                {% for trainer in trainers %}
+                                <option value="{{ trainer.id }}" {% if selected_trainer_id and selected_trainer_id == trainer.id|string %}selected{% endif %}>
+                                    {{ trainer.nombre }} {{ trainer.apellido }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">{{ _('Selecciona un entrenador para enviarle tu solicitud de ingreso al equipo. Si ya tienes una solicitud aceptada, podrás registrarte con el mismo correo.') }}</small>
+                            {% if form_errors and form_errors.get('entrenador_id') %}
+                            <div class="invalid-feedback d-block">{{ form_errors.get('entrenador_id')|join(', ') }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">{{ _('Contraseña') }}</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                {% if form_errors and form_errors.get('password') %}
+                                <div class="invalid-feedback d-block">{{ form_errors.get('password')|join(', ') }}</div>
+                                {% endif %}
+                                <button class="btn btn-outline-secondary" type="button" id="togglePasswordReg" aria-label="{{ _('Mostrar contraseña') }}">
+                                    <i class="fas fa-eye" id="togglePasswordRegIcon"></i>
+                                </button>
+                            </div>
+                            <div class="progress mt-2" style="height:8px;">
+                                <div id="passwordStrengthReg" class="progress-bar" role="progressbar" style="width:0%"></div>
+                            </div>
+                            <small class="text-muted">{{ _('Entre 8 y 16 caracteres, con al menos un carácter especial (ej: @, #, $, %)') }}</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">{{ _('Confirmar Contraseña') }}</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                            {% if form_errors and form_errors.get('confirm_password') %}
+                            <div class="invalid-feedback d-block">{{ form_errors.get('confirm_password')|join(', ') }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if form_errors and form_errors.get('general') %}
+                        <div class="alert alert-danger">{{ form_errors.get('general')|join(', ') }}</div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> {{ _('Al registrarte, aceptas formar parte de nuestra comunidad deportiva. Un entrenador revisará tu solicitud.') }}
+                        </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-check-circle"></i> {{ _('Registrarse') }}
+                        </button>
+                    </form>
+                    <hr>
+                    <div class="text-center">
+                        <p>{{ _('¿Ya tienes cuenta?') }} <a href="{{ url_for('auth.login') }}">{{ _('Inicia Sesión aquí') }}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('registroForm').addEventListener('submit', function(e) {
+    const nombre = document.getElementById('nombre').value.trim();
+    const apellido = document.getElementById('apellido').value.trim();
+    const cedula = document.getElementById('cedula').value.trim();
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm_password').value;
+    
+    // 1. Validar nombre/apellido: solo letras y espacios
+    const lettersOnlyRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+    if (!lettersOnlyRegex.test(nombre) || !lettersOnlyRegex.test(apellido)) {
+        e.preventDefault();
+        alert('{{ _('El nombre y el apellido deben contener únicamente letras y espacios.') }}');
+        return;
+    }
+    
+    // 2. Validar cédula: solo números
+    const numbersOnlyRegex = /^\d+$/;
+    if (!numbersOnlyRegex.test(cedula)) {
+        e.preventDefault();
+        alert('{{ _('El campo Cédula de Identidad debe contener única y estrictamente números.') }}');
+        return;
+    }
+    
+    // 3. Validar contraseñas coincidencia
+    if (password !== confirm) {
+        e.preventDefault();
+        alert('{{ _('Las contraseñas no coinciden.') }}');
+        return;
+    }
+    
+    // 4. Validar contraseña estricta (longitud 8-16)
+    if (password.length < 8 || password.length > 16) {
+        e.preventDefault();
+        alert('{{ _('La contraseña debe tener obligatoriamente entre 8 y 16 caracteres.') }}');
+        return;
+    }
+    
+    // 5. Validar contraseña estricta (al menos un carácter especial)
+    const specialCharRegex = /[@#$%^&*()-_=+[{\]};:'",<.>\/?`|~!]/;
+    if (!specialCharRegex.test(password)) {
+        e.preventDefault();
+        alert('{{ _('La contraseña debe incluir al menos un carácter especial (ej: @, #, $, %, etc.).') }}');
+        return;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-clock"></i> {{ _('Horarios del entrenador') }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="mb-4">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">{{ _('Días') }}</label>
+                                <input type="text" name="dias" class="form-control" placeholder="{{ _('Lunes, Miércoles, Viernes') }}" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">{{ _('Horario') }}</label>
+                                <input type="text" name="horario" class="form-control" placeholder="{{ _('18:00 - 20:00') }}" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">{{ _('Precio') }}</label>
+                                <input type="text" name="precio" class="form-control" placeholder="{{ _('$120') }}" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">{{ _('Descripción') }}</label>
+                                <textarea name="descripcion" class="form-control" rows="3" placeholder="{{ _('Entrenamiento para nivel intermedio, técnica y fuerza') }}"></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus"></i> {{ _('Agregar horario') }}
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if horarios %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{{ _('Entrenador') }}</th>
+                                    <th>{{ _('Días') }}</th>
+                                    <th>{{ _('Horario') }}</th>
+                                    <th>{{ _('Precio') }}</th>
+                                    <th>{{ _('Descripción') }}</th>
+                                    <th>{{ _('Acciones') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for horario in horarios %}
+                                <tr>
+                                    <td>{{ horario.entrenador_nombre if horario.entrenador_nombre else current_user.nombre }} {{ horario.entrenador_apellido if horario.entrenador_apellido else '' }}</td>
+                                    <td>{{ horario.dias }}</td>
+                                    <td>{{ horario.horario }}</td>
+                                    <td>{{ horario.precio }}</td>
+                                    <td>{{ horario.descripcion or '-' }}</td>
+                                    <td>
+                                        <form action="{{ url_for('trainer.eliminar_horario', horario_id=horario.id) }}" method="POST" onsubmit="return confirm('{{ _('¿Eliminar este horario?') }}');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button class="btn btn-sm btn-outline-danger">{{ _('Eliminar') }}</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">{{ _('No hay horarios registrados aún. Agrega tu primer horario para que los jugadores puedan solicitar unirse.') }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

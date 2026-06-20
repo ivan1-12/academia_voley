@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Gestión Nutricional') }} - Juventud Global Sports{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-apple-alt text-success"></i> {{ _('Gestión de Nutrición') }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Formulario (Solo Entrenadores) -->
+    {% if current_user.rol == 'entrenador' %}
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">{{ _('Crear Nuevo Plan Alimenticio') }}</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('trainer.gestion_nutricion') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Título del Plan') }}</label>
+                        <input type="text" name="titulo" class="form-control" required placeholder="{{ _('Ej: Dieta para Competencia') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Desayuno') }}</label>
+                        <textarea name="desayuno" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Almuerzo') }}</label>
+                        <textarea name="almuerzo" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Cena') }}</label>
+                        <textarea name="cena" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Meriendas / Hidratación') }}</label>
+                        <textarea name="merienda" class="form-control" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-save"></i> {{ _('Guardar Plan Nutricional') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Listado de Planes -->
+    <div class="{% if current_user.rol == 'entrenador' %}col-md-7{% else %}col-12{% endif %}">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">{{ _('Planes Disponibles') }}</h5>
+            </div>
+            <div class="card-body">
+                {% if planes %}
+                    <div class="accordion" id="accordionNutricion">
+                        {% for plan in planes %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ plan.id }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ plan.id }}">
+                                    <strong>{{ plan.titulo }}</strong>
+                                </button>
+                            </h2>
+                            <div id="collapse{{ plan.id }}" class="accordion-collapse collapse" data-bs-parent="#accordionNutricion">
+                                <div class="accordion-body">
+                                    <p><strong><i class="fas fa-coffee"></i> {{ _('Desayuno:') }}</strong> {{ plan.desayuno }}</p>
+                                    <p><strong><i class="fas fa-utensils"></i> {{ _('Almuerzo:') }}</strong> {{ plan.almuerzo }}</p>
+                                    <p><strong><i class="fas fa-moon"></i> {{ _('Cena:') }}</strong> {{ plan.cena }}</p>
+                                    <p><strong><i class="fas fa-apple-alt"></i> {{ _('Otros/Merienda:') }}</strong> {{ plan.merienda }}</p>
+                                    
+                                    {% if current_user.rol in ['entrenador', 'super_usuario'] %}
+                                    <div class="text-end mt-3 border-top pt-2">
+                                        <form action="{{ url_for('trainer.eliminar_nutricion', nutricion_id=plan.id) }}" method="POST" onsubmit="return confirm('{{ _('¿Eliminar este plan nutricional?') }}');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i> {{ _('Eliminar Plan') }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="text-muted">{{ _('No hay planes nutricionales registrados.') }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

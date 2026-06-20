@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Gestión de Logros') }} - Juventud Global Sports{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4"><i class="fas fa-trophy text-warning"></i> {{ _('Gestión de Logros') }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Formulario de Registro (Solo Entrenadores) -->
+    {% if current_user.rol == 'entrenador' %}
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">{{ _('Registrar Nuevo Logro') }}</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('trainer.gestion_logros') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Título del Logro') }}</label>
+                        <input type="text" name="titulo" class="form-control" required placeholder="{{ _('Ej: MVP del Torneo') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Descripción') }}</label>
+                        <textarea name="descripcion" class="form-control" rows="3" required placeholder="{{ _('Detalla el logro obtenido...') }}"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Asignar a Jugador') }}</label>
+                        <select name="usuario_id" class="form-select" required>
+                            <option value="">{{ _('Seleccione un jugador...') }}</option>
+                            {% for jugador in jugadores %}
+                            <option value="{{ jugador.id }}">{{ jugador.nombre }} {{ jugador.apellido }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">
+                        <i class="fas fa-save"></i> {{ _('Guardar Logro') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Lista de Logros -->
+    <div class="{% if current_user.rol == 'entrenador' %}col-md-8{% else %}col-12{% endif %}">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">{{ _('Muro de Éxitos') }}</h5>
+            </div>
+            <div class="card-body">
+                {% if logros %}
+                    <div class="row">
+                        {% for logro in logros %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-warning">
+                                <div class="card-body">
+                                    <h6 class="card-title text-warning"><i class="fas fa-medal"></i> {{ logro.titulo }}</h6>
+                                    <p class="card-text mb-1"><strong>{{ _('Jugador:') }}</strong> {{ logro.nombre }} {{ logro.apellido }}</p>
+                                    <p class="card-text small text-muted">{{ logro.descripcion }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <small class="text-muted"><i class="fas fa-calendar-alt"></i> {{ logro.fecha_conseguido.strftime('%d/%m/%Y') }}</small>
+                                        {% if current_user.rol in ['entrenador', 'super_usuario'] %}
+                                        <form action="{{ url_for('trainer.eliminar_logro', logro_id=logro.id) }}" method="POST" onsubmit="return confirm('{{ _('¿Eliminar este logro?') }}');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-trophy fa-4x text-muted mb-3"></i>
+                        <p class="lead">{{ _('Aún no hay logros registrados.') }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
