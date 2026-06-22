@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil de Jugador - Juventud Global Sports{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-user"></i> {{ usuario.nombre }} {{ usuario.apellido }}</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>{{ _('Email:') }}</strong> {{ usuario.email }}</p>
+                    <p><strong>{{ _('Género:') }}</strong> {{ usuario.genero or _('No especificado') }}</p>
+                    <p><strong>{{ _('Fecha Nacimiento:') }}</strong> {{ usuario.fecha_nacimiento or _('No especificado') }}</p>
+                    <p><strong>{{ _('Cédula:') }}</strong> {{ usuario.cedula or _('No especificado') }}</p>
+
+                    {% if perfil %}
+                    <hr>
+                    <h5>{{ _('Perfil Deportivo') }}</h5>
+                    <p><strong>{{ _('Altura (cm):') }}</strong> {{ perfil.altura_cm or '-' }}</p>
+                    <p><strong>{{ _('Peso (kg):') }}</strong> {{ perfil.peso_kg or '-' }}</p>
+                    <p><strong>{{ _('Posición:') }}</strong> {{ perfil.posicion or '-' }}</p>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{{ url_for('trainer.dashboard_entrenador') }}" class="btn btn-secondary">{{ _('Volver') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

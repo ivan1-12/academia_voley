@@ -4,6 +4,13 @@ from flask_login import current_user
 from models import get_db
 from validators import validar_formato_email
 
+def _tabla_tiene_columna(cur, tabla, columna):
+    try:
+        cur.execute(f"SHOW COLUMNS FROM {tabla} LIKE %s", (columna,))
+        return cur.fetchone() is not None
+    except Exception:
+        return False
+
 public_bp = Blueprint("public", __name__)
 
 
@@ -103,13 +110,9 @@ def solicitar_unirse(trainer_id):
         db = get_db()
         cur = db.cursor()
         try:
-            cur.execute("SELECT id, rol FROM usuarios WHERE email = %s", (email,))
-            usuario_existente = cur.fetchone()
-            tipo = (
-                "academia"
-                if usuario_existente and usuario_existente.get("rol") == "jugador"
-                else "nuevo"
-            )
+            # Todas las solicitudes enviadas desde la página de un entrenador se consideran
+            # solicitudes por staff / equipo, incluso si el email no existe aún.
+            tipo = "academia"
 
             cur.execute(
                 "INSERT INTO solicitudes_equipo (entrenador_id, nombre, email, telefono, mensaje, tipo) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -132,16 +135,25 @@ def solicitar_unirse(trainer_id):
 
 @public_bp.route("/galeria_publica")
 def galeria_publica():
+    tipos = []
     try:
         cur = get_db().cursor()
-        cur.execute("SELECT * FROM galeria ORDER BY fecha_subida DESC")
+        cur.execute(
+            "SELECT g.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido "
+            "FROM galeria g LEFT JOIN usuarios u ON g.usuario_id = u.id "
+            "ORDER BY g.fecha_subida DESC"
+        )
         galeria = cur.fetchall()
+        cur.execute(
+            "SELECT DISTINCT tipo FROM galeria WHERE tipo IS NOT NULL AND tipo != '' ORDER BY tipo"
+        )
+        tipos = [row["tipo"] for row in cur.fetchall()]
         cur.close()
     except Exception:
         current_app.logger.exception("Error cargando galería pública")
         galeria = []
 
-    return render_template("galeria.html", galeria=galeria)
+    return render_template("galeria.html", galeria=galeria, galeria_tipos=tipos)
 
 
 @public_bp.route("/set_language", methods=["GET"])

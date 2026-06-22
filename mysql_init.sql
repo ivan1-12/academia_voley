@@ -167,7 +167,10 @@ CREATE TABLE IF NOT EXISTS `logros` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `titulo` VARCHAR(255) NOT NULL,
   `descripcion` TEXT,
-  `fecha_logro` DATE
+  `fecha_logro` DATE,
+  `usuario_id` INT DEFAULT NULL,
+  `imagen_url` VARCHAR(255) DEFAULT NULL,
+  FOREIGN KEY (`usuario_id`) REFERENCES `usuarios`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 13. Historial de descargas

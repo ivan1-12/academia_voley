@@ -44,6 +44,7 @@ class Config:
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_SAMESITE = "Lax"
     WTF_CSRF_TIME_LIMIT = 3600
+    PASSWORD_RESET_EXPIRATION = int(os.environ.get("PASSWORD_RESET_EXPIRATION", 3600))
 
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "0").lower() in ("1", "true", "yes")
     # Por defecto escuchar en todas las interfaces para permitir acceso desde móviles

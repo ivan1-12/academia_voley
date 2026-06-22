@@ -113,12 +113,44 @@ body {
     transform: translateY(-5px);
 }
 
-/* ====== GALLERY ====== */
 .gallery-img {
     height: 250px;
     object-fit: cover;
     width: 100%;
     transition: transform 0.3s ease;
+}
+
+.gallery-img:hover {
+    transform: scale(1.03);
+}
+
+[data-bs-theme="dark"] .table th,
+[data-bs-theme="dark"] .table td {
+    color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary,
+[data-bs-theme="dark"] .btn-outline-success,
+[data-bs-theme="dark"] .btn-outline-warning,
+[data-bs-theme="dark"] .btn-outline-danger,
+[data-bs-theme="dark"] .btn-outline-secondary {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+[data-bs-theme="dark"] .btn-outline-primary:hover,
+[data-bs-theme="dark"] .btn-outline-secondary:hover,
+[data-bs-theme="dark"] .btn-outline-success:hover,
+[data-bs-theme="dark"] .btn-outline-warning:hover,
+[data-bs-theme="dark"] .btn-outline-danger:hover,
+[data-bs-theme="dark"] .btn-outline-primary:focus,
+[data-bs-theme="dark"] .btn-outline-secondary:focus,
+[data-bs-theme="dark"] .btn-outline-success:focus,
+[data-bs-theme="dark"] .btn-outline-warning:focus,
+[data-bs-theme="dark"] .btn-outline-danger:focus {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.55);
 }
 
 .gallery-img:hover {
@@ -130,6 +162,26 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
+}
+
+/* ====== TRAINER SCHEDULE ====== */
+.horario-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+[data-bs-theme="dark"] .horario-box {
+    background-color: #1f2435;
+    border-color: #2d3146;
+}
+
+.horario-box .list-group-item {
+    background-color: transparent;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-bs-theme="dark"] .horario-box .list-group-item {
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .btn-completar:hover {

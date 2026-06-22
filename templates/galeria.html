@@ -15,10 +15,9 @@
         <div class="col-12 text-center">
             <div class="btn-group justify-content-center" role="group">
                 <button class="btn btn-primary active" data-filter="all">{{ _('Todos') }}</button>
-                <button class="btn btn-outline-primary" data-filter="partido">{{ _('Partidos') }}</button>
-                <button class="btn btn-outline-primary" data-filter="trofeo">{{ _('Trofeos') }}</button>
-                <button class="btn btn-outline-primary" data-filter="equipo">{{ _('Equipos') }}</button>
-                <button class="btn btn-outline-primary" data-filter="entrenamiento">{{ _('Entrenamientos') }}</button>
+                {% for tipo in galeria_tipos %}
+                <button class="btn btn-outline-primary" data-filter="{{ tipo }}">{{ tipo|capitalize }}</button>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -27,29 +26,23 @@
     <div class="row justify-content-center gallery-grid">
         {% if galeria %}
             {% for item in galeria %}
-            <div class="col-md-4 mb-4 gallery-item" data-type="{{ item.tipo }}">
-                <div class="card h-100">
-                    {% if item.imagen_url %}
-                        <img src="{{ item.imagen_url }}" class="card-img-top gallery-img" alt="{{ item.titulo }}">
-                    {% else %}
-                        <img src="https://via.placeholder.com/400x300?text=Sin+Imagen" class="card-img-top" alt="{{ _('Placeholder') }}">
-                    {% endif %}
+            <div class="col-md-4 mb-4 gallery-item" data-type="{{ item.tipo or 'otro' }}">
+                <div class="card h-100 shadow-sm">
+                    <a href="#" class="text-decoration-none open-gallery-preview" data-title="{{ item.titulo|e }}" data-description="{{ item.descripcion|e }}" data-image="{{ item.imagen_url }}" data-type="{{ item.tipo or 'Sin tipo' }}" data-uploaded="{{ item.fecha_subida }}" data-author="{{ item.entrenador_nombre or item.entrenador_apellido or '' }}">
+                        {% if item.imagen_url %}
+                            <img src="{{ item.imagen_url }}" class="card-img-top gallery-img" alt="{{ item.titulo }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/400x300?text=Sin+Imagen" class="card-img-top gallery-img" alt="{{ _('Placeholder') }}">
+                        {% endif %}
+                    </a>
                     <div class="card-body">
-                        <h5 class="card-title">{{ item.titulo }}</h5>
-                        <p class="card-text">{{ item.descripcion or _('Sin descripción') }}</p>
-                        <small class="text-muted">
-                            <i class="fas fa-calendar-alt"></i> {{ item.fecha_subida.strftime('%d/%m/%Y') }}
-                        </small>
-                        <div class="mt-2">
-                            <span class="badge bg-info">
-                                {{ item.tipo|capitalize }}
-                            </span>
-                            {% if current_user.is_authenticated and current_user.rol in ['entrenador', 'super_usuario'] %}
-                            <form action="{{ url_for('trainer.eliminar_imagen', imagen_id=item.id) }}" method="POST" style="display:inline" onsubmit="return confirm('{{ _('Eliminar imagen') }} {{ item.titulo }}?');">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-sm btn-danger ms-2"> <i class="fas fa-trash"></i> {{ _('Eliminar') }}</button>
-                            </form>
-                            {% endif %}
+                        <h5 class="card-title">{{ item.titulo or _('Sin título') }}</h5>
+                        <p class="card-text mb-2">{{ item.descripcion or _('Sin descripción') }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt"></i> {{ item.fecha_subida }}
+                            </small>
+                            <span class="badge bg-info">{{ item.tipo|capitalize }}</span>
                         </div>
                     </div>
                 </div>
@@ -57,7 +50,7 @@
             {% endfor %}
         {% else %}
             <div class="col-12">
-                    <div class="alert alert-info text-center">
+                <div class="alert alert-info text-center">
                     <i class="fas fa-info-circle"></i> {{ _('No hay imágenes en la galería aún.') }}
                 </div>
             </div>
@@ -65,21 +58,44 @@
     </div>
 </div>
 
+<!-- Preview modal -->
+<div class="modal fade" id="galleryPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="galleryPreviewTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row gx-4 gy-3">
+                    <div class="col-md-7">
+                        <img id="galleryPreviewImage" src="" class="img-fluid rounded" alt="Preview">
+                    </div>
+                    <div class="col-md-5">
+                        <p id="galleryPreviewDescription" class="mb-3"></p>
+                        <p class="mb-2"><strong>{{ _('Categoría:') }}</strong> <span id="galleryPreviewType"></span></p>
+                        <p class="mb-2"><strong>{{ _('Subido:') }}</strong> <span id="galleryPreviewUploaded"></span></p>
+                        <p class="mb-0"><strong>{{ _('Subido por:') }}</strong> <span id="galleryPreviewAuthor"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 // Filtro de galería
-document.querySelectorAll('[data-filter]').forEach(button => {
+const galleryFilterButtons = document.querySelectorAll('[data-filter]');
+galleryFilterButtons.forEach(button => {
     button.addEventListener('click', function() {
         const filter = this.getAttribute('data-filter');
-        
-        // Actualizar estilo de botones
-        document.querySelectorAll('[data-filter]').forEach(btn => {
+        galleryFilterButtons.forEach(btn => {
             btn.classList.remove('active');
             btn.classList.add('btn-outline-primary');
         });
         this.classList.add('active');
         this.classList.remove('btn-outline-primary');
-        
-        // Filtrar elementos
+
         document.querySelectorAll('.gallery-item').forEach(item => {
             if (filter === 'all' || item.getAttribute('data-type') === filter) {
                 item.style.display = 'block';
@@ -89,5 +105,29 @@ document.querySelectorAll('[data-filter]').forEach(button => {
         });
     });
 });
+
+const previewModalElement = document.getElementById('galleryPreviewModal');
+if (previewModalElement) {
+    const previewModal = new bootstrap.Modal(previewModalElement);
+    const previewTitle = document.getElementById('galleryPreviewTitle');
+    const previewImage = document.getElementById('galleryPreviewImage');
+    const previewDescription = document.getElementById('galleryPreviewDescription');
+    const previewType = document.getElementById('galleryPreviewType');
+    const previewUploaded = document.getElementById('galleryPreviewUploaded');
+    const previewAuthor = document.getElementById('galleryPreviewAuthor');
+
+    document.querySelectorAll('.open-gallery-preview').forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            previewTitle.textContent = this.dataset.title || '{{ _('Vista previa') }}';
+            previewImage.src = this.dataset.image || '';
+            previewDescription.textContent = this.dataset.description || '{{ _('Sin descripción disponible.') }}';
+            previewType.textContent = this.dataset.type || '{{ _('Sin tipo') }}';
+            previewUploaded.textContent = this.dataset.uploaded || '{{ _('Fecha desconocida') }}';
+            previewAuthor.textContent = this.dataset.author || '{{ _('Desconocido') }}';
+            previewModal.show();
+        });
+    });
+}
 </script>
 {% endblock %}

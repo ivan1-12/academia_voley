@@ -10,15 +10,15 @@
 </div>
 
 <div class="row">
-    <!-- Formulario de Registro (Solo Entrenadores) -->
-    {% if current_user.rol == 'entrenador' %}
+    <!-- Formulario de Registro (Solo Entrenadores y Superusuarios) -->
+    {% if current_user.rol in ['entrenador', 'super_usuario'] %}
     <div class="col-md-4 mb-4">
         <div class="card shadow-sm">
             <div class="card-header bg-warning text-dark">
                 <h5 class="mb-0">{{ _('Registrar Nuevo Logro') }}</h5>
             </div>
             <div class="card-body">
-                <form action="{{ url_for('trainer.gestion_logros') }}" method="POST">
+                <form action="{{ url_for('trainer.gestion_logros') }}" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label class="form-label">{{ _('Título del Logro') }}</label>
@@ -28,6 +28,7 @@
                         <label class="form-label">{{ _('Descripción') }}</label>
                         <textarea name="descripcion" class="form-control" rows="3" required placeholder="{{ _('Detalla el logro obtenido...') }}"></textarea>
                     </div>
+                    {% if has_usuario_id %}
                     <div class="mb-3">
                         <label class="form-label">{{ _('Asignar a Jugador') }}</label>
                         <select name="usuario_id" class="form-select" required>
@@ -37,6 +38,17 @@
                             {% endfor %}
                         </select>
                     </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Fecha del logro') }}</label>
+                        <input type="date" name="fecha_logro" class="form-control" required>
+                    </div>
+                    {% if has_imagen_url %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Foto del logro (opcional)') }}</label>
+                        <input type="file" name="foto" class="form-control" accept="image/*">
+                    </div>
+                    {% endif %}
                     <button type="submit" class="btn btn-warning w-100">
                         <i class="fas fa-save"></i> {{ _('Guardar Logro') }}
                     </button>
@@ -46,7 +58,6 @@
     </div>
     {% endif %}
 
-    <!-- Lista de Logros -->
     <div class="{% if current_user.rol == 'entrenador' %}col-md-8{% else %}col-12{% endif %}">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
@@ -54,20 +65,53 @@
             </div>
             <div class="card-body">
                 {% if logros %}
-                    <div class="row">
+                    <div class="row g-3">
                         {% for logro in logros %}
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-warning">
+                        <div class="col-md-6 col-xl-4">
+                            <div class="card h-100 shadow-sm border-warning bg-white">
+                                {% if logro.imagen_url %}
+                                <div class="overflow-hidden rounded-top" style="height:180px; background:#f8f9fa;">
+                                    <img src="{{ logro.imagen_url }}" class="w-100 h-100" style="object-fit:cover;" alt="{{ logro.titulo }}">
+                                </div>
+                                {% else %}
+                                <div class="d-flex align-items-center justify-content-center rounded-top bg-warning text-white" style="height:180px;">
+                                    <div class="text-center">
+                                        <i class="fas fa-star fa-3x"></i>
+                                        <div class="small mt-2">{{ _('Sin imagen de logro') }}</div>
+                                    </div>
+                                </div>
+                                {% endif %}
                                 <div class="card-body">
-                                    <h6 class="card-title text-warning"><i class="fas fa-medal"></i> {{ logro.titulo }}</h6>
-                                    <p class="card-text mb-1"><strong>{{ _('Jugador:') }}</strong> {{ logro.nombre }} {{ logro.apellido }}</p>
-                                    <p class="card-text small text-muted">{{ logro.descripcion }}</p>
-                                    <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small class="text-muted"><i class="fas fa-calendar-alt"></i> {{ logro.fecha_conseguido.strftime('%d/%m/%Y') }}</small>
+                                    <h5 class="card-title text-warning"><i class="fas fa-medal me-2"></i>{{ logro.titulo }}</h5>
+                                    <p class="card-text mb-2 text-secondary">{{ logro.descripcion }}</p>
+                                    <div class="mb-2">
+                                        <span class="badge bg-dark text-white me-1">
+                                            <i class="fas fa-user"></i>
+                                            {% if has_usuario_id and logro.jugador_nombre %}
+                                                {{ logro.jugador_nombre }} {{ logro.jugador_apellido }}
+                                            {% else %}
+                                                {{ _('Jugador no asignado') }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="mb-3 text-muted small">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        {% if logro.fecha_logro %}
+                                            {{ logro.fecha_logro.strftime('%d/%m/%Y') if logro.fecha_logro.strftime is defined else logro.fecha_logro }}
+                                        {% else %}
+                                            {{ _('Fecha no registrada') }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        {% if current_user.rol in ['entrenador', 'super_usuario'] %}
+                                        <a href="{{ url_for('trainer.editar_logro', logro_id=logro.id) }}" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i> {{ _('Editar') }}
+                                        </a>
+                                        {% endif %}
                                         {% if current_user.rol in ['entrenador', 'super_usuario'] %}
                                         <form action="{{ url_for('trainer.eliminar_logro', logro_id=logro.id) }}" method="POST" onsubmit="return confirm('{{ _('¿Eliminar este logro?') }}');">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                            <button type="submit" class="btn btn-sm btn-danger">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -82,6 +126,7 @@
                     <div class="text-center py-5">
                         <i class="fas fa-trophy fa-4x text-muted mb-3"></i>
                         <p class="lead">{{ _('Aún no hay logros registrados.') }}</p>
+                        <p class="text-muted">{{ _('Crea el primer logro usando el formulario de la izquierda.') }}</p>
                     </div>
                 {% endif %}
             </div>

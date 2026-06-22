@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, g, url_for
-from flask_wtf.csrf import generate_csrf
+from flask import Flask, render_template, request, g, url_for, redirect, flash
+from flask_wtf.csrf import CSRFError, generate_csrf
 from config import Config
-from extensions import bcrypt, login_manager, csrf, babel
+from extensions import bcrypt, login_manager, csrf, babel, limiter
 from models import get_db, close_db
 from flask_login import current_user
 from flask_babel import gettext as _, get_locale as _get_babel_locale
@@ -14,6 +14,8 @@ import logging
 
 from routes.public import public_bp
 from routes.auth import auth_bp
+from routes.auth_reset import reset_bp
+from routes.graphql_api import graphql_bp
 from routes.player import player_bp
 from routes.trainer import trainer_bp
 from routes.reports import reports_bp
@@ -45,7 +47,14 @@ def get_locale():
 bcrypt.init_app(app)
 login_manager.init_app(app)
 csrf.init_app(app)
+limiter.init_app(app)
 babel.init_app(app, locale_selector=get_locale)
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    flash(_("Invalid CSRF token. Please try again."), "danger")
+    return redirect(request.referrer or url_for("public.index"))
 
 
 @app.before_request
@@ -60,6 +69,8 @@ def _log_resolved_locale():
 
 app.register_blueprint(public_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(reset_bp)
+app.register_blueprint(graphql_bp)
 app.register_blueprint(player_bp)
 app.register_blueprint(trainer_bp)
 app.register_blueprint(reports_bp)

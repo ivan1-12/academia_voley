@@ -5,10 +5,12 @@ Werkzeug==2.3.7
 PyMySQL==1.1.0
 python-dotenv==1.0.0
 Flask-WTF==1.1.1
+Flask-Limiter==4.1.1
+graphene==3.4.3
 fpdf2==2.8.7
 Flask-Babel==3.1.0
-Pillow==10.1.0
+Pillow==12.2.0
 pytest==7.4.2
-pre-commit==3.4.0
+pre-commit==4.6.0
 black==24.1.0
 ruff==0.12.1

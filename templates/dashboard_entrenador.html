@@ -18,13 +18,16 @@
     <!-- Estadísticas Rápidas -->
     <div class="row mb-4">
         <div class="col-md-6 mb-3">
-            <div class="card bg-primary text-white stat-card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ _('Total Jugadores') }}</h5>
-                    <h2 class="display-4">{{ total_jugadores }}</h2>
-                    <i class="fas fa-users fa-2x d-block mx-auto mt-2"></i>
+            <a href="{{ url_for('trainer.jugadores_detalle') }}" class="text-decoration-none">
+                <div class="card bg-primary text-white stat-card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ _('Total Jugadores') }}</h5>
+                        <h2 class="display-4">{{ total_jugadores }}</h2>
+                        <p class="mb-0">{{ _('Ver detalle de jugadores') }}</p>
+                        <i class="fas fa-users fa-2x d-block mx-auto mt-2"></i>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-6 mb-3">
             <div class="card bg-success text-white stat-card h-100">
@@ -36,16 +39,49 @@
             </div>
         </div>
     </div>
-
-    <!-- Acciones Rápidas -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white text-center">
-                    <h5 class="mb-0"><i class="fas fa-cogs"></i> {{ _('Acciones Rápidas') }}</h5>
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-secondary text-white text-center">
+                                <h5 class="mb-0">{{ _('Detalle de Jugadores') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>{{ _('Nombre') }}</th>
+                                                <th>{{ _('Posición') }}</th>
+                                                <th>{{ _('Edad') }}</th>
+                                                <th>{{ _('Email') }}</th>
+                                                <th>{{ _('Categoría') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for jugador in jugadores %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ url_for('player.perfil_jugador', usuario_id=jugador.id) }}" class="fw-bold">
+                                                        {{ jugador.nombre }} {{ jugador.apellido }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ jugador.posicion or _('No definida') }}</td>
+                                                <td>{{ jugador.edad or '-' }}</td>
+                                                <td>{{ jugador.email }}</td>
+                                                <td>{{ jugador.genero or _('No asignada') }}</td>
+                                            </tr>
+                                            {% else %}
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">{{ _('No hay jugadores registrados.') }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body text-center">
-                    <div class="row">
                         <div class="col-md-3 col-6 mb-2">
                             <a href="{{ url_for('trainer.gestion_entrenamientos') }}" class="btn btn-primary w-100">
                                 <i class="fas fa-dumbbell"></i> {{ _('Entrenamientos') }}
@@ -107,7 +143,7 @@
         </div>
     </div>
 
-    <!-- Lista de Jugadores -->
+    <!-- Lista de Jugadores dividida por género -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
@@ -115,37 +151,26 @@
                     <h5 class="mb-0"><i class="fas fa-users"></i> {{ _('Gestión de Jugadores') }}</h5>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>{{ _('Nombre') }}</th>
-                                    <th>{{ _('Email') }}</th>
-                                    <th>{{ _('Acciones') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for jugador in jugadores %}
-                                <tr>
-                                    <td>{{ jugador.nombre }} {{ jugador.apellido }}</td>
-                                    <td>{{ jugador.email }}</td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#asignarEntrenamientoModal{{ jugador.id }}">
-                                                {{ _('Asignar Rutina') }}
-                                            </button>
-                                            <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#asignarNutricionModal{{ jugador.id }}">
-                                                {{ _('Nutrición') }}
-                                            </button>
-                                            <form action="{{ url_for('trainer.eliminar_jugador', usuario_id=jugador.id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar jugador?') }}');">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <button type="submit" class="btn btn-sm btn-danger">{{ _('Eliminar') }}</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Modales de Asignación por cada jugador -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-center">{{ _('Masculino') }}</h6>
+                            <ul class="list-group mb-3">
+                                {% for jugador in jugadores if jugador.genero == 'masculino' %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <a href="{{ url_for('player.perfil_jugador', usuario_id=jugador.id) }}" class="fw-bold">{{ jugador.nombre }} {{ jugador.apellido }}</a>
+                                        <div class="small text-muted">{{ jugador.email }}</div>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#asignarEntrenamientoModal{{ jugador.id }}">{{ _('Rutina') }}</button>
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#asignarNutricionModal{{ jugador.id }}">{{ _('Nutrición') }}</button>
+                                        <form action="{{ url_for('trainer.eliminar_jugador', usuario_id=jugador.id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar jugador?') }}');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">{{ _('Eliminar') }}</button>
+                                        </form>
+                                    </div>
+                                </li>
+                                <!-- Modales -->
                                 <div class="modal fade" id="asignarEntrenamientoModal{{ jugador.id }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -153,7 +178,7 @@
                                                 <h5 class="modal-title">{{ _('Asignar Entrenamiento a') }} {{ jugador.nombre }}</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <form action="{{ url_for('trainer.asignar_entrenamiento') }}" method="POST">
+                                            <form action="{{ url_for('trainer.asignar_entrenamiento') }}" method="POST" data-ajax="true">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <div class="modal-body">
                                                     <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
@@ -171,7 +196,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="modal fade" id="asignarNutricionModal{{ jugador.id }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
@@ -179,7 +203,7 @@
                                                 <h5 class="modal-title">{{ _('Asignar Nutrición a') }} {{ jugador.nombre }}</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                             </div>
-                                            <form action="{{ url_for('trainer.asignar_nutricion') }}" method="POST">
+                                            <form action="{{ url_for('trainer.asignar_nutricion') }}" method="POST" data-ajax="true">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <div class="modal-body">
                                                     <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
@@ -198,8 +222,80 @@
                                     </div>
                                 </div>
                                 {% endfor %}
-                            </tbody>
-                        </table>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-center">{{ _('Femenino') }}</h6>
+                            <ul class="list-group mb-3">
+                                {% for jugador in jugadores if jugador.genero == 'femenino' %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <a href="{{ url_for('player.perfil_jugador', usuario_id=jugador.id) }}" class="fw-bold">{{ jugador.nombre }} {{ jugador.apellido }}</a>
+                                        <div class="small text-muted">{{ jugador.email }}</div>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#asignarEntrenamientoModal{{ jugador.id }}">{{ _('Rutina') }}</button>
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#asignarNutricionModal{{ jugador.id }}">{{ _('Nutrición') }}</button>
+                                        <form action="{{ url_for('trainer.eliminar_jugador', usuario_id=jugador.id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar jugador?') }}');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-danger">{{ _('Eliminar') }}</button>
+                                        </form>
+                                    </div>
+                                </li>
+                                <!-- Modales reutilizados -->
+                                <div class="modal fade" id="asignarEntrenamientoModal{{ jugador.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{{ _('Asignar Entrenamiento a') }} {{ jugador.nombre }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form action="{{ url_for('trainer.asignar_entrenamiento') }}" method="POST" data-ajax="true">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
+                                                    <select name="entrenamiento_id" class="form-select" required>
+                                                        <option value="">{{ _('Seleccione un entrenamiento...') }}</option>
+                                                        {% for ent in entrenamientos %}
+                                                        <option value="{{ ent.id }}">{{ ent.titulo }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">{{ _('Asignar') }}</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="asignarNutricionModal{{ jugador.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{{ _('Asignar Nutrición a') }} {{ jugador.nombre }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form action="{{ url_for('trainer.asignar_nutricion') }}" method="POST" data-ajax="true">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
+                                                    <select name="nutricion_id" class="form-select" required>
+                                                        <option value="">{{ _('Seleccione un plan...') }}</option>
+                                                        {% for plan in planes_nutricion %}
+                                                        <option value="{{ plan.id }}">{{ plan.titulo }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-success text-white">{{ _('Asignar') }}</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -217,17 +313,41 @@
                     <div class="row">
                         {% for foto in media %}
                         <div class="col-md-2 col-4 mb-3">
-                            <div class="card h-100 shadow-sm">
-                                <img src="{{ foto.imagen_url }}" class="card-img-top" style="height: 80px; object-fit: cover;">
-                                <div class="card-footer p-1 text-center">
-                                    <form action="{{ url_for('trainer.eliminar_imagen', imagen_id=foto.id) }}" method="POST" onsubmit="return confirm('{{ _('¿Borrar foto?') }}');">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-sm text-danger border-0 p-0"><i class="fas fa-trash"></i></button>
-                                    </form>
+                            <div class="card h-100 shadow-sm gallery-box">
+                                <a href="#" class="text-decoration-none open-gallery-preview" data-title="{{ foto.titulo|e }}" data-description="{{ foto.descripcion|e }}" data-image="{{ foto.imagen_url }}" data-type="{{ foto.tipo }}" data-uploaded="{{ foto.fecha_subida }}" data-author="{{ foto.entrenador_nombre or '' }} {{ foto.entrenador_apellido or '' }}">
+                                    <img src="{{ foto.imagen_url }}" class="card-img-top" style="height: 100px; object-fit: cover;">
+                                </a>
+                                <div class="card-footer p-1 text-center small">
+                                    <span class="badge bg-info">{{ foto.tipo or _('Sin tipo') }}</span>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de vista previa de galería -->
+    <div class="modal fade" id="galleryPreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="galleryPreviewTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row gx-4 gy-3">
+                        <div class="col-md-7">
+                            <img id="galleryPreviewImage" src="" class="img-fluid rounded" alt="Preview">
+                        </div>
+                        <div class="col-md-5">
+                            <p id="galleryPreviewDescription" class="mb-3"></p>
+                            <p class="mb-2"><strong>{{ _('Categoría:') }}</strong> <span id="galleryPreviewType"></span></p>
+                            <p class="mb-2"><strong>{{ _('Subido:') }}</strong> <span id="galleryPreviewUploaded"></span></p>
+                            <p class="mb-0"><strong>{{ _('Subido por:') }}</strong> <span id="galleryPreviewAuthor"></span></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -250,10 +370,19 @@
                             <input type="text" name="titulo" class="form-control" required>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">{{ _('Categoría') }}</label>
+                            <select name="tipo" class="form-select" required>
+                                <option value="equipo">{{ _('Equipo') }}</option>
+                                <option value="partido">{{ _('Partido') }}</option>
+                                <option value="entrenamiento">{{ _('Entrenamiento') }}</option>
+                                <option value="trofeo">{{ _('Trofeo') }}</option>
+                                <option value="logro">{{ _('Logro') }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">{{ _('Archivo') }}</label>
                             <input type="file" name="foto" class="form-control" accept="image/*" required>
                         </div>
-                        <input type="hidden" name="tipo" value="equipo">
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">{{ _('Subir') }}</button>

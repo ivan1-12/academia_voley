@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Editar Logro') }} - Juventud Global Sports{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-warning">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> {{ _('Editar Logro') }}</h5>
+                <a href="{{ url_for('trainer.gestion_logros') }}" class="btn btn-sm btn-dark">
+                    <i class="fas fa-arrow-left"></i> {{ _('Volver a logros') }}
+                </a>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('trainer.editar_logro', logro_id=logro.id) }}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Título del Logro') }}</label>
+                        <input type="text" name="titulo" class="form-control" required value="{{ logro.titulo }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Descripción') }}</label>
+                        <textarea name="descripcion" class="form-control" rows="4" required>{{ logro.descripcion }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Fecha del logro') }}</label>
+                        <input type="date" name="fecha_logro" class="form-control" value="{{ logro.fecha_logro if logro.fecha_logro is defined else '' }}" required>
+                    </div>
+                    {% if has_usuario_id %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Jugador asignado') }}</label>
+                        <select name="usuario_id" class="form-select" required>
+                            <option value="">{{ _('Seleccione un jugador...') }}</option>
+                            {% for jugador in jugadores %}
+                            <option value="{{ jugador.id }}" {% if logro.usuario_id == jugador.id %}selected{% endif %}>
+                                {{ jugador.nombre }} {{ jugador.apellido }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    {% if has_imagen_url %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Foto del logro (opcional)') }}</label>
+                        {% if logro.imagen_url %}
+                        <div class="mb-2">
+                            <img src="{{ logro.imagen_url }}" class="img-fluid rounded" style="max-height:220px; object-fit:cover;">
+                        </div>
+                        {% endif %}
+                        <input type="file" name="foto" class="form-control" accept="image/*">
+                    </div>
+                    {% endif %}
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> {{ _('Guardar cambios') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

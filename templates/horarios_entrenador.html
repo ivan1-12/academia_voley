@@ -37,36 +37,34 @@
                     </form>
 
                     {% if horarios %}
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>{{ _('Entrenador') }}</th>
-                                    <th>{{ _('Días') }}</th>
-                                    <th>{{ _('Horario') }}</th>
-                                    <th>{{ _('Precio') }}</th>
-                                    <th>{{ _('Descripción') }}</th>
-                                    <th>{{ _('Acciones') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for horario in horarios %}
-                                <tr>
-                                    <td>{{ horario.entrenador_nombre if horario.entrenador_nombre else current_user.nombre }} {{ horario.entrenador_apellido if horario.entrenador_apellido else '' }}</td>
-                                    <td>{{ horario.dias }}</td>
-                                    <td>{{ horario.horario }}</td>
-                                    <td>{{ horario.precio }}</td>
-                                    <td>{{ horario.descripcion or '-' }}</td>
-                                    <td>
-                                        <form action="{{ url_for('trainer.eliminar_horario', horario_id=horario.id) }}" method="POST" onsubmit="return confirm('{{ _('¿Eliminar este horario?') }}');">
-                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button class="btn btn-sm btn-outline-danger">{{ _('Eliminar') }}</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="row g-3">
+                        {% for horario in horarios %}
+                        <div class="col-md-6">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="card-title mb-1">{{ horario.dias }}</h5>
+                                            <p class="mb-1"><strong>{{ horario.horario }}</strong></p>
+                                            <p class="mb-1 text-success fw-bold">{{ horario.precio }}</p>
+                                            {% if horario.descripcion %}
+                                            <p class="small text-muted">{{ horario.descripcion }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">{{ horario.entrenador_nombre or current_user.nombre }}</small>
+                                            <div class="mt-2">
+                                                <form action="{{ url_for('trainer.eliminar_horario', horario_id=horario.id) }}" method="POST" onsubmit="return confirm('{{ _('¿Eliminar este horario?') }}');">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button class="btn btn-sm btn-outline-danger">{{ _('Eliminar') }}</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                     {% else %}
                     <div class="alert alert-info">{{ _('No hay horarios registrados aún. Agrega tu primer horario para que los jugadores puedan solicitar unirse.') }}</div>

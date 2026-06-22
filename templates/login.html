@@ -60,6 +60,9 @@
                         });
                     </script>
                     <hr>
+                    <div class="text-center mb-2">
+                        <p>{{ _('¿Olvidaste tu contraseña?') }} <a href="{{ url_for('auth_reset.forgot_password') }}">{{ _('Recupérala aquí') }}</a></p>
+                    </div>
                     <div class="text-center">
                         <p>{{ _('¿No tienes cuenta?') }} <a href="{{ url_for('auth.registro') }}">{{ _('Regístrate aquí') }}</a></p>
                     </div>

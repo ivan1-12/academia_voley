@@ -9,6 +9,31 @@ import io
 player_bp = Blueprint("player", __name__)
 
 
+@player_bp.route("/perfil_jugador/<int:usuario_id>")
+@login_required
+@rol_requerido("entrenador", "super_usuario")
+def perfil_jugador(usuario_id):
+    db = get_db()
+    cur = db.cursor()
+    try:
+        cur.execute("SELECT * FROM usuarios WHERE id = %s AND rol = 'jugador'", (usuario_id,))
+        usuario = cur.fetchone()
+        if not usuario:
+            flash(_("Jugador no encontrado."), "warning")
+            cur.close()
+            return redirect(url_for("trainer.dashboard_entrenador"))
+
+        cur.execute("SELECT * FROM perfiles_jugadores WHERE usuario_id = %s", (usuario_id,))
+        perfil = cur.fetchone()
+    except Exception:
+        usuario = None
+        perfil = None
+    finally:
+        cur.close()
+
+    return render_template("perfil_jugador.html", usuario=usuario, perfil=perfil)
+
+
 @player_bp.route("/dashboard_jugador")
 @login_required
 def dashboard_jugador():

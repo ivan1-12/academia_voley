@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify, abort
 from flask_babel import gettext as _
 from flask_login import login_required, current_user
+from extensions import limiter
 from models import get_db, rol_requerido, permiso_requerido
 from validators import (
     validar_nombre_texto,
@@ -15,6 +16,7 @@ from extensions import bcrypt
 import os
 import random
 import string
+from utils.notifications import send_email
 
 
 def generar_contraseña_aleatoria(length=12):
@@ -39,6 +41,14 @@ def allowed_logo(filename):
     ].lower() in current_app.config.get(
         "LOGO_EXTENSIONS", {"png", "jpg", "jpeg", "webp", "svg"}
     )
+
+
+def _tabla_tiene_columna(cur, tabla, columna):
+    try:
+        cur.execute(f"SHOW COLUMNS FROM {tabla} LIKE %s", (columna,))
+        return cur.fetchone() is not None
+    except Exception:
+        return False
 
 
 def _remove_existing_logos(images_dir):
@@ -81,7 +91,11 @@ def dashboard_entrenador():
         jugadores = []
 
     try:
-        cur.execute("SELECT * FROM galeria ORDER BY fecha_subida DESC")
+        cur.execute(
+            "SELECT g.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido "
+            "FROM galeria g LEFT JOIN usuarios u ON g.usuario_id = u.id "
+            "ORDER BY g.fecha_subida DESC"
+        )
         media = cur.fetchall()
     except Exception:
         media = []
@@ -98,6 +112,14 @@ def dashboard_entrenador():
     except Exception:
         planes_nutricion = []
 
+    try:
+        cur.execute(
+            "SELECT DISTINCT tipo FROM galeria WHERE tipo IS NOT NULL AND tipo != '' ORDER BY tipo"
+        )
+        galeria_tipos = [row["tipo"] for row in cur.fetchall()]
+    except Exception:
+        galeria_tipos = []
+
     cur.close()
 
     # Nota: Hemos depurado la estadística de Asistencia que estaba hardcodeada en el HTML.
@@ -109,7 +131,29 @@ def dashboard_entrenador():
         media=media,
         entrenamientos=entrenamientos,
         planes_nutricion=planes_nutricion,
+        galeria_tipos=galeria_tipos,
     )
+
+
+@trainer_bp.route("/jugadores_detalle")
+@login_required
+@rol_requerido("entrenador", "super_usuario")
+def jugadores_detalle():
+    db = get_db()
+    cur = db.cursor()
+    try:
+        cur.execute(
+            "SELECT u.id, u.nombre, u.apellido, u.email, u.genero, u.edad, p.posicion "
+            "FROM usuarios u LEFT JOIN perfiles_jugadores p ON u.id = p.usuario_id "
+            "WHERE u.rol = 'jugador' ORDER BY u.apellido, u.nombre"
+        )
+        jugadores = cur.fetchall()
+    except Exception:
+        jugadores = []
+    finally:
+        cur.close()
+
+    return render_template("jugadores_detalle.html", jugadores=jugadores)
 
 
 @trainer_bp.route("/eliminar_jugador/<int:usuario_id>", methods=["POST"])
@@ -784,11 +828,18 @@ def asignar_entrenamiento():
             (jugador_id, entrenamiento_id),
         )
         db.commit()
-        flash(_("Entrenamiento asignado exitosamente"), "success")
+        msg = _("Entrenamiento asignado exitosamente")
+        flash(msg, "success")
+        # Si la petición viene por AJAX devolver JSON en lugar de redirect
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"success": True, "message": msg})
     except Exception as e:
         db.rollback()
         current_app.logger.exception("Error asignando entrenamiento: %s", e)
-        flash(_("Error al asignar entrenamiento"), "danger")
+        msg = _("Error al asignar entrenamiento")
+        flash(msg, "danger")
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"success": False, "message": msg})
     finally:
         cur.close()
 
@@ -924,29 +975,71 @@ def solicitudes_equipo():
     db = get_db()
     cur = db.cursor()
     try:
+        # Obtener pendientes y archivadas por separado para evitar mostrar archivadas en listas principales
+        base_where = ""
+        params_pending = []
+        params_arch = []
         if current_user.rol == "super_usuario":
-            query = "SELECT s.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido FROM solicitudes_equipo s JOIN usuarios u ON s.entrenador_id = u.id"
-            params = []
-            if tipo_filter in ("nuevo", "academia"):
-                query += " WHERE s.tipo = %s"
-                params.append(tipo_filter)
-            query += " ORDER BY s.creado_at DESC"
-            cur.execute(query, params)
+            base_from = "FROM solicitudes_equipo s JOIN usuarios u ON s.entrenador_id = u.id"
         else:
-            query = "SELECT s.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido FROM solicitudes_equipo s JOIN usuarios u ON s.entrenador_id = u.id WHERE s.entrenador_id = %s"
-            params = [current_user.id]
-            if tipo_filter in ("nuevo", "academia"):
-                query += " AND s.tipo = %s"
-                params.append(tipo_filter)
-            query += " ORDER BY s.creado_at DESC"
-            cur.execute(query, params)
-        solicitudes = cur.fetchall()
+            base_from = "FROM solicitudes_equipo s JOIN usuarios u ON s.entrenador_id = u.id WHERE s.entrenador_id = %s"
+            params_pending.append(current_user.id)
+            params_arch.append(current_user.id)
+
+        if tipo_filter in ("nuevo", "academia"):
+            # añadir filtro por tipo
+            if base_from.find('WHERE') == -1:
+                base_from += " WHERE s.tipo = %s"
+                params_pending.append(tipo_filter)
+                params_arch.append(tipo_filter)
+            else:
+                base_from += " AND s.tipo = %s"
+                params_pending.append(tipo_filter)
+                params_arch.append(tipo_filter)
+
+        # pendientes
+        pending_query = f"SELECT s.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido {base_from} {'AND' if 'WHERE' in base_from else 'WHERE'} s.estado = 'pendiente' ORDER BY s.creado_at DESC"
+        # archivadas (estado != pendiente)
+        arch_query = f"SELECT s.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido {base_from} {'AND' if 'WHERE' in base_from else 'WHERE'} s.estado != 'pendiente' ORDER BY s.creado_at DESC"
+
+        cur.execute(pending_query, params_pending)
+        solicitudes_pendientes = cur.fetchall()
+        cur.execute(arch_query, params_arch)
+        solicitudes_archivadas = cur.fetchall()
+
+        # categorizar pendientes por tipo
+        solicitudes = solicitudes_pendientes + solicitudes_archivadas
+        solicitudes_academia_pendientes = [s for s in solicitudes_pendientes if s.get('tipo') == 'academia']
+        solicitudes_nuevo_pendientes = [s for s in solicitudes_pendientes if s.get('tipo') == 'nuevo']
+        solicitudes_otros_pendientes = [s for s in solicitudes_pendientes if s.get('tipo') not in ('nuevo','academia')]
+        # mantener variables antiguas para compatibilidad con plantilla
+        solicitudes_academia = [s for s in solicitudes if s.get('tipo') == 'academia']
+        solicitudes_nuevo = [s for s in solicitudes if s.get('tipo') == 'nuevo']
+        solicitudes_otros = [s for s in solicitudes if s.get('tipo') not in ('nuevo','academia')]
     except Exception:
         solicitudes = []
+        solicitudes_academia = []
+        solicitudes_nuevo = []
+        solicitudes_otros = []
+        solicitudes_pendientes = []
+        solicitudes_archivadas = []
+        solicitudes_academia_pendientes = []
+        solicitudes_nuevo_pendientes = []
+        solicitudes_otros_pendientes = []
     finally:
         cur.close()
     return render_template(
-        "solicitudes_equipo.html", solicitudes=solicitudes, tipo_filter=tipo_filter
+        "solicitudes_equipo.html",
+        solicitudes=solicitudes,
+        solicitudes_academia=solicitudes_academia,
+        solicitudes_nuevo=solicitudes_nuevo,
+        solicitudes_otros=solicitudes_otros,
+        solicitudes_pendientes=solicitudes_pendientes,
+        solicitudes_archivadas=solicitudes_archivadas,
+        solicitudes_academia_pendientes=solicitudes_academia_pendientes,
+        solicitudes_nuevo_pendientes=solicitudes_nuevo_pendientes,
+        solicitudes_otros_pendientes=solicitudes_otros_pendientes,
+        tipo_filter=tipo_filter,
     )
 
 
@@ -988,15 +1081,34 @@ def procesar_solicitud_equipo(solicitud_id):
             (solicitud_id,),
         )
         db.commit()
+        # Si la solicitud era de tipo 'nuevo', activar la cuenta creada previamente (si existe)
+        try:
+            if solicitud.get("tipo") == "nuevo":
+                cur.execute("SELECT id FROM usuarios WHERE email = %s AND rol = 'jugador'", (solicitud.get("email"),))
+                user_row = cur.fetchone()
+                if user_row:
+                    cur.execute("UPDATE usuarios SET activo = 1 WHERE id = %s", (user_row["id"],))
+                    db.commit()
+
+        except Exception:
+            db.rollback()
+            current_app.logger.exception("Error activando usuario para solicitud %s", solicitud_id)
+
+        # Enviar notificación por correo si está disponible la dirección
+        try:
+            if solicitud.get("email"):
+                subject = "Solicitud aceptada - Academia"
+                body = (
+                    f"Hola {solicitud.get('nombre')},\n\nTu solicitud ha sido aceptada. Puedes iniciar sesión con tu correo y la contraseña que configuraste al registrarte.\n\nSaludos,\nAcademia"
+                )
+                send_email(solicitud.get("email"), subject, body)
+        except Exception:
+            current_app.logger.exception("Error enviando notificacion por correo para solicitud %s", solicitud_id)
 
         if solicitud.get("tipo") == "nuevo":
-            flash(_("Solicitud aceptada. El solicitante podrá crear su perfil usando el mismo correo."),
-                "success",
-            )
+            flash(_("Solicitud aceptada. El solicitante podrá iniciar sesión (se envió notificación por correo cuando fue posible)."), "success")
         else:
-            flash(_("Solicitud aceptada. El jugador de la academia fue puesto en espera para la creación de perfil."),
-                "success",
-            )
+            flash(_("Solicitud aceptada. El jugador de la academia fue puesto en espera para la creación de perfil (se envió notificación por correo cuando fue posible)."), "success")
     except Exception as e:
         db.rollback()
         current_app.logger.exception("Error procesando solicitud: %s", e)
@@ -1033,11 +1145,17 @@ def asignar_nutricion():
             )
 
         db.commit()
-        flash(_("Plan nutricional asignado exitosamente"), "success")
+        msg = _("Plan nutricional asignado exitosamente")
+        flash(msg, "success")
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"success": True, "message": msg})
     except Exception as e:
         db.rollback()
         current_app.logger.exception("Error asignando nutrición: %s", e)
-        flash(_("Error al asignar plan nutricional"), "danger")
+        msg = _("Error al asignar plan nutricional")
+        flash(msg, "danger")
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"success": False, "message": msg})
     finally:
         cur.close()
 
@@ -1073,12 +1191,20 @@ def subir_foto():
 
         db = get_db()
         cur = db.cursor()
+        has_usuario_id = _tabla_tiene_columna(cur, "galeria", "usuario_id")
         try:
-            cur.execute(
-                """INSERT INTO galeria (titulo, descripcion, imagen_url, tipo, fecha_subida) 
-                      VALUES (%s, %s, %s, %s, NOW())""",
-                (titulo, descripcion, f"/static/uploads/{filename}", tipo),
-            )
+            if has_usuario_id:
+                cur.execute(
+                    "INSERT INTO galeria (titulo, descripcion, imagen_url, tipo, fecha_subida, usuario_id) "
+                    "VALUES (%s, %s, %s, %s, NOW(), %s)",
+                    (titulo, descripcion, f"/static/uploads/{filename}", tipo, current_user.id),
+                )
+            else:
+                cur.execute(
+                    "INSERT INTO galeria (titulo, descripcion, imagen_url, tipo, fecha_subida) "
+                    "VALUES (%s, %s, %s, %s, NOW())",
+                    (titulo, descripcion, f"/static/uploads/{filename}", tipo),
+                )
             db.commit()
             flash(_("Foto subida exitosamente"), "success")
         except Exception as e:
@@ -1098,33 +1224,229 @@ def subir_foto():
 @rol_requerido("entrenador", "super_usuario")
 def gestion_logros():
     db = get_db()
-    if request.method == "POST":
-        titulo = request.form["titulo"]
-        descripcion = request.form["descripcion"]
-        fecha_logro = request.form["fecha_logro"]
+    cur = db.cursor()
+    has_usuario_id = _tabla_tiene_columna(cur, "logros", "usuario_id")
+    has_imagen_url = _tabla_tiene_columna(cur, "logros", "imagen_url")
 
-        cur = db.cursor()
+    if request.method == "POST":
+        titulo = request.form.get("titulo")
+        descripcion = request.form.get("descripcion")
+        fecha_logro = request.form.get("fecha_logro")
+        usuario_id = request.form.get("usuario_id") if has_usuario_id else None
+        foto = request.files.get("foto") if has_imagen_url else None
+
+        imagen_url = None
+        if foto and foto.filename:
+            if allowed_file(foto.filename):
+                filename = secure_filename(foto.filename)
+                filename = f"logro_{int(datetime.utcnow().timestamp())}_{filename}"
+                upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"])
+                os.makedirs(upload_path, exist_ok=True)
+                foto.save(os.path.join(upload_path, filename))
+                imagen_url = f"/static/uploads/{filename}"
+            else:
+                flash(_("El archivo de imagen no tiene un formato compatible."), "danger")
+                cur.close()
+                return redirect(url_for("trainer.gestion_logros"))
+
         try:
-            cur.execute(
-                "INSERT INTO logros (titulo, descripcion, fecha_logro) VALUES (%s, %s, %s)",
-                (titulo, descripcion, fecha_logro),
-            )
+            if has_usuario_id and has_imagen_url:
+                cur.execute(
+                    "INSERT INTO logros (titulo, descripcion, fecha_logro, usuario_id, imagen_url) VALUES (%s, %s, %s, %s, %s)",
+                    (titulo, descripcion, fecha_logro, usuario_id or None, imagen_url),
+                )
+            elif has_usuario_id:
+                cur.execute(
+                    "INSERT INTO logros (titulo, descripcion, fecha_logro, usuario_id) VALUES (%s, %s, %s, %s)",
+                    (titulo, descripcion, fecha_logro, usuario_id or None),
+                )
+            elif has_imagen_url:
+                cur.execute(
+                    "INSERT INTO logros (titulo, descripcion, fecha_logro, imagen_url) VALUES (%s, %s, %s, %s)",
+                    (titulo, descripcion, fecha_logro, imagen_url),
+                )
+            else:
+                cur.execute(
+                    "INSERT INTO logros (titulo, descripcion, fecha_logro) VALUES (%s, %s, %s)",
+                    (titulo, descripcion, fecha_logro),
+                )
+        except Exception:
+            # Fallback: esquema antiguo sin columnas usuario_id/imagen_url
+            try:
+                cur.execute(
+                    "INSERT INTO logros (titulo, descripcion, fecha_logro) VALUES (%s, %s, %s)",
+                    (titulo, descripcion, fecha_logro),
+                )
+            except Exception as e:
+                db.rollback()
+                current_app.logger.exception("Error agregando logro (fallback): %s", e)
+                flash(_("Error al agregar logro"), "danger")
+                cur.close()
+                return redirect(url_for("trainer.gestion_logros"))
+
+        # Si hay imagen y columna compatible, agregar también a la galería para que aparezca en la sección pública
+        if imagen_url and has_imagen_url:
+            try:
+                cur.execute(
+                    "INSERT INTO galeria (titulo, descripcion, imagen_url, tipo, fecha_subida, usuario_id) VALUES (%s, %s, %s, %s, NOW(), %s)",
+                    (titulo, descripcion, imagen_url, 'logro', current_user.id),
+                )
+            except Exception:
+                current_app.logger.exception("No se pudo insertar imagen de logro en galería")
+
+        try:
             db.commit()
             flash(_("Logro agregado exitosamente"), "success")
         except Exception as e:
             db.rollback()
-            current_app.logger.exception("Error agregando logro: %s", e)
+            current_app.logger.exception("Error finalizando insercion de logro: %s", e)
             flash(_("Error al agregar logro"), "danger")
         finally:
             cur.close()
         return redirect(url_for("trainer.gestion_logros"))
 
+    # Obtener jugadores para el selector solo si la tabla soporta usuario_id
+    jugadores = []
+    if has_usuario_id:
+        try:
+            cur.execute("SELECT id, nombre, apellido FROM usuarios WHERE rol = 'jugador' ORDER BY nombre")
+            jugadores = cur.fetchall()
+        except Exception:
+            jugadores = []
+
+    try:
+        if has_usuario_id:
+            cur.execute(
+                "SELECT l.*, u.nombre AS jugador_nombre, u.apellido AS jugador_apellido "
+                "FROM logros l LEFT JOIN usuarios u ON l.usuario_id = u.id "
+                "ORDER BY l.fecha_logro DESC"
+            )
+        else:
+            cur.execute("SELECT l.* FROM logros l ORDER BY l.fecha_logro DESC")
+        logros = cur.fetchall()
+    except Exception:
+        logros = []
+    finally:
+        cur.close()
+
+    return render_template(
+        "logros.html",
+        logros=logros,
+        jugadores=jugadores,
+        has_usuario_id=has_usuario_id,
+        has_imagen_url=has_imagen_url,
+    )
+
+
+@trainer_bp.route("/editar_logro/<int:logro_id>", methods=["GET", "POST"])
+@login_required
+@rol_requerido("entrenador", "super_usuario")
+def editar_logro(logro_id):
+    db = get_db()
     cur = db.cursor()
-    cur.execute("SELECT * FROM logros ORDER BY fecha_logro DESC")
-    logros = cur.fetchall()
+    has_usuario_id = _tabla_tiene_columna(cur, "logros", "usuario_id")
+    has_imagen_url = _tabla_tiene_columna(cur, "logros", "imagen_url")
+
+    if request.method == "POST":
+        titulo = request.form.get("titulo")
+        descripcion = request.form.get("descripcion")
+        fecha_logro = request.form.get("fecha_logro")
+        usuario_id = request.form.get("usuario_id") if has_usuario_id else None
+        foto = request.files.get("foto") if has_imagen_url else None
+
+        imagen_url = None
+        if foto and foto.filename:
+            if allowed_file(foto.filename):
+                filename = secure_filename(foto.filename)
+                filename = f"logro_{int(datetime.utcnow().timestamp())}_{filename}"
+                upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"])
+                os.makedirs(upload_path, exist_ok=True)
+                foto.save(os.path.join(upload_path, filename))
+                imagen_url = f"/static/uploads/{filename}"
+            else:
+                flash(_("El archivo de imagen no tiene un formato compatible."), "danger")
+                cur.close()
+                return redirect(url_for("trainer.editar_logro", logro_id=logro_id))
+
+        try:
+            if has_usuario_id and has_imagen_url:
+                if imagen_url:
+                    cur.execute(
+                        "UPDATE logros SET titulo = %s, descripcion = %s, fecha_logro = %s, usuario_id = %s, imagen_url = %s WHERE id = %s",
+                        (titulo, descripcion, fecha_logro, usuario_id or None, imagen_url, logro_id),
+                    )
+                else:
+                    cur.execute(
+                        "UPDATE logros SET titulo = %s, descripcion = %s, fecha_logro = %s, usuario_id = %s WHERE id = %s",
+                        (titulo, descripcion, fecha_logro, usuario_id or None, logro_id),
+                    )
+            elif has_usuario_id:
+                cur.execute(
+                    "UPDATE logros SET titulo = %s, descripcion = %s, fecha_logro = %s, usuario_id = %s WHERE id = %s",
+                    (titulo, descripcion, fecha_logro, usuario_id or None, logro_id),
+                )
+            elif has_imagen_url:
+                if imagen_url:
+                    cur.execute(
+                        "UPDATE logros SET titulo = %s, descripcion = %s, fecha_logro = %s, imagen_url = %s WHERE id = %s",
+                        (titulo, descripcion, fecha_logro, imagen_url, logro_id),
+                    )
+                else:
+                    cur.execute(
+                        "UPDATE logros SET titulo = %s, descripcion = %s, fecha_logro = %s WHERE id = %s",
+                        (titulo, descripcion, fecha_logro, logro_id),
+                    )
+            else:
+                cur.execute(
+                    "UPDATE logros SET titulo = %s, descripcion = %s, fecha_logro = %s WHERE id = %s",
+                    (titulo, descripcion, fecha_logro, logro_id),
+                )
+            db.commit()
+            flash(_("Logro actualizado correctamente"), "success")
+        except Exception as e:
+            db.rollback()
+            current_app.logger.exception("Error actualizando logro: %s", e)
+            flash(_("Error al actualizar logro"), "danger")
+            cur.close()
+            return redirect(url_for("trainer.editar_logro", logro_id=logro_id))
+
+        cur.close()
+        return redirect(url_for("trainer.gestion_logros"))
+
+    try:
+        if has_usuario_id:
+            cur.execute(
+                "SELECT l.*, u.nombre AS jugador_nombre, u.apellido AS jugador_apellido "
+                "FROM logros l LEFT JOIN usuarios u ON l.usuario_id = u.id WHERE l.id = %s",
+                (logro_id,),
+            )
+        else:
+            cur.execute("SELECT * FROM logros WHERE id = %s", (logro_id,))
+        logro = cur.fetchone()
+    except Exception:
+        logro = None
+
+    jugadores = []
+    if has_usuario_id:
+        try:
+            cur.execute("SELECT id, nombre, apellido FROM usuarios WHERE rol = 'jugador' ORDER BY nombre")
+            jugadores = cur.fetchall()
+        except Exception:
+            jugadores = []
+
     cur.close()
 
-    return render_template("logros.html", logros=logros)
+    if not logro:
+        flash(_("Logro no encontrado."), "warning")
+        return redirect(url_for("trainer.gestion_logros"))
+
+    return render_template(
+        "editar_logro.html",
+        logro=logro,
+        jugadores=jugadores,
+        has_usuario_id=has_usuario_id,
+        has_imagen_url=has_imagen_url,
+    )
 
 
 @trainer_bp.route("/eliminar_entrenamiento/<int:entrenamiento_id>", methods=["POST"])
@@ -1225,64 +1547,50 @@ def branding():
         if ext == "jpeg":
             ext = "jpg"
         target_name = f"logo.{ext}"
-        # Save to temporary path first
         tmp_name = f"logo_tmp.{ext}"
         tmp_path = os.path.join(images_dir, tmp_name)
+
         try:
             logo.save(tmp_path)
 
-            # Only raster formats are processed; SVGs are saved as-is
-            if ext in ("png", "jpg", "jpeg", "webp"):
+            if ext in ("png", "jpg", "webp"):
                 try:
                     im = Image.open(tmp_path).convert("RGBA")
-                    # Create square canvas and center the image
                     max_side = max(im.width, im.height)
                     canvas = Image.new("RGBA", (max_side, max_side), (255, 255, 255, 0))
                     paste_x = (max_side - im.width) // 2
                     paste_y = (max_side - im.height) // 2
-                    # Use alpha channel as mask when present
                     if "A" in im.getbands():
                         canvas.paste(im, (paste_x, paste_y), im)
                     else:
                         canvas.paste(im, (paste_x, paste_y))
 
-                    # Resize to a reasonable fixed size to ensure consistent appearance
                     target_size = 512
                     canvas = canvas.resize((target_size, target_size), Image.LANCZOS)
-
-                    # Remove existing logos and save
                     _remove_existing_logos(images_dir)
                     save_path = os.path.join(images_dir, target_name)
-                    if ext in ("jpg", "jpeg"):
-                        # JPEG doesn't support alpha; paste on white background
-                        bg = Image.new(
-                            "RGB", (target_size, target_size), (255, 255, 255)
-                        )
+                    if ext == "jpg":
+                        bg = Image.new("RGB", (target_size, target_size), (255, 255, 255))
                         bg.paste(canvas, mask=canvas.split()[3])
                         bg.save(save_path, quality=95)
                     else:
-                        # PNG/WebP keep alpha
                         canvas.save(save_path)
 
-                    os.remove(tmp_path)
                     flash(_("Logo actualizado correctamente."), "success")
                     return redirect(url_for("trainer.branding"))
                 except Exception as e:
                     current_app.logger.exception("Error procesando logo: %s", e)
-                    # fallback: move original file
                     _remove_existing_logos(images_dir)
                     os.replace(tmp_path, os.path.join(images_dir, target_name))
                     flash(_("Logo actualizado (sin procesar)."), "warning")
                     return redirect(url_for("trainer.branding"))
             else:
-                # For SVG or unsupported raster types, simply replace
                 _remove_existing_logos(images_dir)
                 os.replace(tmp_path, os.path.join(images_dir, target_name))
                 flash(_("Logo actualizado correctamente."), "success")
                 return redirect(url_for("trainer.branding"))
         except Exception as e:
             current_app.logger.exception("Error guardando logo: %s", e)
-            # Clean tmp file if exists
             try:
                 if os.path.exists(tmp_path):
                     os.remove(tmp_path)
@@ -1291,61 +1599,13 @@ def branding():
             flash(_("Error al guardar el logo. Intenta nuevamente."), "danger")
             return redirect(url_for("trainer.branding"))
 
-    return render_template("branding.html")
+    logo_url = None
+    for name in LOGO_CANDIDATES:
+        candidate_path = os.path.join(images_dir, name)
+        if os.path.isfile(candidate_path):
+            logo_url = url_for("static", filename=f"images/{name}")
+            break
+    if not logo_url:
+        logo_url = url_for("static", filename="images/logo.png")
 
-
-@trainer_bp.route("/eliminar_entrenador/<int:usuario_id>", methods=["POST"])
-@login_required
-@permiso_requerido("modificar_entrenadores")
-def eliminar_entrenador(usuario_id):
-    if current_user.id == usuario_id:
-        flash(_("No puedes eliminar tu propia cuenta desde aquí."), "danger")
-        return redirect(url_for("trainer.gestion_usuarios"))
-
-    db = get_db()
-    cur = db.cursor()
-    try:
-        cur.execute("SELECT rol FROM usuarios WHERE id = %s", (usuario_id,))
-        row = cur.fetchone()
-        if not row or row.get("rol") != "entrenador":
-            flash(_("Entrenador no encontrado."), "warning")
-            return redirect(url_for("trainer.gestion_usuarios"))
-
-        cur.execute(
-            "DELETE FROM horarios_entrenador WHERE entrenador_id = %s", (usuario_id,)
-        )
-        cur.execute(
-            "DELETE FROM solicitudes_equipo WHERE entrenador_id = %s", (usuario_id,)
-        )
-        cur.execute(
-            "DELETE FROM usuarios WHERE id = %s AND rol = 'entrenador'", (usuario_id,)
-        )
-        db.commit()
-        flash(_("Entrenador eliminado correctamente."), "success")
-    except Exception as e:
-        db.rollback()
-        current_app.logger.exception("Error eliminando entrenador: %s", e)
-        flash(_("Error al eliminar entrenador."), "danger")
-    finally:
-        cur.close()
-
-    return redirect(url_for("trainer.gestion_usuarios"))
-
-
-@trainer_bp.route("/api/jugadores")
-@login_required
-@rol_requerido("entrenador", "super_usuario")
-def api_jugadores():
-    db = get_db()
-    cur = db.cursor()
-    try:
-        cur.execute(
-            "SELECT id, nombre, apellido, email FROM usuarios WHERE rol = 'jugador' ORDER BY nombre"
-        )
-        jugadores = cur.fetchall()
-    except Exception:
-        jugadores = []
-    finally:
-        cur.close()
-
-    return jsonify({"jugadores": jugadores})
+    return render_template("branding.html", brand_logo_url=logo_url)

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
 from flask_babel import gettext as _
 from flask_login import login_user, logout_user, login_required, current_user
-from extensions import bcrypt
+from extensions import bcrypt, limiter
 from models import get_db, User, FALLBACK_PERMISOS
 from validators import (
     validar_nombre_texto,
@@ -185,7 +185,7 @@ def registro():
             if (
                 solicitud_existente
                 and solicitud_existente.get("estado") == "aceptado"
-                and solicitud_existente.get("tipo") == "nuevo"
+                and solicitud_existente.get("tipo") in ("nuevo", "academia")
             ):
                 fn = datetime.strptime(fecha_nacimiento, "%Y-%m-%d").date()
                 today = date.today()
@@ -234,6 +234,37 @@ def registro():
                     selected_trainer_id=entrenador_id,
                 )
 
+            # Crear cuenta de jugador en estado inactivo con los datos enviados para evitar doble formulario
+            try:
+                cur.execute("SELECT id FROM roles WHERE nombre = 'jugador'")
+                rol_row = cur.fetchone()
+                rol_id = rol_row["id"] if rol_row else None
+                password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+                idioma = session.get("lang", "es")
+                fn = datetime.strptime(fecha_nacimiento, "%Y-%m-%d").date() if fecha_nacimiento else None
+                today = date.today()
+                edad = (
+                    today.year - fn.year - ((today.month, today.day) < (fn.month, fn.day))
+                ) if fn else None
+
+                cur.execute(
+                    "INSERT INTO usuarios (nombre, apellido, email, password, rol, rol_id, fecha_nacimiento, edad, genero, cedula, idioma, activo) VALUES (%s, %s, %s, %s, 'jugador', %s, %s, %s, %s, %s, %s, 0)",
+                    (
+                        nombre,
+                        apellido,
+                        email,
+                        password_hash,
+                        rol_id,
+                        fecha_nacimiento,
+                        edad,
+                        genero,
+                        cedula,
+                        idioma,
+                    ),
+                )
+            except Exception:
+                db.rollback()
+
             cur.execute(
                 "INSERT INTO solicitudes_equipo (entrenador_id, nombre, email, telefono, mensaje, tipo) VALUES (%s, %s, %s, %s, %s, 'nuevo')",
                 (
@@ -245,7 +276,7 @@ def registro():
                 ),
             )
             db.commit()
-            flash(_("Tu solicitud fue enviada correctamente. Cuando el entrenador la acepte, podrás crear tu perfil con el mismo correo."),
+            flash(_("Tu solicitud fue enviada correctamente. Cuando el entrenador la acepte recibirás un correo y podrás iniciar sesión."),
                 "success",
             )
             cur.close()
@@ -263,6 +294,7 @@ def registro():
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("10 per hour")
 def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip()

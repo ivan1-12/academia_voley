@@ -12,8 +12,10 @@
             <div class="card-body">
                 <div class="text-center mb-4 p-4 bg-light rounded">
                     <p class="text-muted mb-3">{{ _('Vista previa actual') }}</p>
-                    <div class="brand-logo-circle brand-logo-circle--lg mx-auto">
-                            <img src="{{ brand_logo_url }}" alt="{{ _('Logo') }}" id="brandPreviewImg">
+                    <div class="brand-logo-circle brand-logo-circle--lg mx-auto mb-4">
+                        <img src="{{ brand_logo_url }}" alt="{{ _('Logo') }}" id="brandPreviewImg">
+                    </div>
+                </div>
                 <form method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
