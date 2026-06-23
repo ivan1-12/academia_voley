@@ -1,0 +1,44 @@
+Instrucciones para ejecutar Academia Voley en otra PC
+
+Requisitos previos:
+- Python 3.10 o superior instalado.
+- MySQL instalado y accesible.
+- Clonar o copiar el proyecto en la PC de destino.
+- Instalar dependencias desde el virtualenv.
+
+Pasos:
+
+1. Abrir PowerShell en la carpeta del proyecto.
+
+2. Crear y activar el entorno virtual:
+   py -3 -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+
+3. Instalar dependencias:
+   pip install -r requirements.txt
+
+4. Revisar y ajustar el archivo `.env`:
+   - SECRET_KEY: valor seguro cualquiera.
+   - MYSQL_HOST: dirección de MySQL local (por ejemplo `127.0.0.1`).
+   - MYSQL_PORT: puerto de MySQL (por ejemplo `3306` o `3307`).
+   - MYSQL_USER: usuario de MySQL.
+   - MYSQL_PASSWORD: contraseña de MySQL.
+   - MYSQL_DB: nombre de la base de datos.
+   - ADMIN_EMAIL / ADMIN_PASSWORD: credenciales iniciales de administrador.
+
+5. Asegurarse de que la base de datos existe y tiene la estructura requerida.
+   Ejecutar el script `mysql_init.sql` en MySQL para crear tablas si aún no existen.
+
+6. Compilar traducciones (para idiomas):
+   .\.venv\Scripts\python.exe scripts\compile_translations.py
+
+7. Ejecutar la aplicación:
+   .\.venv\Scripts\python.exe app.py
+
+8. Abrir la aplicación en el navegador:
+   http://127.0.0.1:5000
+
+Notas:
+- Si el puerto 5000 ya está en uso, cambia `FLASK_PORT` en `.env` y usa la URL correspondiente.
+- Al ejecutar en local, el app se iniciará en modo de desarrollo y mostrará mensajes en la consola.
+- Si no deseas usar Docker, no es necesario. Esta guía es para correr el proyecto directamente con Python.

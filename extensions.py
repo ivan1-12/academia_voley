@@ -9,7 +9,11 @@ from flask_limiter.util import get_remote_address
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 csrf = CSRFProtect()
-limiter = Limiter(key_func=get_remote_address, default_limits=["500 per day", "100 per hour"])
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["500 per day", "100 per hour"],
+    storage_uri="memory://",
+)
 babel = Babel()
 
 # Configuración básica de LoginManager

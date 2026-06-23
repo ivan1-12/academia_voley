@@ -14,7 +14,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow-sm">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('public.index') }}">
                 <span class="brand-logo-circle brand-logo-circle--sm">
@@ -39,15 +39,22 @@
                     
                     {% if current_user.is_authenticated %}
                         {% if current_user.rol == 'super_usuario' %}
-                        <li class="nav-item">
-                                <a class="nav-link fw-bold text-warning" href="{{ url_for('reports.reportes') }}">
-                                <i class="fas fa-chart-bar"></i> {{ _('Reportes') }}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle fw-semibold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-tools me-1"></i> {{ _('Administración') }}
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link fw-bold text-success" href="{{ url_for('trainer.gestion_usuarios') }}">
-                                <i class="fas fa-user-cog"></i> {{ _('Gestión de usuarios') }}
-                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('reports.reportes') }}">
+                                        <i class="fas fa-chart-bar text-primary"></i> {{ _('Reportes') }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center gap-2" href="{{ url_for('trainer.gestion_usuarios') }}">
+                                        <i class="fas fa-user-cog text-success"></i> {{ _('Gestión de usuarios') }}
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         {% endif %}
                         <li class="nav-item">
@@ -84,8 +91,8 @@
                     </li>
 
                     <!-- Botón de Tema -->
-                    <li class="nav-item ms-lg-1">
-                        <button id="themeToggle" class="btn btn-outline-light btn-sm mt-1">
+                    <li class="nav-item ms-lg-1 d-flex align-items-center">
+                        <button id="themeToggle" class="btn btn-outline-light btn-sm">
                             <i class="fas fa-moon" id="themeIcon"></i>
                         </button>
                     </li>
@@ -140,5 +147,46 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/form_utils.js') }}"></script>
+    {% block scripts %}{% endblock %}
+    <script>
+        (function () {
+            var shapeKey = 'brandLogoShape';
+            var availableShapes = ['circle', 'rounded', 'pill', 'hexagon'];
+
+            function applyShape(shape) {
+                if (!shape || availableShapes.indexOf(shape) === -1) {
+                    shape = 'circle';
+                }
+                var wrappers = document.querySelectorAll('.brand-logo-circle');
+                wrappers.forEach(function (wrapper) {
+                    availableShapes.forEach(function (candidate) {
+                        wrapper.classList.remove('shape-' + candidate);
+                    });
+                    wrapper.classList.add('shape-' + shape);
+                });
+                localStorage.setItem(shapeKey, shape);
+                var activeButtons = document.querySelectorAll('#shapeOptions .shape-option');
+                activeButtons.forEach(function (button) {
+                    button.classList.toggle('active', button.dataset.shape === shape);
+                });
+                var input = document.getElementById('logoShapeInput');
+                if (input) {
+                    input.value = shape;
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                var currentShape = localStorage.getItem(shapeKey) || 'circle';
+                applyShape(currentShape);
+
+                var shapeOptions = document.querySelectorAll('#shapeOptions .shape-option');
+                shapeOptions.forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        applyShape(button.dataset.shape);
+                    });
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

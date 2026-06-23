@@ -29,13 +29,7 @@ py -3.14 -m venv .venv
 pip install -r requirements.txt
 ```
 
-3. Copiar el archivo de variables de entorno:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-4. Editar `.env` y ajustar al menos:
+3. Editar el archivo `.env` que ya está presente en la raíz del proyecto y ajustar al menos:
    - `SECRET_KEY`
    - `MYSQL_HOST`
    - `MYSQL_PORT`
@@ -83,7 +77,7 @@ La salida en consola indicará la URL local (por defecto `http://127.0.0.1:5000`
 python scripts\compile_translations.py
 ```
 
-- El archivo `.env.example` ya incluye valores de configuración base y debe copiarse a `.env`.
+- El proyecto usa un único archivo `.env` en la raíz para configuración local.
 
 - El proyecto ignora el directorio `.venv` y las carpetas de caché en `.gitignore`.
 

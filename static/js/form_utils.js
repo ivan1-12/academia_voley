@@ -54,10 +54,15 @@ function attachPasswordStrength(inputId, barId) {
     }
 }
 
-// Auto-attach for forms that use our IDs (best-effort)
-document.addEventListener('DOMContentLoaded', function () {
+function initFormUtils() {
     attachPasswordToggle('togglePasswordReg', 'password', 'togglePasswordRegIcon');
     attachPasswordStrength('password', 'passwordStrengthReg');
     attachPasswordToggle('togglePasswordStaff', 'password', 'togglePasswordStaffIcon');
     attachPasswordStrength('password', 'passwordStrengthStaff');
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFormUtils);
+} else {
+    initFormUtils();
+}

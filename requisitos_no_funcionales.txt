@@ -1,0 +1,54 @@
+Requisitos No Funcionales - Sistema Web Academia Voley
+
+1. RNF001 - Seguridad
+   - Las contraseñas se almacenan con bcrypt y sal segura.
+   - Protección CSRF activa en formularios con tokens Flask-WTF.
+   - Validación de entrada en servidor para reducir riesgos de inyección SQL y XSS.
+   - Cabeceras de seguridad HTTP aplicadas: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy y X-XSS-Protection.
+   - Cookies de sesión y remember usan `HttpOnly` y `SameSite=Lax`.
+
+2. RNF002 - Rendimiento
+   - Servir archivos estáticos desde `static/`.
+   - Límite de subida de archivos configurado (`MAX_CONTENT_LENGTH`).
+   - Procesamiento de imágenes opcional y degradación segura si Pillow no está disponible.
+
+3. RNF003 - Disponibilidad y fiabilidad
+   - Uso de transacciones y rollback en operaciones de base de datos.
+   - Manejo de errores con logging y mensajes amigables al usuario.
+   - Recuperación de conexión DB en teardown de contexto.
+
+4. RNF004 - Escalabilidad y despliegue
+   - El servidor de desarrollo no es para producción; usar WSGI (Gunicorn/uWSGI) detrás de proxy inverso.
+   - Para producción, se recomienda un backend persistente para rate limiting (Redis/Memcached).
+   - Configuración gestionada por variables de entorno y `.env` para ambientes distintos.
+
+5. RNF005 - Mantenibilidad
+   - Código organizado con Blueprints y separaciones claras de rutas, modelos, validadores y utilidades.
+   - Tests automatizados con `pytest` para flujos críticos.
+   - Documentación incluida en `README.md` y scripts de soporte en `scripts/`.
+
+6. RNF006 - Usabilidad
+   - Interfaz web responsiva y capaz de mostrar mensajes flash claros.
+   - Formularios con validación de entrada y feedback inmediato.
+   - Support para selección de idioma en UI.
+
+7. RNF007 - Compatibilidad
+   - Soporta Python 3.10+.
+   - Base de datos MySQL, con conexión configurada en `config.py`.
+   - Dependencias gestionadas en `requirements.txt`.
+
+8. RNF008 - Internacionalización
+   - Soporte de locales con Flask-Babel.
+   - Traducciones mantenidas en archivos `.po` y compiladas a `.mo`.
+   - Selección de idioma por sesión y persistencia en usuario autenticado.
+
+9. RNF009 - Backup y recuperación
+   - Respaldo de la base de datos debe realizarse fuera de la app.
+   - Configuración de la app separada del código fuente para facilitar restauración.
+
+10. RNF010 - Privacidad y datos personales
+   - Minimizar la exposición de información de usuarios en vistas públicas.
+   - Los datos personales se muestran solo en áreas autorizadas.
+   - Gestión de cuentas desactivadas para proteger acceso.
+
+Notas: Priorizar seguridad, modularidad y despliegue en entorno controlado antes de exponer la aplicación en producción.

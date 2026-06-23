@@ -183,9 +183,26 @@ CREATE TABLE IF NOT EXISTS `descargas_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Índices adicionales
-CREATE INDEX IF NOT EXISTS `idx_usuarios_rol` ON `usuarios`(`rol`);
-CREATE INDEX IF NOT EXISTS `idx_usuarios_rol_id` ON `usuarios`(`rol_id`);
-CREATE INDEX IF NOT EXISTS `idx_galeria_tipo` ON `galeria`(`tipo`);
+-- Índices adicionales: crear solo si no existen (compatible con distintas versiones de MySQL/cliente)
+-- Nota: usamos consultas a INFORMATION_SCHEMA y sentencias preparadas para evitar errores en importaciones
+
+-- idx_usuarios_rol
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.STATISTICS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios' AND INDEX_NAME = 'idx_usuarios_rol';
+SET @sql = IF(@c = 0, 'ALTER TABLE `usuarios` ADD INDEX `idx_usuarios_rol` (`rol`)', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- idx_usuarios_rol_id
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.STATISTICS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios' AND INDEX_NAME = 'idx_usuarios_rol_id';
+SET @sql = IF(@c = 0, 'ALTER TABLE `usuarios` ADD INDEX `idx_usuarios_rol_id` (`rol_id`)', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- idx_galeria_tipo
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.STATISTICS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'galeria' AND INDEX_NAME = 'idx_galeria_tipo';
+SET @sql = IF(@c = 0, 'ALTER TABLE `galeria` ADD INDEX `idx_galeria_tipo` (`tipo`)', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- INSERCIÓN DE DATOS INICIALES Y CONFIGURACIÓN
 -- Insertar Roles

@@ -1,0 +1,22 @@
+FROM python:3.11-slim
+WORKDIR /app
+
+# Install system deps
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc libffi-dev libssl-dev && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source
+COPY . .
+
+ENV FLASK_ENV=production
+ENV PYTHONUNBUFFERED=1
+
+# Create upload folders
+RUN mkdir -p static/images uploads
+
+EXPOSE 8000
+
+CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0:8000", "app:app"]

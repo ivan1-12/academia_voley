@@ -1,0 +1,63 @@
+Requisitos Funcionales - Sistema Web Academia Voley
+
+1. RF001 - Registro de usuarios
+   - Permitir registro de jugadores con selección de entrenador.
+   - Si existe una solicitud previa aceptada de tipo 'nuevo' o 'academia', completar registro y permitir login.
+   - Si no existe solicitud aceptada, crear cuenta de jugador inactiva y generar solicitud tipo 'nuevo'.
+
+2. RF002 - Autenticación y recuperación
+   - Iniciar y cerrar sesión verificando credenciales y estado de cuenta activo.
+   - Restaurar contraseña mediante link seguro con token expirado y límite de intentos.
+   - Guardar la preferencia de idioma del usuario en sesión y en la cuenta.
+
+3. RF003 - Solicitudes para unirse al equipo
+   - Enviar solicitudes públicas desde la página del entrenador o durante registro.
+   - Gestionar solicitudes de tipo 'academia' y 'nuevo'.
+   - Entrenadores y `super_usuario` pueden aceptar/rechazar solicitudes.
+   - Las solicitudes aceptadas cambian estado a 'aceptado'; rechazadas a 'rechazada'.
+   - Mostrar listas separadas de solicitudes pendientes y archivadas.
+
+4. RF004 - Gestión de la galería
+   - Subir imágenes con título, descripción, tipo/categoría y opcional autor.
+   - Mostrar galería pública con orden cronológico y opciones de filtrado por tipo.
+   - Eliminar imágenes desde la UI y borrar el archivo asociado del disco.
+   - Insertar automáticamente imágenes de logros en la galería cuando esté disponible.
+
+5. RF005 - Gestión de logros
+   - Crear, editar y eliminar logros con título, descripción y fecha.
+   - Asociar logros a jugadores si la columna `usuario_id` existe.
+   - Adjuntar imagen de logro si la columna `imagen_url` existe.
+   - Actualizar logros y eliminar registros sin perder integridad.
+
+6. RF006 - Gestión de usuarios y roles
+   - `super_usuario` puede crear, editar y eliminar entrenadores.
+   - Gestionar cuentas de jugadores y entrenadores: activar/inactivar, editar perfil y cambiar contraseña.
+   - RBAC basado en roles y permisos para proteger acciones sensibles.
+
+7. RF007 - Branding y logo
+   - Subir logo desde el panel de administración.
+   - Procesar y normalizar imágenes con Pillow si está disponible.
+   - Reemplazar el logo anterior y almacenar el archivo en `static/images/`.
+
+8. RF008 - Entrenamientos y nutrición
+   - Crear y listar entrenamientos con ejercicios, duración, dificultad e imagen opcional.
+   - Crear y listar planes nutricionales con comidas y recomendaciones de hidratación.
+   - Asignar entrenamientos y planes nutricionales a jugadores.
+
+9. RF009 - Horarios de entrenador
+   - Entrenadores gestionan sus horarios con días, horarios, precio y descripción.
+   - El listado de horarios aparece en el perfil académico público.
+
+10. RF010 - Reportes administrativos
+   - Mostrar métricas de usuarios activos recientes, recomendaciones asignadas y descargas.
+   - Filtrar el historial de descargas por rangos de tiempo.
+
+11. RF011 - Internacionalización
+   - Soportar múltiples locales con Flask-Babel (`es`, `en`, `pt`, `fr`).
+   - Mantener archivos de traducción `.po` y `.mo` en `translations/`.
+
+12. RF012 - Interacciones AJAX y API interna
+   - Asignaciones de entrenamientos y nutrición pueden responder vía JSON cuando se usan por AJAX.
+   - Límites de frecuencia aplicados a endpoints sensibles mediante Flask-Limiter.
+
+Notas: los requisitos deben corresponder con la estructura de datos actual (`usuarios`, `solicitudes_equipo`, `galeria`, `logros`, `entrenamientos`, `nutricion`, `horarios_entrenador`, `descargas_log`).

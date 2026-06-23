@@ -37,6 +37,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Preview de imágenes de galería
+document.addEventListener('DOMContentLoaded', function() {
+    const previewModalEl = document.getElementById('galleryPreviewModal');
+    if (!previewModalEl || typeof bootstrap === 'undefined') return;
+
+    const previewModal = new bootstrap.Modal(previewModalEl);
+    const titleEl = document.getElementById('galleryPreviewTitle');
+    const imageEl = document.getElementById('galleryPreviewImage');
+    const descriptionEl = document.getElementById('galleryPreviewDescription');
+    const typeEl = document.getElementById('galleryPreviewType');
+    const uploadedEl = document.getElementById('galleryPreviewUploaded');
+    const authorEl = document.getElementById('galleryPreviewAuthor');
+
+    document.querySelectorAll('.open-gallery-preview').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (!this.dataset.image) return;
+
+            titleEl.textContent = this.dataset.title || 'Vista previa';
+            imageEl.src = this.dataset.image;
+            imageEl.alt = this.dataset.title || 'Preview';
+            descriptionEl.textContent = this.dataset.description || '';
+            typeEl.textContent = this.dataset.type || '';
+            uploadedEl.textContent = this.dataset.uploaded || '';
+            authorEl.textContent = this.dataset.author || '';
+            previewModal.show();
+        });
+    });
+});
+
 // Ocultar filas no pendientes en las tablas principales de solicitudes
 document.addEventListener('DOMContentLoaded', function() {
     try {

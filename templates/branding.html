@@ -12,11 +12,32 @@
             <div class="card-body">
                 <div class="text-center mb-4 p-4 bg-light rounded">
                     <p class="text-muted mb-3">{{ _('Vista previa actual') }}</p>
-                    <div class="brand-logo-circle brand-logo-circle--lg mx-auto mb-4">
+                    <div class="brand-logo-circle brand-logo-circle--lg shape-circle mx-auto mb-4" id="brandPreviewWrapper">
                         <img src="{{ brand_logo_url }}" alt="{{ _('Logo') }}" id="brandPreviewImg">
+                    </div>
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-3">
+                        <div class="text-start">
+                            <p class="mb-2 fw-semibold">{{ _('Forma del borde') }}</p>
+                            <p class="small text-muted mb-2">{{ _('Las imágenes se adaptan al borde y se recortan automáticamente para mantener una vista elegante.') }}</p>
+                            <div class="d-flex flex-wrap gap-2 justify-content-center" id="shapeOptions">
+                                <button type="button" class="shape-option btn btn-sm btn-outline-secondary active" data-shape="circle">
+                                    <span class="shape-swatch shape-circle"></span> {{ _('Circular') }}
+                                </button>
+                                <button type="button" class="shape-option btn btn-sm btn-outline-secondary" data-shape="rounded">
+                                    <span class="shape-swatch shape-rounded"></span> {{ _('Redondeado') }}
+                                </button>
+                                <button type="button" class="shape-option btn btn-sm btn-outline-secondary" data-shape="pill">
+                                    <span class="shape-swatch shape-pill"></span> {{ _('Elíptico') }}
+                                </button>
+                                <button type="button" class="shape-option btn btn-sm btn-outline-secondary" data-shape="hexagon">
+                                    <span class="shape-swatch shape-hexagon"></span> {{ _('Hexágono') }}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="logo_shape" id="logoShapeInput" value="circle">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label class="form-label">{{ _('Subir nuevo logo') }}</label>

@@ -4,145 +4,168 @@
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <div class="card shadow-sm">
-                <div class="card-header bg-warning text-dark">
-                    <h3 class="mb-0"><i class="fas fa-envelope-open-text"></i> {{ _('Solicitudes para unirse al equipo') }}</h3>
+            <div class="card shadow-sm solicitud-card">
+                <div class="card-header bg-warning text-dark d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+                    <div>
+                        <h3 class="mb-1"><i class="fas fa-envelope-open-text"></i> {{ _('Solicitudes para unirse al equipo') }}</h3>
+                        <p class="mb-0 text-muted">{{ _('Administra todas las solicitudes con claridad y accede fácilmente al buzón cuando lo necesites.') }}</p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-end">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Filtro de solicitudes">
+                            <a href="{{ url_for('trainer.solicitudes_equipo') }}" class="btn btn-outline-secondary {% if not tipo_filter %}active{% endif %}">{{ _('Todas') }}</a>
+                            <a href="{{ url_for('trainer.solicitudes_equipo', tipo='nuevo') }}" class="btn btn-outline-success {% if tipo_filter == 'nuevo' %}active{% endif %}">{{ _('Nuevas') }}</a>
+                            <a href="{{ url_for('trainer.solicitudes_equipo', tipo='academia') }}" class="btn btn-outline-primary {% if tipo_filter == 'academia' %}active{% endif %}">{{ _('Jugadores de la academia') }}</a>
+                        </div>
+                        <button id="toggleBuzonBtn" class="toggle-buzon-btn btn btn-dark btn-sm" type="button" {% if not solicitudes_archivadas %}disabled{% endif %}>
+                            <i class="fas fa-inbox me-1"></i> {{ _('Abrir buzón') if solicitudes_archivadas else _('Buzón vacío') }}
+                        </button>
+                        <a href="{{ url_for('trainer.solicitudes_equipo') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-list me-1"></i> {{ _('Ver todas') }}
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <a href="{{ url_for('trainer.solicitudes_equipo') }}" class="btn btn-sm btn-outline-secondary {% if not tipo_filter %}active{% endif %}">{{ _('Todas') }}</a>
-                        <a href="{{ url_for('trainer.solicitudes_equipo', tipo='nuevo') }}" class="btn btn-sm btn-outline-success {% if tipo_filter == 'nuevo' %}active{% endif %}">{{ _('Nuevas') }}</a>
-                        <a href="{{ url_for('trainer.solicitudes_equipo', tipo='academia') }}" class="btn btn-sm btn-outline-primary {% if tipo_filter == 'academia' %}active{% endif %}">{{ _('Jugadores de la academia') }}</a>
-                    </div>
                     {% if tipo_filter %}
-                        <div class="mb-3">
-                            <div class="alert alert-secondary">
+                        <div class="mb-4">
+                            <div class="alert alert-secondary py-3 mb-0">
                                 {% if tipo_filter == 'nuevo' %}
-                                    {{ _('Mostrando solicitudes de registro.') }}
+                                    {{ _('Filtrando solo solicitudes de registro.') }}
                                 {% else %}
-                                    {{ _('Mostrando solicitudes presentadas por el staff / jugadores de la academia.') }}
+                                    {{ _('Filtrando solicitudes presentadas por staff o jugadores de la academia.') }}
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <a href="{{ url_for('trainer.solicitudes_equipo') }}" class="btn btn-sm btn-outline-secondary">
-                                <i class="fas fa-list"></i> {{ _('Ver todas las solicitudes') }}
-                            </a>
-                        </div>
+                    {% endif %}
 
-                        {% if solicitudes_pendientes %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>{{ _('Solicitante') }}</th>
-                                        <th>{{ _('Entrenador') }}</th>
-                                        <th>{{ _('Email') }}</th>
-                                        <th>{{ _('Tipo') }}</th>
-                                        <th>{{ _('Telefono') }}</th>
-                                        <th>{{ _('Mensaje') }}</th>
-                                        <th>{{ _('Estado') }}</th>
-                                        <th>{{ _('Acciones') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for sol in solicitudes_pendientes %}
-                                    <tr>
-                                        <td>{{ sol.nombre }}</td>
-                                        <td>{{ sol.entrenador_nombre or current_user.nombre }} {{ sol.entrenador_apellido or '' }}</td>
-                                        <td>{{ sol.email }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ 'warning' if sol.tipo == 'nuevo' else 'info' }}">
-                                                {{ _('Nuevo') if sol.tipo == 'nuevo' else _('Jugadores de la academia') if sol.tipo == 'academia' else sol.tipo }}
-                                            </span>
-                                        </td>
-                                        <td>{{ sol.telefono or '-' }}</td>
-                                        <td>{{ sol.mensaje }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ 'secondary' if sol.estado == 'pendiente' else 'success' if sol.estado in ['aceptado','registrado'] else 'danger' }}">
-                                                {{ sol.estado | capitalize }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            {% if sol.estado == 'pendiente' %}
-                                            <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <input type="hidden" name="action" value="aceptar">
-                                                <button class="btn btn-sm btn-success">{{ _('Aceptar') }}</button>
-                                            </form>
-                                            <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <input type="hidden" name="action" value="rechazar">
-                                                <button class="btn btn-sm btn-danger">{{ _('Rechazar') }}</button>
-                                            </form>
-                                            {% else %}
-                                            <span class="text-muted">{{ _('Sin acciones') }}</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        {% else %}
-                            <div class="alert alert-info">{{ _('No hay solicitudes de ese tipo en este momento.') }}</div>
-                        {% endif %}
-
-                            {% if solicitudes_archivadas %}
-                        <div class="my-3">
-                            <button id="toggleBuzonBtn" class="toggle-buzon-btn btn btn-outline-secondary btn-sm" type="button">
-                                <i class="fas fa-inbox"></i> {{ _('Abrir buzón') }}
-                            </button>
-                        </div>
-                        <div id="buzonSection" class="border rounded p-3" style="display:none;">
-                            <h5>{{ _('Buzón de solicitudes aceptadas/rechazadas') }}</h5>
-                            <div class="table-responsive mt-3">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>{{ _('Solicitante') }}</th>
-                                            <th>{{ _('Entrenador') }}</th>
-                                            <th>{{ _('Email') }}</th>
-                                            <th>{{ _('Tipo') }}</th>
-                                            <th>{{ _('Telefono') }}</th>
-                                            <th>{{ _('Mensaje') }}</th>
-                                            <th>{{ _('Estado') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for sol in solicitudes_archivadas %}
-                                        <tr>
-                                            <td>{{ sol.nombre }}</td>
-                                            <td>{{ sol.entrenador_nombre or current_user.nombre }} {{ sol.entrenador_apellido or '' }}</td>
-                                            <td>{{ sol.email }}</td>
-                                            <td>
-                                                <span class="badge bg-{{ 'warning' if sol.tipo == 'nuevo' else 'info' }}">
-                                                    {{ _('Nuevo') if sol.tipo == 'nuevo' else _('Jugadores de la academia') if sol.tipo == 'academia' else sol.tipo }}
-                                                </span>
-                                            </td>
-                                            <td>{{ sol.telefono or '-' }}</td>
-                                            <td>{{ sol.mensaje }}</td>
-                                            <td>
-                                                <span class="badge bg-{{ 'success' if sol.estado == 'aceptado' else 'danger' }}">
-                                                    {{ sol.estado | capitalize }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                    <div id="buzonSection" class="buzon-section mb-4" style="display:none;">
+                        <div class="card border-secondary shadow-sm">
+                            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-0">{{ _('Buzón de solicitudes aceptadas / rechazadas') }}</h5>
+                                    <small class="text-white-50">{{ _('Historial limpio de solicitudes procesadas.') }}</small>
+                                </div>
+                                <span class="badge bg-light text-dark">{{ solicitudes_archivadas | length }}</span>
+                            </div>
+                            <div class="card-body p-0">
+                                {% if solicitudes_archivadas %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>{{ _('Solicitante') }}</th>
+                                                <th>{{ _('Entrenador') }}</th>
+                                                <th>{{ _('Email') }}</th>
+                                                <th>{{ _('Tipo') }}</th>
+                                                <th>{{ _('Teléfono') }}</th>
+                                                <th>{{ _('Estado') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for sol in solicitudes_archivadas %}
+                                            <tr>
+                                                <td>{{ sol.nombre }}</td>
+                                                <td>{{ sol.entrenador_nombre or current_user.nombre }} {{ sol.entrenador_apellido or '' }}</td>
+                                                <td>{{ sol.email }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ 'warning' if sol.tipo == 'nuevo' else 'info' }} solicitud-badge-type">
+                                                        {{ _('Nuevo') if sol.tipo == 'nuevo' else _('Jugadores de la academia') if sol.tipo == 'academia' else sol.tipo }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ sol.telefono or '-' }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ 'success' if sol.estado == 'aceptado' else 'danger' }} solicitud-badge-state">
+                                                        {{ sol.estado | capitalize }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="p-4 text-center text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-3"></i>
+                                    <p class="mb-0">{{ _('No hay solicitudes archivadas aún.') }}</p>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
-                        {% endif %}
+                    </div>
 
-                    {% else %}
-                        <div class="mb-4">
-                            <div class="card mb-4">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0">{{ _('Solicitudes presentadas por el staff / jugadores de la academia') }}</h5>
+                    {% if tipo_filter %}
+                        <div class="solicitud-area-card card shadow-sm">
+                            <div class="card-header bg-white border-0">
+                                <h5 class="mb-0">{{ _('Solicitudes actuales') }}</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                {% if solicitudes_pendientes %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>{{ _('Solicitante') }}</th>
+                                                <th>{{ _('Entrenador') }}</th>
+                                                <th>{{ _('Email') }}</th>
+                                                <th>{{ _('Tipo') }}</th>
+                                                <th>{{ _('Teléfono') }}</th>
+                                                <th>{{ _('Mensaje') }}</th>
+                                                <th>{{ _('Estado') }}</th>
+                                                <th>{{ _('Acciones') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for sol in solicitudes_pendientes %}
+                                            <tr>
+                                                <td>{{ sol.nombre }}</td>
+                                                <td>{{ sol.entrenador_nombre or current_user.nombre }} {{ sol.entrenador_apellido or '' }}</td>
+                                                <td>{{ sol.email }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ 'warning' if sol.tipo == 'nuevo' else 'info' }} solicitud-badge-type">
+                                                        {{ _('Nuevo') if sol.tipo == 'nuevo' else _('Jugadores de la academia') if sol.tipo == 'academia' else sol.tipo }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ sol.telefono or '-' }}</td>
+                                                <td>{{ sol.mensaje }}</td>
+                                                <td>
+                                                    <span class="badge bg-secondary solicitud-badge-state">{{ sol.estado | capitalize }}</span>
+                                                </td>
+                                                <td>
+                                                    {% if sol.estado == 'pendiente' %}
+                                                    <div class="d-flex gap-2 flex-wrap">
+                                                        <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <input type="hidden" name="action" value="aceptar">
+                                                            <button class="btn btn-sm btn-success">{{ _('Aceptar') }}</button>
+                                                        </form>
+                                                        <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <input type="hidden" name="action" value="rechazar">
+                                                            <button class="btn btn-sm btn-danger">{{ _('Rechazar') }}</button>
+                                                        </form>
+                                                    </div>
+                                                    {% else %}
+                                                    <span class="text-muted">{{ _('Sin acciones') }}</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div class="card-body">
-                                    {% if solicitudes_academia_pendientes %}
+                                {% else %}
+                                <div class="alert alert-info mb-0">{{ _('No hay solicitudes de ese tipo en este momento.') }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row gx-4 gy-4">
+                            <div class="col-12">
+                                <div class="solicitud-area-card card shadow-sm">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="mb-0">{{ _('Solicitudes presentadas por el staff') }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if solicitudes_academia_pendientes %}
                                         <div class="table-responsive">
                                             <table class="table table-hover align-middle mb-0">
                                                 <thead class="table-light">
@@ -150,7 +173,7 @@
                                                         <th>{{ _('Solicitante') }}</th>
                                                         <th>{{ _('Entrenador') }}</th>
                                                         <th>{{ _('Email') }}</th>
-                                                        <th>{{ _('Telefono') }}</th>
+                                                        <th>{{ _('Teléfono') }}</th>
                                                         <th>{{ _('Mensaje') }}</th>
                                                         <th>{{ _('Estado') }}</th>
                                                         <th>{{ _('Acciones') }}</th>
@@ -166,25 +189,21 @@
                                                         <td>{{ sol.telefono or '-' }}</td>
                                                         <td>{{ sol.mensaje }}</td>
                                                         <td>
-                                                            <span class="badge bg-{{ 'secondary' if sol.estado == 'pendiente' else 'success' if sol.estado in ['aceptado','registrado'] else 'danger' }}">
-                                                                {{ sol.estado | capitalize }}
-                                                            </span>
+                                                            <span class="badge bg-secondary solicitud-badge-state">{{ sol.estado | capitalize }}</span>
                                                         </td>
                                                         <td>
-                                                            {% if sol.estado == 'pendiente' %}
-                                                            <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
-                                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                                <input type="hidden" name="action" value="aceptar">
-                                                                <button class="btn btn-sm btn-success">{{ _('Aceptar') }}</button>
-                                                            </form>
-                                                            <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
-                                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                                <input type="hidden" name="action" value="rechazar">
-                                                                <button class="btn btn-sm btn-danger">{{ _('Rechazar') }}</button>
-                                                            </form>
-                                                            {% else %}
-                                                            <span class="text-muted">{{ _('Sin acciones') }}</span>
-                                                            {% endif %}
+                                                            <div class="d-flex gap-2 flex-wrap">
+                                                                <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="hidden" name="action" value="aceptar">
+                                                                    <button class="btn btn-sm btn-success">{{ _('Aceptar') }}</button>
+                                                                </form>
+                                                                <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="hidden" name="action" value="rechazar">
+                                                                    <button class="btn btn-sm btn-danger">{{ _('Rechazar') }}</button>
+                                                                </form>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                     {% endif %}
@@ -192,18 +211,20 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                    {% else %}
+                                        {% else %}
                                         <div class="alert alert-info mb-0">{{ _('No hay solicitudes desde staff en este momento.') }}</div>
-                                    {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="card">
-                                <div class="card-header bg-warning text-dark">
-                                    <h5 class="mb-0">{{ _('Solicitudes de registro') }}</h5>
-                                </div>
-                                <div class="card-body">
-                                    {% if solicitudes_nuevo_pendientes %}
+                            <div class="col-12">
+                                <div class="solicitud-area-card card shadow-sm">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h5 class="mb-0">{{ _('Solicitudes de registro') }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if solicitudes_nuevo_pendientes %}
                                         <div class="table-responsive">
                                             <table class="table table-hover align-middle mb-0">
                                                 <thead class="table-light">
@@ -211,7 +232,7 @@
                                                         <th>{{ _('Solicitante') }}</th>
                                                         <th>{{ _('Entrenador') }}</th>
                                                         <th>{{ _('Email') }}</th>
-                                                        <th>{{ _('Telefono') }}</th>
+                                                        <th>{{ _('Teléfono') }}</th>
                                                         <th>{{ _('Mensaje') }}</th>
                                                         <th>{{ _('Estado') }}</th>
                                                         <th>{{ _('Acciones') }}</th>
@@ -227,25 +248,21 @@
                                                         <td>{{ sol.telefono or '-' }}</td>
                                                         <td>{{ sol.mensaje }}</td>
                                                         <td>
-                                                            <span class="badge bg-{{ 'secondary' if sol.estado == 'pendiente' else 'success' if sol.estado in ['aceptado','registrado'] else 'danger' }}">
-                                                                {{ sol.estado | capitalize }}
-                                                            </span>
+                                                            <span class="badge bg-secondary solicitud-badge-state">{{ sol.estado | capitalize }}</span>
                                                         </td>
                                                         <td>
-                                                            {% if sol.estado == 'pendiente' %}
-                                                            <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
-                                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                                <input type="hidden" name="action" value="aceptar">
-                                                                <button class="btn btn-sm btn-success">{{ _('Aceptar') }}</button>
-                                                            </form>
-                                                            <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
-                                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                                <input type="hidden" name="action" value="rechazar">
-                                                                <button class="btn btn-sm btn-danger">{{ _('Rechazar') }}</button>
-                                                            </form>
-                                                            {% else %}
-                                                            <span class="text-muted">{{ _('Sin acciones') }}</span>
-                                                            {% endif %}
+                                                            <div class="d-flex gap-2 flex-wrap">
+                                                                <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="hidden" name="action" value="aceptar">
+                                                                    <button class="btn btn-sm btn-success">{{ _('Aceptar') }}</button>
+                                                                </form>
+                                                                <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="hidden" name="action" value="rechazar">
+                                                                    <button class="btn btn-sm btn-danger">{{ _('Rechazar') }}</button>
+                                                                </form>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                     {% endif %}
@@ -253,65 +270,65 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                    {% else %}
+                                        {% else %}
                                         <div class="alert alert-info mb-0">{{ _('No hay solicitudes de registro en este momento.') }}</div>
-                                    {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
+
                             {% if solicitudes_otros_pendientes %}
-                            <div class="card mt-4">
-                                <div class="card-header bg-secondary text-white">
-                                    <h5 class="mb-0">{{ _('Solicitudes sin tipo definido') }}</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>{{ _('Solicitante') }}</th>
-                                                    <th>{{ _('Entrenador') }}</th>
-                                                    <th>{{ _('Email') }}</th>
-                                                    <th>{{ _('Telefono') }}</th>
-                                                    <th>{{ _('Mensaje') }}</th>
-                                                    <th>{{ _('Estado') }}</th>
-                                                    <th>{{ _('Acciones') }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for sol in solicitudes_otros_pendientes %}
-                                                {% if sol.estado == 'pendiente' %}
-                                                <tr>
-                                                    <td>{{ sol.nombre }}</td>
-                                                    <td>{{ sol.entrenador_nombre or current_user.nombre }} {{ sol.entrenador_apellido or '' }}</td>
-                                                    <td>{{ sol.email }}</td>
-                                                    <td>{{ sol.telefono or '-' }}</td>
-                                                    <td>{{ sol.mensaje }}</td>
-                                                    <td>
-                                                        <span class="badge bg-{{ 'secondary' if sol.estado == 'pendiente' else 'success' if sol.estado in ['aceptado','registrado'] else 'danger' }}">
-                                                            {{ sol.estado | capitalize }}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        {% if sol.estado == 'pendiente' %}
-                                                        <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
-                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                            <input type="hidden" name="action" value="aceptar">
-                                                            <button class="btn btn-sm btn-success">{{ _('Aceptar') }}</button>
-                                                        </form>
-                                                        <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
-                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                            <input type="hidden" name="action" value="rechazar">
-                                                            <button class="btn btn-sm btn-danger">{{ _('Rechazar') }}</button>
-                                                        </form>
-                                                        {% else %}
-                                                        <span class="text-muted">{{ _('Sin acciones') }}</span>
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
-                                                {% endif %}
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                            <div class="col-12">
+                                <div class="solicitud-area-card card shadow-sm">
+                                    <div class="card-header bg-secondary text-white">
+                                        <h5 class="mb-0">{{ _('Solicitudes sin tipo definido') }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>{{ _('Solicitante') }}</th>
+                                                        <th>{{ _('Entrenador') }}</th>
+                                                        <th>{{ _('Email') }}</th>
+                                                        <th>{{ _('Teléfono') }}</th>
+                                                        <th>{{ _('Mensaje') }}</th>
+                                                        <th>{{ _('Estado') }}</th>
+                                                        <th>{{ _('Acciones') }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for sol in solicitudes_otros_pendientes %}
+                                                    {% if sol.estado == 'pendiente' %}
+                                                    <tr>
+                                                        <td>{{ sol.nombre }}</td>
+                                                        <td>{{ sol.entrenador_nombre or current_user.nombre }} {{ sol.entrenador_apellido or '' }}</td>
+                                                        <td>{{ sol.email }}</td>
+                                                        <td>{{ sol.telefono or '-' }}</td>
+                                                        <td>{{ sol.mensaje }}</td>
+                                                        <td>
+                                                            <span class="badge bg-secondary solicitud-badge-state">{{ sol.estado | capitalize }}</span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex gap-2 flex-wrap">
+                                                                <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="hidden" name="action" value="aceptar">
+                                                                    <button class="btn btn-sm btn-success">{{ _('Aceptar') }}</button>
+                                                                </form>
+                                                                <form method="POST" action="{{ url_for('trainer.procesar_solicitud_equipo', solicitud_id=sol.id) }}" class="d-inline">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="hidden" name="action" value="rechazar">
+                                                                    <button class="btn btn-sm btn-danger">{{ _('Rechazar') }}</button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -323,4 +340,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var toggleBuzonBtn = document.getElementById('toggleBuzonBtn');
+        var buzonSection = document.getElementById('buzonSection');
+        var openLabel = "{{ _('Abrir buzón') }}";
+        var closeLabel = "{{ _('Cerrar buzón') }}";
+
+        if (toggleBuzonBtn) {
+            toggleBuzonBtn.addEventListener('click', function () {
+                if (buzonSection.style.display === 'none' || buzonSection.style.display === '') {
+                    buzonSection.style.display = 'block';
+                    toggleBuzonBtn.innerHTML = '<i class="fas fa-inbox me-1"></i> ' + closeLabel;
+                } else {
+                    buzonSection.style.display = 'none';
+                    toggleBuzonBtn.innerHTML = '<i class="fas fa-inbox me-1"></i> ' + openLabel;
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

@@ -23,8 +23,17 @@ from routes.reports import reports_bp
 app = Flask(__name__)
 app.config.from_object(Config)
 
-logging.basicConfig(level=logging.INFO)
-app.logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.WARNING)
+werkzeug_logger = logging.getLogger("werkzeug")
+if app.config.get("FLASK_DEBUG"):
+    werkzeug_logger.setLevel(logging.INFO)
+    werkzeug_logger.propagate = True
+    werkzeug_logger.disabled = False
+else:
+    werkzeug_logger.setLevel(logging.ERROR)
+    werkzeug_logger.propagate = False
+    werkzeug_logger.disabled = True
+app.logger.setLevel(logging.WARNING)
 
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
@@ -271,28 +280,14 @@ def get_local_ipv4_addresses():
 
 def print_access_info(host, port):
     addresses = get_local_ipv4_addresses()
-    print("\nLa aplicación se está ejecutando en tu PC en estas direcciones:")
-    print(f"  - Local: http://127.0.0.1:{port}")
-    if addresses:
+    print(f"Local: http://127.0.0.1:{port}")
+    if host == "0.0.0.0":
         for ip in addresses:
             if ip != "127.0.0.1":
-                print(f"  - En la red local: http://{ip}:{port}")
-    if host in ("127.0.0.1", "localhost"):
-        print(
-            "\nNota: el servidor solo escucha en localhost. Para acceder desde otro dispositivo, cambia FLASK_HOST a 0.0.0.0 en .env."
-        )
-    elif host == "0.0.0.0":
-        print(
-            "\nPuedes usar cualquiera de las direcciones anteriores desde tu teléfono conectado a la misma red Wi-Fi."
-        )
-    else:
-        print(f"\nEl servidor está configurado para escuchar en: http://{host}:{port}")
-
-    if host == "0.0.0.0" and addresses:
-        for ip in addresses:
-            if ip != "127.0.0.1":
-                print(f"\n--> Abre esta dirección en tu teléfono: http://{ip}:{port}")
+                print(f"LAN:   http://{ip}:{port}")
                 break
+    else:
+        print(f"Host:  http://{host}:{port}")
     print("")
 
 
@@ -311,13 +306,12 @@ if __name__ == "__main__":
     run_host = host
     if host in ("127.0.0.1", "localhost"):
         run_host = "0.0.0.0"
-        app.logger.info(
-            "FLASK_HOST estaba en localhost; enlazando a 0.0.0.0 para permitir acceso desde la red local."
-        )
 
     print_access_info(run_host, port)
     app.run(
         host=run_host,
         port=port,
         debug=app.config["FLASK_DEBUG"],
+        use_debugger=app.config["FLASK_DEBUG"],
+        use_reloader=app.config["FLASK_DEBUG"],
     )

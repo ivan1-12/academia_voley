@@ -85,10 +85,17 @@ def dashboard_entrenador():
         total_media = 0
 
     try:
-        cur.execute("SELECT * FROM usuarios WHERE rol = 'jugador'")
-        jugadores = cur.fetchall()
+        if current_user.rol == 'super_usuario':
+            cur.execute("SELECT COUNT(*) as total FROM solicitudes_equipo")
+        else:
+            cur.execute(
+                "SELECT COUNT(*) as total FROM solicitudes_equipo WHERE entrenador_id = %s",
+                (current_user.id,),
+            )
+        total_solicitudes = cur.fetchone()
+        total_solicitudes = total_solicitudes["total"] if total_solicitudes else 0
     except Exception:
-        jugadores = []
+        total_solicitudes = 0
 
     try:
         cur.execute(
@@ -127,7 +134,7 @@ def dashboard_entrenador():
         "dashboard_entrenador.html",
         total_jugadores=total_jugadores,
         total_media=total_media,
-        jugadores=jugadores,
+        total_solicitudes=total_solicitudes,
         media=media,
         entrenamientos=entrenamientos,
         planes_nutricion=planes_nutricion,
@@ -512,6 +519,36 @@ def toggle_cuenta(usuario_id):
         db.rollback()
         current_app.logger.exception("Error cambiando estado de cuenta: %s", e)
         flash(_("No se pudo actualizar el estado de la cuenta."), "danger")
+    finally:
+        cur.close()
+
+    return redirect(url_for("trainer.gestion_usuarios"))
+
+
+@trainer_bp.route("/eliminar_entrenador/<int:usuario_id>", methods=["POST"])
+@login_required
+@permiso_requerido("modificar_entrenadores")
+def eliminar_entrenador(usuario_id):
+    if usuario_id == current_user.id:
+        flash(_("No puedes eliminar tu propia cuenta."), "warning")
+        return redirect(url_for("trainer.gestion_usuarios"))
+
+    db = get_db()
+    cur = db.cursor()
+    try:
+        cur.execute("SELECT rol FROM usuarios WHERE id = %s", (usuario_id,))
+        usuario = cur.fetchone()
+        if not usuario or usuario.get("rol") != "entrenador":
+            flash(_("Entrenador no encontrado."), "warning")
+            return redirect(url_for("trainer.gestion_usuarios"))
+
+        cur.execute("DELETE FROM usuarios WHERE id = %s AND rol = 'entrenador'", (usuario_id,))
+        db.commit()
+        flash(_("Entrenador eliminado correctamente."), "success")
+    except Exception as e:
+        db.rollback()
+        current_app.logger.exception("Error eliminando entrenador: %s", e)
+        flash(_("No se pudo eliminar el entrenador."), "danger")
     finally:
         cur.close()
 
@@ -1002,10 +1039,17 @@ def solicitudes_equipo():
         # archivadas (estado != pendiente)
         arch_query = f"SELECT s.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido {base_from} {'AND' if 'WHERE' in base_from else 'WHERE'} s.estado != 'pendiente' ORDER BY s.creado_at DESC"
 
-        cur.execute(pending_query, params_pending)
-        solicitudes_pendientes = cur.fetchall()
-        cur.execute(arch_query, params_arch)
-        solicitudes_archivadas = cur.fetchall()
+        if params_pending:
+            cur.execute(pending_query, params_pending)
+        else:
+            cur.execute(pending_query)
+        solicitudes_pendientes = list(cur.fetchall())
+
+        if params_arch:
+            cur.execute(arch_query, params_arch)
+        else:
+            cur.execute(arch_query)
+        solicitudes_archivadas = list(cur.fetchall())
 
         # categorizar pendientes por tipo
         solicitudes = solicitudes_pendientes + solicitudes_archivadas
@@ -1556,25 +1600,24 @@ def branding():
             if ext in ("png", "jpg", "webp"):
                 try:
                     im = Image.open(tmp_path).convert("RGBA")
-                    max_side = max(im.width, im.height)
-                    canvas = Image.new("RGBA", (max_side, max_side), (255, 255, 255, 0))
-                    paste_x = (max_side - im.width) // 2
-                    paste_y = (max_side - im.height) // 2
-                    if "A" in im.getbands():
-                        canvas.paste(im, (paste_x, paste_y), im)
-                    else:
-                        canvas.paste(im, (paste_x, paste_y))
-
                     target_size = 512
-                    canvas = canvas.resize((target_size, target_size), Image.LANCZOS)
+                    scale = max(target_size / im.width, target_size / im.height)
+                    new_width = int(im.width * scale)
+                    new_height = int(im.height * scale)
+                    resized = im.resize((new_width, new_height), Image.LANCZOS)
+
+                    left = max(0, (new_width - target_size) // 2)
+                    top = max(0, (new_height - target_size) // 2)
+                    cropped = resized.crop((left, top, left + target_size, top + target_size))
+
                     _remove_existing_logos(images_dir)
                     save_path = os.path.join(images_dir, target_name)
                     if ext == "jpg":
                         bg = Image.new("RGB", (target_size, target_size), (255, 255, 255))
-                        bg.paste(canvas, mask=canvas.split()[3])
+                        bg.paste(cropped, mask=cropped.split()[3])
                         bg.save(save_path, quality=95)
                     else:
-                        canvas.save(save_path)
+                        cropped.save(save_path)
 
                     flash(_("Logo actualizado correctamente."), "success")
                     return redirect(url_for("trainer.branding"))
