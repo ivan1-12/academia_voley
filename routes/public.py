@@ -136,22 +136,28 @@ def solicitar_unirse(trainer_id):
 @public_bp.route("/galeria_publica")
 def galeria_publica():
     tipos = []
+    galeria = []
+    db = get_db()
+    cur = db.cursor()
     try:
-        cur = get_db().cursor()
-        cur.execute(
-            "SELECT g.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido "
-            "FROM galeria g LEFT JOIN usuarios u ON g.usuario_id = u.id "
-            "ORDER BY g.fecha_subida DESC"
-        )
+        has_usuario_id = _tabla_tiene_columna(cur, "galeria", "usuario_id")
+        if has_usuario_id:
+            cur.execute(
+                "SELECT g.*, u.nombre AS entrenador_nombre, u.apellido AS entrenador_apellido "
+                "FROM galeria g LEFT JOIN usuarios u ON g.usuario_id = u.id "
+                "ORDER BY g.fecha_subida DESC"
+            )
+        else:
+            cur.execute("SELECT * FROM galeria ORDER BY fecha_subida DESC")
         galeria = cur.fetchall()
         cur.execute(
             "SELECT DISTINCT tipo FROM galeria WHERE tipo IS NOT NULL AND tipo != '' ORDER BY tipo"
         )
         tipos = [row["tipo"] for row in cur.fetchall()]
-        cur.close()
     except Exception:
         current_app.logger.exception("Error cargando galería pública")
-        galeria = []
+    finally:
+        cur.close()
 
     return render_template("galeria.html", galeria=galeria, galeria_tipos=tipos)
 
