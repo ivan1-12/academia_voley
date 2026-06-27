@@ -9,6 +9,18 @@ import io
 player_bp = Blueprint("player", __name__)
 
 
+def normalizar_telefono(telefono):
+    if telefono is None:
+        return ""
+    valor = str(telefono).strip()
+    if not valor:
+        return ""
+    digitos = "".join(ch for ch in valor if ch.isdigit())
+    if len(digitos) <= 4:
+        return digitos
+    return f"{digitos[:4]}-{digitos[4:]}"
+
+
 @player_bp.route("/perfil_jugador/<int:usuario_id>")
 @login_required
 @rol_requerido("entrenador", "super_usuario")
@@ -23,6 +35,7 @@ def perfil_jugador(usuario_id):
             cur.close()
             return redirect(url_for("trainer.dashboard_entrenador"))
 
+        usuario["telefono"] = normalizar_telefono(usuario.get("telefono"))
         cur.execute("SELECT * FROM perfiles_jugadores WHERE usuario_id = %s", (usuario_id,))
         perfil = cur.fetchone()
     except Exception:
@@ -79,6 +92,13 @@ def dashboard_jugador():
     except Exception:
         perfil = None
 
+    if hasattr(current_user, 'telefono'):
+        current_user.telefono = normalizar_telefono(current_user.telefono)
+
+    total_entrenamientos = len(entrenamientos)
+    completados = sum(1 for entrenamiento in entrenamientos if entrenamiento.get("completado"))
+    progreso_general = round((completados / total_entrenamientos * 100), 1) if total_entrenamientos else 0.0
+
     cur.close()
 
     return render_template(
@@ -86,6 +106,9 @@ def dashboard_jugador():
         entrenamientos=entrenamientos,
         nutricion=nutricion,
         perfil=perfil,
+        total_entrenamientos=total_entrenamientos,
+        completados=completados,
+        progreso_general=progreso_general,
     )
 
 
@@ -133,6 +156,7 @@ def editar_perfil_jugador():
     altura_cm = request.form.get("altura_cm")
     peso_kg = request.form.get("peso_kg")
     posicion = request.form.get("posicion", "").strip()
+    telefono = normalizar_telefono(request.form.get("telefono", ""))
 
     # Convertir a tipos numéricos o None con validación
     try:
@@ -154,6 +178,11 @@ def editar_perfil_jugador():
             (target_usuario_id,),
         )
         existente = cur.fetchone()
+
+        cur.execute(
+            "UPDATE usuarios SET telefono = %s WHERE id = %s",
+            (telefono, target_usuario_id),
+        )
 
         if existente:
             cur.execute(

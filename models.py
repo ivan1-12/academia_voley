@@ -7,12 +7,13 @@ from functools import wraps
 
 
 class User(UserMixin):
-    def __init__(self, id, nombre, apellido, email, rol, permisos=None):
+    def __init__(self, id, nombre, apellido, email, rol, permisos=None, telefono=None):
         self.id = id
         self.nombre = nombre
         self.apellido = apellido
         self.email = email
         self.rol = rol
+        self.telefono = telefono
         self.permisos = permisos or set()
 
     def has_permission(self, permiso):
@@ -47,15 +48,39 @@ FALLBACK_PERMISOS = {
 
 def get_db():
     if "db" not in g:
-        g.db = pymysql.connect(
-            host=current_app.config.get("MYSQL_HOST", "localhost"),
-            user=current_app.config.get("MYSQL_USER", "root"),
-            password=current_app.config.get("MYSQL_PASSWORD", ""),
-            db=current_app.config.get("MYSQL_DB", ""),
-            port=int(current_app.config.get("MYSQL_PORT", 3307)),
-            cursorclass=pymysql.cursors.DictCursor,
-            autocommit=False,
-        )
+        host = current_app.config.get("MYSQL_HOST", "localhost")
+        user = current_app.config.get("MYSQL_USER", "root")
+        password = current_app.config.get("MYSQL_PASSWORD", "")
+        db_name = current_app.config.get("MYSQL_DB", "")
+        configured_port = int(current_app.config.get("MYSQL_PORT", 3307))
+        ports = [configured_port]
+        for fallback_port in (3306, 3307):
+            if fallback_port not in ports:
+                ports.append(fallback_port)
+
+        last_error = None
+        for port in ports:
+            try:
+                g.db = pymysql.connect(
+                    host=host,
+                    user=user,
+                    password=password,
+                    db=db_name,
+                    port=port,
+                    cursorclass=pymysql.cursors.DictCursor,
+                    autocommit=False,
+                )
+                if port != configured_port:
+                    current_app.logger.warning(
+                        "Conexión a MySQL establecida usando el puerto %s (fallback de %s)",
+                        port,
+                        configured_port,
+                    )
+                break
+            except Exception as exc:
+                last_error = exc
+        else:
+            raise last_error
     return g.db
 
 
@@ -120,6 +145,7 @@ def load_user(user_id):
                 user["email"],
                 rol_actual,
                 permisos,
+                telefono=user.get("telefono"),
             )
 
         cur.close()

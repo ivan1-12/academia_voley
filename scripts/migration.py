@@ -76,7 +76,65 @@ try:
 except Exception as e:
     print(f"Error al agregar columna activo: {e}")
 
-# 2. Crear tabla descargas_log
+# 2. Asegurar columnas de usuarios usadas por el flujo de solicitudes y login
+for column_name, definition in [
+    ("activo", "TINYINT(1) NOT NULL DEFAULT 1"),
+    ("telefono", "VARCHAR(100) DEFAULT NULL"),
+    ("idioma", "VARCHAR(5) NOT NULL DEFAULT 'es'"),
+    ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+]:
+    try:
+        res = run(f"SHOW COLUMNS FROM usuarios LIKE '{column_name}'")
+        if not res:
+            run(f"ALTER TABLE usuarios ADD COLUMN {column_name} {definition}")
+            print(f"-> Columna '{column_name}' agregada a la tabla 'usuarios'.")
+        else:
+            print(f"-> La columna '{column_name}' ya existe en 'usuarios'.")
+    except Exception as e:
+        print(f"Error al verificar la columna {column_name}: {e}")
+
+# 3. Asegurar columnas de entrenamientos usadas por la gestión de rutinas
+for column_name, definition in [
+    ("imagen_url", "VARCHAR(512) DEFAULT NULL"),
+    ("fecha_creacion", "DATETIME DEFAULT CURRENT_TIMESTAMP"),
+]:
+    try:
+        res = run(f"SHOW COLUMNS FROM entrenamientos LIKE '{column_name}'")
+        if not res:
+            run(f"ALTER TABLE entrenamientos ADD COLUMN {column_name} {definition}")
+            print(f"-> Columna '{column_name}' agregada a la tabla 'entrenamientos'.")
+        else:
+            print(f"-> La columna '{column_name}' ya existe en 'entrenamientos'.")
+    except Exception as e:
+        print(f"Error al verificar la columna {column_name} en entrenamientos: {e}")
+
+# 4. Asegurar columna usuario_id en galeria si no existe
+try:
+    res = run("SHOW COLUMNS FROM galeria LIKE 'usuario_id'")
+    if not res:
+        run("ALTER TABLE galeria ADD COLUMN usuario_id INT DEFAULT NULL")
+        print("-> Columna 'usuario_id' agregada a la tabla 'galeria'.")
+    else:
+        print("-> La columna 'usuario_id' ya existe en 'galeria'.")
+except Exception as e:
+    print(f"Error al verificar la columna usuario_id en galeria: {e}")
+
+# 5. Asegurar columnas de solicitudes si no existen
+for column_name, definition in [
+    ("tipo", "VARCHAR(20) NOT NULL DEFAULT 'nuevo'"),
+    ("estado", "VARCHAR(50) NOT NULL DEFAULT 'pendiente'"),
+]:
+    try:
+        res = run(f"SHOW COLUMNS FROM solicitudes_equipo LIKE '{column_name}'")
+        if not res:
+            run(f"ALTER TABLE solicitudes_equipo ADD COLUMN {column_name} {definition}")
+            print(f"-> Columna '{column_name}' agregada a la tabla 'solicitudes_equipo'.")
+        else:
+            print(f"-> La columna '{column_name}' ya existe en 'solicitudes_equipo'.")
+    except Exception as e:
+        print(f"Error al verificar la columna {column_name} en solicitudes_equipo: {e}")
+
+# 6. Crear tabla descargas_log
 run(
     """
 CREATE TABLE IF NOT EXISTS descargas_log (

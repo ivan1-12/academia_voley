@@ -42,7 +42,7 @@
             <a href="{{ url_for('trainer.solicitudes_equipo') }}" class="text-decoration-none">
                 <div class="card bg-warning text-dark stat-card h-100">
                     <div class="card-body text-center">
-                        <h5 class="card-title">{{ _('Solicitudes') }}</h5>
+                        <h5 class="card-title">{{ _('Solicitudes en trámite') }}</h5>
                         <h2 class="display-4">{{ total_solicitudes }}</h2>
                         <p class="mb-0">{{ _('Ver solicitudes de equipo') }}</p>
                         <i class="fas fa-envelope-open-text fa-2x d-block mx-auto mt-2"></i>
@@ -103,6 +103,175 @@
             </a>
         </div>
         {% endif %}
+    </div>
+
+    <!-- Nutrición y rutinas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-dumbbell"></i> {{ _('Nutrición y rutinas') }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if jugadores_asignables %}
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <input type="text" id="searchPlayers" class="form-control" placeholder="{{ _('Buscar jugador por nombre') }}">
+                            </div>
+                            <div class="col-md-6">
+                                <select id="filterGender" class="form-select">
+                                    <option value="">{{ _('Todos los géneros') }}</option>
+                                    <option value="masculino">{{ _('Masculino') }}</option>
+                                    <option value="femenino">{{ _('Femenino') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        {% set generos = [('Masculino', 'm|masculino|male|hombre'), ('Femenino', 'f|femenino|female|mujer')] %}
+                        <div class="row g-4">
+                            {% for titulo, match in generos %}
+                            <div class="col-lg-6">
+                                <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="text-uppercase text-muted mb-0 text-center w-100">{{ titulo }}</h6>
+                                    </div>
+                                    <div class="d-flex flex-column gap-3">
+                                        {% for jugador in jugadores_asignables if (jugador.genero or '')|string|lower in match.split('|') %}
+                                        <div class="card border-0 shadow-sm player-card" data-name="{{ jugador.nombre }} {{ jugador.apellido }}" data-gender="{{ (jugador.genero or '')|string|lower }}">
+                                            <div class="card-body p-3">
+                                                <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap mb-3">
+                                                    <div>
+                                                        <h6 class="mb-1">{{ jugador.nombre }} {{ jugador.apellido }}</h6>
+                                                        <div class="small text-muted">
+                                                            {{ _('Edad:') }} {{ jugador.edad if jugador.edad is not none else _('Sin registrar') }}
+                                                            {% if jugador.posicion %}
+                                                                · {{ _('Posición:') }} {{ jugador.posicion }}
+                                                            {% endif %}
+                                                        </div>
+                                                        {% if jugador.altura_cm or jugador.peso_kg %}
+                                                        <div class="small text-muted">
+                                                            {% if jugador.altura_cm %}
+                                                                {{ _('Altura:') }} {{ jugador.altura_cm }} cm
+                                                            {% endif %}
+                                                            {% if jugador.altura_cm and jugador.peso_kg %}
+                                                                ·
+                                                            {% endif %}
+                                                            {% if jugador.peso_kg %}
+                                                                {{ _('Peso:') }} {{ jugador.peso_kg }} kg
+                                                            {% endif %}
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalNutricion{{ jugador.id }}" title="{{ _('Asignar nutrición') }}">
+                                                            <i class="fas fa-apple-alt"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEntrenamiento{{ jugador.id }}" title="{{ _('Asignar entrenamiento') }}">
+                                                            <i class="fas fa-dumbbell"></i>
+                                                        </button>
+                                                        <form action="{{ url_for('trainer.eliminar_jugador', usuario_id=jugador.id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ _('¿Eliminar este jugador?') }}');">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="{{ _('Eliminar jugador') }}">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                {% if jugador.planes_nutricion or jugador.entrenamientos_asignados %}
+                                                <div class="mt-3 small">
+                                                    {% if jugador.planes_nutricion %}
+                                                    <div class="mb-2">
+                                                        <div class="fw-semibold text-success">{{ _('Planes nutricionales') }}</div>
+                                                        <div class="d-flex flex-wrap gap-2 mt-1">
+                                                            {% for plan in jugador.planes_nutricion %}
+                                                            <a href="{{ url_for('trainer.gestion_nutricion') }}" class="btn btn-outline-success btn-sm d-inline-flex align-items-center gap-1" title="{{ _('Ver plan') }}">
+                                                                <i class="fas fa-eye"></i> {{ plan.titulo }}
+                                                            </a>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
+                                                    {% if jugador.entrenamientos_asignados %}
+                                                    <div>
+                                                        <div class="fw-semibold text-primary">{{ _('Rutinas asignadas') }}</div>
+                                                        <div class="d-flex flex-wrap gap-2 mt-1">
+                                                            {% for rutina in jugador.entrenamientos_asignados %}
+                                                            <a href="{{ url_for('trainer.gestion_entrenamientos') }}" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1" title="{{ _('Ver rutina') }}">
+                                                                <i class="fas fa-eye"></i> {{ rutina.titulo }}
+                                                            </a>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="modal fade" id="modalNutricion{{ jugador.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-success text-white">
+                                                        <h6 class="modal-title mb-0"><i class="fas fa-apple-alt"></i> {{ _('Asignar nutrición') }}</h6>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="{{ url_for('trainer.asignar_nutricion') }}" method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
+                                                            <label class="form-label">{{ _('Buscar plan nutricional') }}</label>
+                                                            <input type="text" class="form-control mb-3" placeholder="{{ _('Escribe el nombre del plan') }}" onkeyup="filterOptions(this, 'nutricionOptions{{ jugador.id }}')">
+                                                            <select name="nutricion_id" class="form-select" size="6" id="nutricionOptions{{ jugador.id }}" required>
+                                                                {% for plan in planes_nutricion %}
+                                                                <option value="{{ plan.id }}">{{ plan.titulo }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <div class="text-end mt-3">
+                                                                <button type="submit" class="btn btn-success">{{ _('Asignar') }}</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal fade" id="modalEntrenamiento{{ jugador.id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h6 class="modal-title mb-0"><i class="fas fa-dumbbell"></i> {{ _('Asignar entrenamiento') }}</h6>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="{{ url_for('trainer.asignar_entrenamiento') }}" method="POST">
+                                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                            <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
+                                                            <label class="form-label">{{ _('Buscar entrenamiento') }}</label>
+                                                            <input type="text" class="form-control mb-3" placeholder="{{ _('Escribe el nombre del entrenamiento') }}" onkeyup="filterOptions(this, 'entrenamientoOptions{{ jugador.id }}')">
+                                                            <select name="entrenamiento_id" class="form-select" size="6" id="entrenamientoOptions{{ jugador.id }}" required>
+                                                                {% for entrenamiento in entrenamientos %}
+                                                                <option value="{{ entrenamiento.id }}">{{ entrenamiento.titulo }}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <div class="text-end mt-3">
+                                                                <button type="submit" class="btn btn-primary">{{ _('Asignar') }}</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">{{ _('No hay jugadores registrados todavía.') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Gestión de Galería -->
@@ -194,4 +363,50 @@
             </div>
         </div>
     </div>
+    <button id="btnScrollTop" class="btn btn-dark rounded-circle shadow" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050; width: 48px; height: 48px; display: none;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        function filterOptions(input, selectId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            const query = input.value.toLowerCase();
+            Array.from(select.options).forEach(option => {
+                const text = option.text.toLowerCase();
+                option.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        const searchPlayers = document.getElementById('searchPlayers');
+        const filterGender = document.getElementById('filterGender');
+        const cards = document.querySelectorAll('.player-card');
+
+        function applyFilters() {
+            const query = (searchPlayers?.value || '').toLowerCase();
+            const gender = (filterGender?.value || '').toLowerCase();
+            cards.forEach(card => {
+                const name = (card.dataset.name || '').toLowerCase();
+                const cardGender = (card.dataset.gender || '').toLowerCase();
+                const matchesQuery = name.includes(query);
+                const matchesGender = !gender || cardGender.includes(gender);
+                card.style.display = matchesQuery && matchesGender ? '' : 'none';
+            });
+        }
+
+        searchPlayers?.addEventListener('input', applyFilters);
+        filterGender?.addEventListener('change', applyFilters);
+
+        const btnScrollTop = document.getElementById('btnScrollTop');
+        if (btnScrollTop) {
+            window.addEventListener('scroll', () => {
+                btnScrollTop.style.display = window.scrollY > 300 ? 'flex' : 'none';
+                btnScrollTop.style.alignItems = 'center';
+                btnScrollTop.style.justifyContent = 'center';
+            });
+            btnScrollTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    </script>
 {% endblock %}

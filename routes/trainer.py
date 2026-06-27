@@ -63,6 +63,37 @@ def _remove_existing_logos(images_dir):
                 )
 
 
+def _crear_o_activar_usuario_jugador(cur, db, solicitud):
+    email = (solicitud.get("email") or "").strip()
+    nombre = (solicitud.get("nombre") or "").strip()
+    if not email:
+        return None, None
+
+    cur.execute("SELECT id, activo FROM usuarios WHERE email = %s AND rol = 'jugador'", (email,))
+    usuario = cur.fetchone()
+    if usuario:
+        cur.execute("UPDATE usuarios SET activo = 1 WHERE id = %s", (usuario["id"],))
+        return usuario["id"], None
+
+    partes = [parte for parte in nombre.split() if parte]
+    nombre_real = partes[0] if partes else "Jugador"
+    apellido_real = " ".join(partes[1:]) if len(partes) > 1 else "Pendiente"
+    password = generar_contraseña_aleatoria(12)
+    password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+
+    cur.execute("SELECT id FROM roles WHERE nombre = 'jugador'")
+    rol_row = cur.fetchone()
+    rol_id = rol_row["id"] if rol_row else None
+    cur.execute(
+        "INSERT INTO usuarios (nombre, apellido, email, password, rol, rol_id, activo, idioma) VALUES (%s, %s, %s, %s, 'jugador', %s, 1, %s)",
+        (nombre_real, apellido_real, email, password_hash, rol_id, "es"),
+    )
+    db.commit()
+    cur.execute("SELECT id FROM usuarios WHERE email = %s AND rol = 'jugador'", (email,))
+    nuevo = cur.fetchone()
+    return nuevo["id"] if nuevo else None, password
+
+
 @trainer_bp.route("/dashboard_entrenador")
 @login_required
 @rol_requerido("entrenador", "super_usuario")
@@ -85,13 +116,12 @@ def dashboard_entrenador():
         total_media = 0
 
     try:
-        if current_user.rol == 'super_usuario':
-            cur.execute("SELECT COUNT(*) as total FROM solicitudes_equipo")
-        else:
-            cur.execute(
-                "SELECT COUNT(*) as total FROM solicitudes_equipo WHERE entrenador_id = %s",
-                (current_user.id,),
-            )
+        active_statuses = ("pendiente", "registrado", "en proceso", "en espera", "en revisión", "procesando")
+        placeholders = ", ".join(["%s"] * len(active_statuses))
+        cur.execute(
+            f"SELECT COUNT(*) as total FROM solicitudes_equipo WHERE entrenador_id = %s AND estado IN ({placeholders})",
+            (current_user.id, *active_statuses),
+        )
         total_solicitudes = cur.fetchone()
         total_solicitudes = total_solicitudes["total"] if total_solicitudes else 0
     except Exception:
@@ -112,6 +142,31 @@ def dashboard_entrenador():
         entrenamientos = cur.fetchall()
     except Exception:
         entrenamientos = []
+
+    try:
+        cur.execute(
+            "SELECT u.id, u.nombre, u.apellido, u.email, u.edad, u.genero, "
+            "p.posicion, p.altura_cm, p.peso_kg "
+            "FROM usuarios u "
+            "LEFT JOIN perfiles_jugadores p ON u.id = p.usuario_id "
+            "WHERE u.rol = 'jugador' AND u.activo = 1 "
+            "AND EXISTS (SELECT 1 FROM perfiles_jugadores pj WHERE pj.usuario_id = u.id) "
+            "ORDER BY u.apellido, u.nombre"
+        )
+        jugadores_asignables = cur.fetchall()
+        for jugador in jugadores_asignables:
+            cur.execute(
+                "SELECT n.id, n.titulo, n.desayuno, n.almuerzo, n.cena, n.merienda, n.hidratacion FROM asignacion_nutricion an JOIN nutricion n ON an.nutricion_id = n.id WHERE an.jugador_id = %s ORDER BY n.titulo",
+                (jugador["id"],),
+            )
+            jugador["planes_nutricion"] = cur.fetchall()
+            cur.execute(
+                "SELECT e.id, e.titulo, e.descripcion, e.ejercicios, e.duracion_minutos, e.dificultad, e.imagen_url FROM asignacion_entrenamientos ae JOIN entrenamientos e ON ae.entrenamiento_id = e.id WHERE ae.jugador_id = %s ORDER BY e.titulo",
+                (jugador["id"],),
+            )
+            jugador["entrenamientos_asignados"] = cur.fetchall()
+    except Exception:
+        jugadores_asignables = []
 
     try:
         cur.execute("SELECT * FROM nutricion")
@@ -137,6 +192,7 @@ def dashboard_entrenador():
         total_solicitudes=total_solicitudes,
         media=media,
         entrenamientos=entrenamientos,
+        jugadores_asignables=jugadores_asignables,
         planes_nutricion=planes_nutricion,
         galeria_tipos=galeria_tipos,
     )
@@ -150,9 +206,10 @@ def jugadores_detalle():
     cur = db.cursor()
     try:
         cur.execute(
-            "SELECT u.id, u.nombre, u.apellido, u.email, u.genero, u.edad, p.posicion "
+            "SELECT u.id, u.nombre, u.apellido, u.email, u.genero, u.edad, u.activo, u.telefono, p.posicion "
             "FROM usuarios u LEFT JOIN perfiles_jugadores p ON u.id = p.usuario_id "
-            "WHERE u.rol = 'jugador' ORDER BY u.apellido, u.nombre"
+            "WHERE u.rol = 'jugador' "
+            "ORDER BY u.apellido, u.nombre"
         )
         jugadores = cur.fetchall()
     except Exception:
@@ -329,7 +386,8 @@ def agregar_staff():
         # Bloquear creación si la flag está deshabilitada en configuración
         try:
             if not current_app.config.get("ALLOW_SUPERUSER_CREATE_TRAINERS", True):
-                flash(_("La creación de entrenadores está deshabilitada en la configuración."),
+                flash(
+                    _("La creación de entrenadores está deshabilitada en la configuración."),
                     "warning",
                 )
                 return redirect(url_for("trainer.dashboard_entrenador"))
@@ -761,6 +819,32 @@ def cambiar_password_usuario(usuario_id):
     return redirect(url_for("trainer.gestion_usuarios"))
 
 
+@trainer_bp.route("/api/jugadores")
+@login_required
+@rol_requerido("entrenador", "super_usuario")
+def api_jugadores():
+    db = get_db()
+    cur = db.cursor()
+    try:
+        cur.execute(
+            "SELECT u.id, u.nombre, u.apellido FROM usuarios u WHERE u.rol = 'jugador' AND u.activo = 1 AND EXISTS (SELECT 1 FROM perfiles_jugadores pj WHERE pj.usuario_id = u.id) ORDER BY u.apellido, u.nombre"
+        )
+        jugadores = cur.fetchall()
+        return jsonify(
+            {
+                "jugadores": [
+                    {"id": jugador["id"], "nombre": jugador["nombre"], "apellido": jugador["apellido"]}
+                    for jugador in jugadores
+                ]
+            }
+        )
+    except Exception as e:
+        current_app.logger.exception("Error cargando jugadores para asignación: %s", e)
+        return jsonify({"jugadores": []}), 500
+    finally:
+        cur.close()
+
+
 @trainer_bp.route("/gestion_entrenamientos", methods=["GET", "POST"])
 @login_required
 @permiso_requerido("recomendar_rutinas")
@@ -773,6 +857,7 @@ def gestion_entrenamientos():
         duracion = request.form.get("duracion")
         dificultad = request.form.get("dificultad", "").strip()
         imagen = request.files.get("imagen")
+        entrenamiento_id = request.form.get("entrenamiento_id", "").strip()
         imagen_url = None
 
         if (
@@ -801,17 +886,29 @@ def gestion_entrenamientos():
 
         cur = db.cursor()
         try:
-            cur.execute(
-                """INSERT INTO entrenamientos (titulo, descripcion, ejercicios, duracion_minutos, dificultad, imagen_url) 
-                          VALUES (%s, %s, %s, %s, %s, %s)""",
-                (titulo, descripcion, ejercicios, duracion, dificultad, imagen_url),
-            )
-            db.commit()
-            flash(_("Entrenamiento creado exitosamente"), "success")
+            if entrenamiento_id:
+                if imagen_url is None:
+                    cur.execute("SELECT imagen_url FROM entrenamientos WHERE id = %s", (entrenamiento_id,))
+                    existing = cur.fetchone()
+                    imagen_url = existing["imagen_url"] if existing else None
+                cur.execute(
+                    """UPDATE entrenamientos SET titulo = %s, descripcion = %s, ejercicios = %s, duracion_minutos = %s, dificultad = %s, imagen_url = %s WHERE id = %s""",
+                    (titulo, descripcion, ejercicios, duracion, dificultad, imagen_url, entrenamiento_id),
+                )
+                db.commit()
+                flash(_("Entrenamiento actualizado exitosamente"), "success")
+            else:
+                cur.execute(
+                    """INSERT INTO entrenamientos (titulo, descripcion, ejercicios, duracion_minutos, dificultad, imagen_url) 
+                              VALUES (%s, %s, %s, %s, %s, %s)""",
+                    (titulo, descripcion, ejercicios, duracion, dificultad, imagen_url),
+                )
+                db.commit()
+                flash(_("Entrenamiento creado exitosamente"), "success")
         except Exception as e:
             db.rollback()
-            current_app.logger.exception("Error creando entrenamiento: %s", e)
-            flash(_("Error al crear entrenamiento"), "danger")
+            current_app.logger.exception("Error guardando entrenamiento: %s", e)
+            flash(_("Error al guardar entrenamiento"), "danger")
         finally:
             cur.close()
         return redirect(url_for("trainer.gestion_entrenamientos"))
@@ -889,36 +986,91 @@ def asignar_entrenamiento():
 def gestion_nutricion():
     db = get_db()
     if request.method == "POST":
-        titulo = request.form["titulo"]
-        desayuno = request.form["desayuno"]
-        almuerzo = request.form["almuerzo"]
-        cena = request.form["cena"]
-        merienda = request.form["merienda"]
-        hidratacion = request.form["hidratacion"]
+        nutricion_id = request.form.get("nutricion_id", "").strip()
+        titulo = request.form.get("titulo", "").strip()
+        desayuno = request.form.get("desayuno", "").strip()
+        almuerzo = request.form.get("almuerzo", "").strip()
+        cena = request.form.get("cena", "").strip()
+        merienda = request.form.get("merienda", "").strip()
+        hidratacion = request.form.get("hidratacion", "").strip()
+
+        if not titulo:
+            flash(_("El título del plan es obligatorio"), "danger")
+            return redirect(url_for("trainer.gestion_nutricion"))
 
         cur = db.cursor()
         try:
-            cur.execute(
-                """INSERT INTO nutricion (titulo, desayuno, almuerzo, cena, merienda, hidratacion) 
-                          VALUES (%s, %s, %s, %s, %s, %s)""",
-                (titulo, desayuno, almuerzo, cena, merienda, hidratacion),
-            )
-            db.commit()
-            flash(_("Plan nutricional creado exitosamente"), "success")
+            if nutricion_id:
+                cur.execute(
+                    """UPDATE nutricion SET titulo = %s, desayuno = %s, almuerzo = %s, cena = %s, merienda = %s, hidratacion = %s WHERE id = %s""",
+                    (titulo, desayuno, almuerzo, cena, merienda, hidratacion, nutricion_id),
+                )
+                db.commit()
+                flash(_("Plan nutricional actualizado exitosamente"), "success")
+            else:
+                cur.execute(
+                    """INSERT INTO nutricion (titulo, desayuno, almuerzo, cena, merienda, hidratacion) 
+                              VALUES (%s, %s, %s, %s, %s, %s)""",
+                    (titulo, desayuno, almuerzo, cena, merienda, hidratacion),
+                )
+                db.commit()
+                flash(_("Plan nutricional creado exitosamente"), "success")
         except Exception as e:
             db.rollback()
-            current_app.logger.exception("Error creando plan nutricional: %s", e)
-            flash(_("Error al crear plan nutricional"), "danger")
+            current_app.logger.exception("Error guardando plan nutricional: %s", e)
+            flash(_("Error al guardar plan nutricional"), "danger")
         finally:
             cur.close()
         return redirect(url_for("trainer.gestion_nutricion"))
 
     cur = db.cursor()
-    cur.execute("SELECT * FROM nutricion")
-    planes = cur.fetchall()
-    cur.close()
+    try:
+        cur.execute("SELECT * FROM nutricion ORDER BY titulo")
+        planes = cur.fetchall()
 
-    return render_template("nutricion.html", planes=planes)
+        cur.execute(
+            """
+            SELECT u.id, u.nombre, u.apellido, u.genero, u.email,
+                   n.id AS nutricion_id, n.titulo AS plan_titulo
+            FROM usuarios u
+            LEFT JOIN asignacion_nutricion an ON u.id = an.jugador_id
+            LEFT JOIN nutricion n ON an.nutricion_id = n.id
+            WHERE u.rol = 'jugador'
+            AND EXISTS (SELECT 1 FROM perfiles_jugadores pj WHERE pj.usuario_id = u.id)
+            ORDER BY u.genero, u.apellido, u.nombre
+            """
+        )
+        jugadores = cur.fetchall()
+
+        for jugador in jugadores:
+            try:
+                cur.execute(
+                    "SELECT n.id, n.titulo, n.desayuno, n.almuerzo, n.cena, n.merienda, n.hidratacion, an.created_at FROM asignacion_nutricion an JOIN nutricion n ON an.nutricion_id = n.id WHERE an.jugador_id = %s ORDER BY an.created_at DESC, n.titulo",
+                    (jugador["id"],),
+                )
+            except Exception:
+                cur.execute(
+                    "SELECT n.id, n.titulo, n.desayuno, n.almuerzo, n.cena, n.merienda, n.hidratacion FROM asignacion_nutricion an JOIN nutricion n ON an.nutricion_id = n.id WHERE an.jugador_id = %s ORDER BY n.titulo",
+                    (jugador["id"],),
+                )
+            jugador["historial_nutricion"] = cur.fetchall()
+    except Exception as e:
+        current_app.logger.exception("Error cargando jugadores para nutrición: %s", e)
+        planes = []
+        jugadores = []
+    finally:
+        cur.close()
+
+    jugadores_por_genero = {}
+    for jugador in jugadores:
+        genero = (jugador.get("genero") or "").strip() or _("Sin especificar")
+        jugadores_por_genero.setdefault(genero, []).append(jugador)
+
+    return render_template(
+        "nutricion.html",
+        planes=planes,
+        jugadores_por_genero=jugadores_por_genero,
+    )
 
 
 @trainer_bp.route("/horarios_entrenador", methods=["GET", "POST"])
@@ -1119,32 +1271,30 @@ def procesar_solicitud_equipo(solicitud_id):
             flash(_("Solicitud rechazada correctamente."), "success")
             return redirect(url_for("trainer.solicitudes_equipo"))
 
-        # Aceptar la solicitud sin crear cuenta automáticamente
         cur.execute(
             "UPDATE solicitudes_equipo SET estado = 'aceptado' WHERE id = %s",
             (solicitud_id,),
         )
         db.commit()
-        # Si la solicitud era de tipo 'nuevo', activar la cuenta creada previamente (si existe)
+        usuario_id = None
+        temp_password = None
         try:
-            if solicitud.get("tipo") == "nuevo":
-                cur.execute("SELECT id FROM usuarios WHERE email = %s AND rol = 'jugador'", (solicitud.get("email"),))
-                user_row = cur.fetchone()
-                if user_row:
-                    cur.execute("UPDATE usuarios SET activo = 1 WHERE id = %s", (user_row["id"],))
-                    db.commit()
-
+            usuario_id, temp_password = _crear_o_activar_usuario_jugador(cur, db, solicitud)
         except Exception:
             db.rollback()
             current_app.logger.exception("Error activando usuario para solicitud %s", solicitud_id)
 
-        # Enviar notificación por correo si está disponible la dirección
         try:
             if solicitud.get("email"):
                 subject = "Solicitud aceptada - Academia"
                 body = (
-                    f"Hola {solicitud.get('nombre')},\n\nTu solicitud ha sido aceptada. Puedes iniciar sesión con tu correo y la contraseña que configuraste al registrarte.\n\nSaludos,\nAcademia"
+                    f"Hola {solicitud.get('nombre')},\n\nTu solicitud ha sido aceptada."
                 )
+                if temp_password:
+                    body += f"\n\nSe creó tu cuenta de jugador. Puedes iniciar sesión con tu correo y la contraseña temporal: {temp_password}"
+                else:
+                    body += "\n\nYa puedes iniciar sesión con tu correo y la contraseña que configuraste previamente."
+                body += "\n\nSaludos,\nAcademia"
                 send_email(solicitud.get("email"), subject, body)
         except Exception:
             current_app.logger.exception("Error enviando notificacion por correo para solicitud %s", solicitud_id)
@@ -1166,26 +1316,44 @@ def procesar_solicitud_equipo(solicitud_id):
 @login_required
 @permiso_requerido("recomendar_nutricion")
 def asignar_nutricion():
-    jugador_id = request.form["jugador_id"]
-    nutricion_id = request.form["nutricion_id"]
+    jugador_id = request.form.get("jugador_id", "").strip()
+    nutricion_id = request.form.get("nutricion_id", "").strip()
 
     db = get_db()
     cur = db.cursor()
     try:
+        try:
+            jugador_id_int = int(jugador_id)
+            nutricion_id_int = int(nutricion_id)
+        except (TypeError, ValueError):
+            msg = _("Selecciona un plan nutricional válido")
+            flash(msg, "danger")
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify({"success": False, "message": msg})
+            return redirect(url_for("trainer.dashboard_entrenador"))
+
+        cur.execute("SELECT id FROM nutricion WHERE id = %s", (nutricion_id_int,))
+        if cur.fetchone() is None:
+            msg = _("No existe un plan nutricional válido para asignar")
+            flash(msg, "danger")
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify({"success": False, "message": msg})
+            return redirect(url_for("trainer.dashboard_entrenador"))
+
         cur.execute(
-            "SELECT * FROM asignacion_nutricion WHERE jugador_id = %s", (jugador_id,)
+            "SELECT * FROM asignacion_nutricion WHERE jugador_id = %s", (jugador_id_int,)
         )
         existente = cur.fetchone()
 
         if existente:
             cur.execute(
                 "UPDATE asignacion_nutricion SET nutricion_id = %s WHERE jugador_id = %s",
-                (nutricion_id, jugador_id),
+                (nutricion_id_int, jugador_id_int),
             )
         else:
             cur.execute(
                 "INSERT INTO asignacion_nutricion (jugador_id, nutricion_id) VALUES (%s, %s)",
-                (jugador_id, nutricion_id),
+                (jugador_id_int, nutricion_id_int),
             )
 
         db.commit()

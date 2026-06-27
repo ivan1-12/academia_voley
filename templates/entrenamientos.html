@@ -49,7 +49,11 @@
                         {% if entrenamientos %}
                             {% for ent in entrenamientos %}
                             <div class="col-md-6 col-lg-4 mb-4 tarjeta-entrenamiento" 
-                                 data-titulo="{{ ent.titulo|lower }}"
+                                 data-id="{{ ent.id }}"
+                                 data-titulo="{{ ent.titulo|e }}"
+                                 data-busqueda="{{ ent.titulo|lower }}"
+                                 data-descripcion="{{ ent.descripcion|e }}"
+                                 data-ejercicios="{{ ent.ejercicios|e }}"
                                  data-dificultad="{{ ent.dificultad }}"
                                  data-duracion="{{ ent.duracion_minutos }}"
                                  data-imagen="{{ ent.imagen_url or '' }}">
@@ -90,8 +94,11 @@
                                             <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="verDetalle(this.closest('.tarjeta-entrenamiento'))">
                                                 <i class="fas fa-eye"></i> {{ _('Ver') }}
                                             </button>
-                                            <button class="btn btn-sm btn-outline-success flex-grow-1" onclick="seleccionarParaAsignar({{ ent.id }}, '{{ ent.titulo }}')" data-bs-toggle="modal" data-bs-target="#modalAsignarEntrenamiento">
+                                            <button class="btn btn-sm btn-outline-success flex-grow-1" onclick="seleccionarParaAsignar(this.closest('.tarjeta-entrenamiento'))" data-bs-toggle="modal" data-bs-target="#modalAsignarEntrenamiento">
                                                 <i class="fas fa-user-plus"></i> {{ _('Asignar') }}
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalNuevoEntrenamiento" onclick="cargarEntrenamientoParaEditar(this.closest('.tarjeta-entrenamiento'))">
+                                                <i class="fas fa-edit"></i>
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger" onclick="eliminarEntrenamiento({{ ent.id }})">
                                                 <i class="fas fa-trash"></i>
@@ -120,11 +127,12 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="fas fa-plus-circle"></i> {{ _('Crear Nuevo Entrenamiento') }}</h5>
+                <h5 class="modal-title" id="modalNuevoEntrenamientoTitle"><i class="fas fa-plus-circle"></i> {{ _('Crear Nuevo Entrenamiento') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" id="entrenamiento_id" name="entrenamiento_id" value="">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12 mb-3">
@@ -162,7 +170,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancelar') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ _('Crear Entrenamiento') }}</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardarEntrenamiento">{{ _('Crear Entrenamiento') }}</button>
                 </div>
             </form>
         </div>
@@ -180,6 +188,9 @@
             <div class="modal-body">
                 <h4 id="detalleTitulo"></h4>
                 <hr>
+                <div id="detalleImagen" class="mb-3 text-center" style="display:none;">
+                    <img id="detalleImagenSrc" class="img-fluid rounded" style="max-height: 220px; object-fit: cover; width: 100%;" alt="">
+                </div>
                 <p><strong>📝 {{ _('Descripción:') }}</strong></p>
                 <p id="detalleDescripcion"></p>
                 <p><strong>📋 {{ _('Ejercicios:') }}</strong></p>
@@ -211,6 +222,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ url_for('trainer.asignar_entrenamiento') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <p>{{ _('Asignar entrenamiento:') }} <strong id="asignarTitulo"></strong></p>
                     <input type="hidden" id="asignarEntrenamientoId" name="entrenamiento_id">
@@ -254,6 +266,26 @@
 // Variables globales para almacenar el entrenamiento seleccionado
 let entrenamientoSeleccionado = null;
 
+function resetModalEntrenamiento() {
+    document.getElementById('modalNuevoEntrenamientoTitle').innerHTML = '<i class="fas fa-plus-circle"></i> {{ _('Crear Nuevo Entrenamiento') }}';
+    document.getElementById('entrenamiento_id').value = '';
+    document.getElementById('titulo').value = '';
+    document.getElementById('descripcion').value = '';
+    document.getElementById('ejercicios').value = '';
+    document.getElementById('duracion').value = '';
+    document.getElementById('dificultad').value = 'Principiante';
+    document.getElementById('btnGuardarEntrenamiento').innerText = '{{ _('Crear Entrenamiento') }}';
+}
+
+const modalNuevoEntrenamiento = document.getElementById('modalNuevoEntrenamiento');
+if (modalNuevoEntrenamiento) {
+    modalNuevoEntrenamiento.addEventListener('show.bs.modal', function () {
+        if (!document.getElementById('entrenamiento_id').value) {
+            resetModalEntrenamiento();
+        }
+    });
+}
+
 // Filtros en tiempo real
 const buscarEntrenamiento = document.getElementById('buscarEntrenamiento');
     const filtroDificultad = document.getElementById('filtroDificultad');
@@ -270,7 +302,7 @@ function filtrarTarjetas() {
     const tarjetas = document.querySelectorAll('.tarjeta-entrenamiento');
     
     tarjetas.forEach(tarjeta => {
-        const titulo = tarjeta.dataset.titulo;
+        const titulo = tarjeta.dataset.busqueda || tarjeta.dataset.titulo || '';
         const dificultadTarjeta = tarjeta.dataset.dificultad;
         const duracionTarjeta = parseInt(tarjeta.dataset.duracion);
         
@@ -304,9 +336,20 @@ function limpiarFiltros() {
     filtrarTarjetas();
 }
 
+function cargarEntrenamientoParaEditar(card) {
+    document.getElementById('modalNuevoEntrenamientoTitle').innerHTML = '<i class="fas fa-edit"></i> {{ _('Editar Entrenamiento') }}';
+    document.getElementById('entrenamiento_id').value = card.dataset.id || '';
+    document.getElementById('titulo').value = card.dataset.titulo || '';
+    document.getElementById('descripcion').value = card.dataset.descripcion || '';
+    document.getElementById('ejercicios').value = card.dataset.ejercicios || '';
+    document.getElementById('duracion').value = card.dataset.duracion || '';
+    document.getElementById('dificultad').value = card.dataset.dificultad || 'Principiante';
+    document.getElementById('btnGuardarEntrenamiento').innerText = '{{ _('Guardar cambios') }}';
+}
+
 function verDetalle(card) {
     const titulo = card.dataset.titulo || '';
-    const descripcion = card.querySelector('.card-text strong + br') ? card.querySelector('.card-text').innerText : '';
+    const descripcion = card.dataset.descripcion || '';
     const ejercicios = card.dataset.ejercicios || '';
     const duracion = card.dataset.duracion || '';
     const dificultad = card.dataset.dificultad || '';
@@ -342,27 +385,36 @@ function obtenerEstrellasDificultad(dificultad) {
     return dificultad;
 }
 
-function seleccionarParaAsignar(id, titulo) {
-    document.getElementById('asignarTitulo').innerText = titulo;
-    document.getElementById('asignarEntrenamientoId').value = id;
+function seleccionarParaAsignar(card) {
+    document.getElementById('asignarTitulo').innerText = card.dataset.titulo || '';
+    document.getElementById('asignarEntrenamientoId').value = card.dataset.id || '';
     cargarJugadores();
 }
 
 function asignarDesdeDetalle() {
     if (entrenamientoSeleccionado) {
         document.getElementById('modalDetalle').style.display = 'none';
-        seleccionarParaAsignar(entrenamientoSeleccionado.id, entrenamientoSeleccionado.titulo);
+        const card = document.querySelector('.tarjeta-entrenamiento[data-id="' + entrenamientoSeleccionado.id + '"]');
+        if (card) {
+            seleccionarParaAsignar(card);
+        }
         new bootstrap.Modal(document.getElementById('modalAsignarEntrenamiento')).show();
     }
 }
 
 function cargarJugadores() {
-    fetch('/api/jugadores')
+    fetch('/api/jugadores', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
         .then(response => response.json())
         .then(data => {
             const select = document.getElementById('jugador_id');
+            if (!select) return;
+            const jugadores = Array.isArray(data.jugadores) ? data.jugadores : [];
             select.innerHTML = '<option value="">{{ _('-- Seleccionar jugador --') }}</option>';
-            data.jugadores.forEach(jugador => {
+            jugadores.forEach(jugador => {
                 select.innerHTML += `<option value="${jugador.id}">${jugador.nombre} ${jugador.apellido}</option>`;
             });
         })

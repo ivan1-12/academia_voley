@@ -17,10 +17,11 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>{{ _('Nombre') }}</th>
+                                    <th>{{ _('Teléfono') }}</th>
                                     <th>{{ _('Posición') }}</th>
                                     <th>{{ _('Edad') }}</th>
                                     <th>{{ _('Email') }}</th>
-                                    <th>{{ _('Categoría') }}</th>
+                                    <th>{{ _('Estado') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -31,10 +32,11 @@
                                             {{ jugador.nombre }} {{ jugador.apellido }}
                                         </a>
                                     </td>
+                                    <td>{{ jugador.telefono or '-' }}</td>
                                     <td>{{ jugador.posicion or _('No definida') }}</td>
                                     <td>{{ jugador.edad or '-' }}</td>
                                     <td>{{ jugador.email }}</td>
-                                    <td>{{ jugador.genero or _('No asignada') }}</td>
+                                    <td>{{ _('Activo') if jugador.activo else _('Inactivo') }}</td>
                                 </tr>
                                 {% else %}
                                 <tr>

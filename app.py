@@ -22,6 +22,9 @@ from routes.reports import reports_bp
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config.setdefault("RATELIMIT_ENABLED", not app.config.get("TESTING", False))
+if app.config.get("TESTING", False):
+    app.config["RATELIMIT_ENABLED"] = False
 
 logging.basicConfig(level=logging.WARNING)
 werkzeug_logger = logging.getLogger("werkzeug")
@@ -72,6 +75,16 @@ def _log_resolved_locale():
         # Loguear el locale resuelto para depuración
         resolved = _get_babel_locale()
         app.logger.debug(f"Resolved locale: {resolved}")
+    except Exception:
+        pass
+
+
+@app.before_request
+def _sync_rate_limit_state():
+    testing = app.config.get("TESTING", False)
+    app.config["RATELIMIT_ENABLED"] = not testing
+    try:
+        limiter.enabled = not testing
     except Exception:
         pass
 

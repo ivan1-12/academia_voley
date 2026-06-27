@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `genero` VARCHAR(50) DEFAULT NULL,
   `cedula` VARCHAR(100) DEFAULT NULL,
   `descripcion` TEXT NULL,
+  `telefono` VARCHAR(100) DEFAULT NULL,
   `link_facebook` VARCHAR(255) NULL,
   `link_instagram` VARCHAR(255) NULL,
   `last_activity` DATETIME DEFAULT NULL,
@@ -81,7 +82,9 @@ CREATE TABLE IF NOT EXISTS `galeria` (
   `descripcion` TEXT,
   `imagen_url` VARCHAR(512),
   `tipo` VARCHAR(50),
-  `fecha_subida` DATETIME DEFAULT CURRENT_TIMESTAMP
+  `fecha_subida` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `usuario_id` INT DEFAULT NULL,
+  FOREIGN KEY (`usuario_id`) REFERENCES `usuarios`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 6. Entrenamientos
@@ -185,6 +188,42 @@ CREATE TABLE IF NOT EXISTS `descargas_log` (
 -- Índices adicionales
 -- Índices adicionales: crear solo si no existen (compatible con distintas versiones de MySQL/cliente)
 -- Nota: usamos consultas a INFORMATION_SCHEMA y sentencias preparadas para evitar errores en importaciones
+
+-- Compatibilidad para bases ya existentes: columnas necesarias
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios' AND COLUMN_NAME = 'activo';
+SET @sql = IF(@c = 0, 'ALTER TABLE `usuarios` ADD COLUMN `activo` TINYINT(1) NOT NULL DEFAULT 1', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'usuarios' AND COLUMN_NAME = 'idioma';
+SET @sql = IF(@c = 0, 'ALTER TABLE `usuarios` ADD COLUMN `idioma` VARCHAR(5) NOT NULL DEFAULT "es"', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'entrenamientos' AND COLUMN_NAME = 'imagen_url';
+SET @sql = IF(@c = 0, 'ALTER TABLE `entrenamientos` ADD COLUMN `imagen_url` VARCHAR(512) DEFAULT NULL', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'entrenamientos' AND COLUMN_NAME = 'fecha_creacion';
+SET @sql = IF(@c = 0, 'ALTER TABLE `entrenamientos` ADD COLUMN `fecha_creacion` DATETIME DEFAULT CURRENT_TIMESTAMP', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'galeria' AND COLUMN_NAME = 'usuario_id';
+SET @sql = IF(@c = 0, 'ALTER TABLE `galeria` ADD COLUMN `usuario_id` INT DEFAULT NULL', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'solicitudes_equipo' AND COLUMN_NAME = 'tipo';
+SET @sql = IF(@c = 0, 'ALTER TABLE `solicitudes_equipo` ADD COLUMN `tipo` VARCHAR(20) NOT NULL DEFAULT "nuevo"', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'solicitudes_equipo' AND COLUMN_NAME = 'estado';
+SET @sql = IF(@c = 0, 'ALTER TABLE `solicitudes_equipo` ADD COLUMN `estado` VARCHAR(50) NOT NULL DEFAULT "pendiente"', 'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- idx_usuarios_rol
 SELECT COUNT(1) INTO @c FROM INFORMATION_SCHEMA.STATISTICS

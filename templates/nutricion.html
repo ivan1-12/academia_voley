@@ -10,35 +10,39 @@
 </div>
 
 <div class="row">
-    <!-- Formulario (Solo Entrenadores) -->
-    {% if current_user.rol == 'entrenador' %}
+    {% if current_user.rol in ['entrenador', 'super_usuario'] %}
     <div class="col-md-5 mb-4">
         <div class="card shadow-sm">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0">{{ _('Crear Nuevo Plan Alimenticio') }}</h5>
+                <h5 class="mb-0">{{ _('Crear o editar plan alimenticio') }}</h5>
             </div>
             <div class="card-body">
                 <form action="{{ url_for('trainer.gestion_nutricion') }}" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="nutricion_id" id="nutricion_id" value="">
                     <div class="mb-3">
                         <label class="form-label">{{ _('Título del Plan') }}</label>
-                        <input type="text" name="titulo" class="form-control" required placeholder="{{ _('Ej: Dieta para Competencia') }}">
+                        <input type="text" name="titulo" id="plan_titulo" class="form-control" required placeholder="{{ _('Ej: Dieta para Competencia') }}">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ _('Desayuno') }}</label>
-                        <textarea name="desayuno" class="form-control" rows="2"></textarea>
+                        <textarea name="desayuno" id="plan_desayuno" class="form-control" rows="2"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ _('Almuerzo') }}</label>
-                        <textarea name="almuerzo" class="form-control" rows="2"></textarea>
+                        <textarea name="almuerzo" id="plan_almuerzo" class="form-control" rows="2"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ _('Cena') }}</label>
-                        <textarea name="cena" class="form-control" rows="2"></textarea>
+                        <textarea name="cena" id="plan_cena" class="form-control" rows="2"></textarea>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ _('Meriendas / Hidratación') }}</label>
-                        <textarea name="merienda" class="form-control" rows="2"></textarea>
+                        <textarea name="merienda" id="plan_merienda" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Hidratación') }}</label>
+                        <textarea name="hidratacion" id="plan_hidratacion" class="form-control" rows="2"></textarea>
                     </div>
                     <button type="submit" class="btn btn-success w-100">
                         <i class="fas fa-save"></i> {{ _('Guardar Plan Nutricional') }}
@@ -48,6 +52,75 @@
         </div>
     </div>
     {% endif %}
+
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-users"></i> {{ _('Jugadores por género') }}</h5>
+            </div>
+            <div class="card-body">
+                {% if jugadores_por_genero %}
+                    {% for genero, jugadores in jugadores_por_genero.items() %}
+                        <div class="mb-4">
+                            <h6 class="text-uppercase text-muted">{{ genero }}</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Jugador') }}</th>
+                                            <th>{{ _('Correo') }}</th>
+                                            <th>{{ _('Plan actual') }}</th>
+                                            <th>{{ _('Asignar plan') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for jugador in jugadores %}
+                                        <tr>
+                                            <td>{{ jugador.nombre }} {{ jugador.apellido }}</td>
+                                            <td>{{ jugador.email }}</td>
+                                            <td>
+                                                {% if jugador.plan_titulo %}
+                                                    {{ jugador.plan_titulo }}
+                                                {% else %}
+                                                    <span class="text-muted">{{ _('Sin plan') }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <form action="{{ url_for('trainer.asignar_nutricion') }}" method="POST" class="d-flex gap-2">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
+                                                    <select name="nutricion_id" class="form-select form-select-sm">
+                                                        <option value="">{{ _('Sin plan') }}</option>
+                                                        {% for plan in planes %}
+                                                        <option value="{{ plan.id }}" {% if jugador.nutricion_id == plan.id %}selected{% endif %}>{{ plan.titulo }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">{{ _('Asignar') }}</button>
+                                                </form>
+                                                {% if jugador.historial_nutricion %}
+                                                <div class="small text-muted mt-2">
+                                                    <div class="fw-semibold">{{ _('Historial') }}</div>
+                                                    <ul class="mb-0 ps-3">
+                                                        {% for item in jugador.historial_nutricion[:3] %}
+                                                        <li>{{ item.titulo }}{% if item.created_at %} · {{ item.created_at }}{% endif %}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">{{ _('No hay jugadores registrados para mostrar.') }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
     <!-- Listado de Planes -->
     <div class="{% if current_user.rol == 'entrenador' %}col-md-7{% else %}col-12{% endif %}">
@@ -73,7 +146,10 @@
                                     <p><strong><i class="fas fa-apple-alt"></i> {{ _('Otros/Merienda:') }}</strong> {{ plan.merienda }}</p>
                                     
                                     {% if current_user.rol in ['entrenador', 'super_usuario'] %}
-                                    <div class="text-end mt-3 border-top pt-2">
+                                    <div class="text-end mt-3 border-top pt-2 d-flex justify-content-end gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="loadPlanForEdit({{ plan.id }}, '{{ plan.titulo|e }}', '{{ plan.desayuno|e }}', '{{ plan.almuerzo|e }}', '{{ plan.cena|e }}', '{{ plan.merienda|e }}', '{{ plan.hidratacion|e }}')">
+                                            <i class="fas fa-edit"></i> {{ _('Editar') }}
+                                        </button>
                                         <form action="{{ url_for('trainer.eliminar_nutricion', nutricion_id=plan.id) }}" method="POST" onsubmit="return confirm('{{ _('¿Eliminar este plan nutricional?') }}');">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -96,4 +172,24 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadPlanForEdit(id, titulo, desayuno, almuerzo, cena, merienda, hidratacion) {
+    const form = document.querySelector('form[action="{{ url_for('trainer.gestion_nutricion') }}"]');
+    if (!form) return;
+    form.querySelector('input[name="nutricion_id"]').value = id;
+    form.querySelector('input[name="titulo"]').value = titulo;
+    form.querySelector('textarea[name="desayuno"]').value = desayuno;
+    form.querySelector('textarea[name="almuerzo"]').value = almuerzo;
+    form.querySelector('textarea[name="cena"]').value = cena;
+    form.querySelector('textarea[name="merienda"]').value = merienda;
+    form.querySelector('textarea[name="hidratacion"]').value = hidratacion;
+    const button = form.querySelector('button[type="submit"]');
+    if (button) {
+        button.innerHTML = '<i class="fas fa-save"></i> {{ _('Actualizar Plan Nutricional') }}';
+    }
+}
+</script>
 {% endblock %}
