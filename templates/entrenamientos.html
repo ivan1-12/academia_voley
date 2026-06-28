@@ -421,6 +421,17 @@ function cargarJugadores() {
         .catch(error => console.error('{{ _('Error cargando jugadores:') }}', error));
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    const selectedEntrenamientoId = '{{ selected_entrenamiento_id|e }}';
+    if (selectedEntrenamientoId) {
+        const card = document.querySelector('.tarjeta-entrenamiento[data-id="' + selectedEntrenamientoId + '"]');
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            verDetalle(card);
+        }
+    }
+});
+
 function eliminarEntrenamiento(id) {
     if (confirm('{{ _('¿Estás seguro de eliminar este entrenamiento? Esta acción no se puede deshacer.') }}')) {
         const csrfToken = '{{ csrf_token() }}';

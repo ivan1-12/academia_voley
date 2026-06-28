@@ -913,12 +913,17 @@ def gestion_entrenamientos():
             cur.close()
         return redirect(url_for("trainer.gestion_entrenamientos"))
 
+    selected_entrenamiento_id = request.args.get("entrenamiento_id", "").strip()
     cur = db.cursor()
     cur.execute("SELECT * FROM entrenamientos ORDER BY fecha_creacion DESC")
     entrenamientos = cur.fetchall()
     cur.close()
 
-    return render_template("entrenamientos.html", entrenamientos=entrenamientos)
+    return render_template(
+        "entrenamientos.html",
+        entrenamientos=entrenamientos,
+        selected_entrenamiento_id=selected_entrenamiento_id,
+    )
 
 
 @trainer_bp.route("/asignar_entrenamiento", methods=["POST"])
@@ -985,6 +990,8 @@ def asignar_entrenamiento():
 @permiso_requerido("recomendar_nutricion")
 def gestion_nutricion():
     db = get_db()
+    selected_nutricion_id = request.args.get("nutricion_id", "").strip()
+
     if request.method == "POST":
         nutricion_id = request.form.get("nutricion_id", "").strip()
         titulo = request.form.get("titulo", "").strip()
@@ -1070,6 +1077,7 @@ def gestion_nutricion():
         "nutricion.html",
         planes=planes,
         jugadores_por_genero=jugadores_por_genero,
+        selected_nutricion_id=selected_nutricion_id,
     )
 
 

@@ -191,5 +191,17 @@ function loadPlanForEdit(id, titulo, desayuno, almuerzo, cena, merienda, hidrata
         button.innerHTML = '<i class="fas fa-save"></i> {{ _('Actualizar Plan Nutricional') }}';
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const selectedNutricionId = '{{ selected_nutricion_id|e }}';
+    if (selectedNutricionId) {
+        const collapseEl = document.getElementById('collapse' + selectedNutricionId);
+        if (collapseEl) {
+            const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+            bsCollapse.show();
+            collapseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+});
 </script>
 {% endblock %}
