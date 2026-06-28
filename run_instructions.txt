@@ -3,42 +3,47 @@ Instrucciones para ejecutar Academia Voley en otra PC
 Requisitos previos:
 - Python 3.10 o superior instalado.
 - MySQL instalado y accesible.
-- Clonar o copiar el proyecto en la PC de destino.
-- Instalar dependencias desde el virtualenv.
+- Clonar el repositorio desde GitHub.
 
 Pasos:
 
-1. Abrir PowerShell en la carpeta del proyecto.
+1. Clona el repositorio:
+   git clone https://github.com/ivan1-12/academia_voley.git
+   cd academia_voley
 
 2. Crear y activar el entorno virtual:
-   py -3 -m venv .venv
+   py -3.14 -m venv .venv
    .\.venv\Scripts\Activate.ps1
 
 3. Instalar dependencias:
    pip install -r requirements.txt
 
-4. Revisar y ajustar el archivo `.env`:
-   - SECRET_KEY: valor seguro cualquiera.
+4. Crear el archivo de configuración local desde la plantilla:
+   copy .env.example .env
+
+5. Revisar y ajustar los valores en `.env`:
+   - SECRET_KEY: valor secreto seguro.
    - MYSQL_HOST: dirección de MySQL local (por ejemplo `127.0.0.1`).
    - MYSQL_PORT: puerto de MySQL (por ejemplo `3306` o `3307`).
    - MYSQL_USER: usuario de MySQL.
    - MYSQL_PASSWORD: contraseña de MySQL.
-   - MYSQL_DB: nombre de la base de datos.
+   - MYSQL_DB: nombre de la base de datos (`academia_voley`).
    - ADMIN_EMAIL / ADMIN_PASSWORD: credenciales iniciales de administrador.
+   - FLASK_HOST / FLASK_PORT: valores opcionales para la ejecución.
 
-5. Asegurarse de que la base de datos existe y tiene la estructura requerida.
-   Ejecutar el script `mysql_init.sql` en MySQL para crear tablas si aún no existen.
+6. Crear la base de datos y cargar la estructura:
+   mysql -u <usuario> -p < mysql_init.sql
 
-6. Compilar traducciones (para idiomas):
+7. Opcional: compilar traducciones si haces cambios en los archivos de idiomas:
    .\.venv\Scripts\python.exe scripts\compile_translations.py
 
-7. Ejecutar la aplicación:
+8. Ejecutar la aplicación:
    .\.venv\Scripts\python.exe app.py
 
-8. Abrir la aplicación en el navegador:
+9. Abrir la aplicación en el navegador:
    http://127.0.0.1:5000
 
 Notas:
-- Si el puerto 5000 ya está en uso, cambia `FLASK_PORT` en `.env` y usa la URL correspondiente.
-- Al ejecutar en local, el app se iniciará en modo de desarrollo y mostrará mensajes en la consola.
-- Si no deseas usar Docker, no es necesario. Esta guía es para correr el proyecto directamente con Python.
+- No subas el archivo `.env` al repositorio.
+- Si usas XAMPP en el puerto `3307`, ajusta `MYSQL_PORT=3307` en `.env`.
+- Este proyecto no requiere Docker para correr en desarrollo local.

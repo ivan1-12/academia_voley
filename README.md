@@ -14,22 +14,35 @@ Este proyecto es una aplicación Flask para administración de academias de vole
 - MySQL local con esquema inicial
 - `.env` configurado a partir de `.env.example`
 
-## Configurar el entorno
+## Configurar el entorno en otra PC
 
-1. Crear y activar el virtualenv:
+1. Clona el repositorio:
+
+```powershell
+git clone https://github.com/ivan1-12/academia_voley.git
+cd academia_voley
+```
+
+2. Crea y activa el virtualenv:
 
 ```powershell
 py -3.14 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-2. Instalar dependencias:
+3. Instala dependencias:
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-3. Editar el archivo `.env` que ya está presente en la raíz del proyecto y ajustar al menos:
+4. Crea el archivo de configuración local a partir de la plantilla:
+
+```powershell
+copy .env.example .env
+```
+
+5. Edita `.env` y ajusta al menos:
    - `SECRET_KEY`
    - `MYSQL_HOST`
    - `MYSQL_PORT`
@@ -39,7 +52,11 @@ pip install -r requirements.txt
    - `ADMIN_EMAIL`
    - `ADMIN_PASSWORD`
 
-5. Ejecutar el script `mysql_init.sql` en tu instancia de MySQL para crear la estructura de base de datos.
+6. Crea la base de datos y carga la estructura de tablas:
+
+```powershell
+mysql -u <usuario> -p < mysql_init.sql
+```
 
 ## Ejecutar la aplicación
 
