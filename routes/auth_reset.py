@@ -53,7 +53,7 @@ def forgot_password():
 
 
 @reset_bp.route("/reset_password/<token>", methods=["GET", "POST"])
-@limiter.limit("10 per hour")
+@limiter.limit("10 per hour", methods=["POST"])
 def reset_password(token):
     try:
         data = get_serializer().loads(token, max_age=current_app.config.get("PASSWORD_RESET_EXPIRATION", 3600))

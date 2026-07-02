@@ -225,6 +225,62 @@
     }
 }
 
+@media (max-width: 768px) {
+    .navbar-custom .navbar-collapse {
+        background: linear-gradient(180deg, rgba(8,23,47,0.98) 0%, rgba(9,27,60,0.98) 100%);
+        border-top: 1px solid rgba(255,255,255,0.12);
+        margin-top: 0.5rem;
+        padding: 1rem 1rem 0.75rem;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .navbar-custom .navbar-nav {
+        width: 100%;
+    }
+    .navbar-custom .navbar-nav .nav-item {
+        width: 100%;
+    }
+    .navbar-custom .navbar-nav .nav-link {
+        width: 100%;
+        padding: 0.85rem 0.75rem;
+        border-radius: 0.55rem;
+        margin-bottom: 0.25rem;
+        background-color: rgba(255,255,255,0.04);
+    }
+    .navbar-custom .navbar-nav .nav-link:hover,
+    .navbar-custom .navbar-nav .nav-link.active {
+        background-color: rgba(255,255,255,0.12);
+    }
+    .navbar-custom .nav-item.ms-lg-3,
+    .navbar-custom .nav-item.ms-lg-1 {
+        margin-left: 0 !important;
+    }
+    .navbar-custom .form-select {
+        min-width: 100%;
+        margin-bottom: 0.75rem;
+    }
+    .navbar-custom .btn-outline-light,
+    .navbar-custom .btn-primary {
+        width: 100%;
+        display: block;
+        margin-top: 0.35rem;
+    }
+    .navbar-custom .dropdown-menu {
+        position: static;
+        float: none;
+        width: 100%;
+        margin-top: 0.25rem;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(10, 21, 44, 0.98);
+        box-shadow: none;
+    }
+    .navbar-custom .dropdown-item {
+        padding: 0.75rem 0.85rem;
+    }
+    .navbar-custom .dropdown-item + .dropdown-item {
+        border-top: 1px solid rgba(255,255,255,0.08);
+    }
+}
+
 /* ====== BASE ====== */
 body {
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -738,12 +794,80 @@ body {
         padding: 4px 8px;
     }
 
-    /* Navbar compacta */
+    /* Navbar compacta y centrada */
+    .navbar-custom .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 0.35rem;
+    }
     .navbar-brand {
         font-size: 1rem;
+        margin: 0 auto;
     }
-    .navbar-nav .nav-link {
-        padding: 8px 0;
+    .navbar-toggler {
+        margin: 0.35rem auto;
+    }
+    .navbar-custom .navbar-collapse {
+        width: 100%;
+        text-align: center;
+    }
+    .navbar-custom .navbar-nav {
+        justify-content: center;
+        width: 100%;
+    }
+    .navbar-custom .navbar-nav .nav-item {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .navbar-custom .nav-link,
+    .navbar-custom .navbar-nav .nav-item > .btn,
+    .navbar-custom .navbar-nav .nav-item .form-select,
+    .navbar-custom .navbar-nav .nav-item .btn-outline-light {
+        width: 100%;
+        max-width: 360px;
+        display: inline-flex;
+        justify-content: center;
+        text-align: center;
+        margin: 0.2rem auto;
+    }
+    .navbar-custom .navbar-nav .nav-item > .btn {
+        padding: 0.65rem 1rem;
+        border-radius: 0.55rem;
+        min-height: 44px;
+        align-items: center;
+    }
+    .navbar-custom .navbar-nav .nav-item > .btn.btn-primary.btn-sm {
+        margin-top: 0.2rem;
+    }
+    .navbar-custom .navbar-nav .nav-item > .btn-outline-light {
+        margin-top: 0.2rem;
+    }
+    .navbar-custom .nav-link {
+        padding: 10px 0;
+        border-radius: 0.55rem;
+    }
+    .navbar-custom .nav-link:hover,
+    .navbar-custom .nav-link.active {
+        background-color: rgba(255,255,255,0.12);
+    }
+    .navbar-custom .nav-item.ms-lg-3,
+    .navbar-custom .nav-item.ms-lg-1 {
+        margin-left: 0 !important;
+    }
+    .navbar-custom .dropdown-menu {
+        position: static;
+        width: 100%;
+        margin-top: 0.35rem;
+    }
+    .navbar-custom .dropdown-item {
+        padding: 0.75rem 0.85rem;
+    }
+    .navbar-custom .dropdown-item + .dropdown-item {
+        border-top: 1px solid rgba(255,255,255,0.08);
     }
 
     /* Cards compactas */

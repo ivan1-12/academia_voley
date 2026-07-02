@@ -294,7 +294,7 @@ def registro():
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
-@limiter.limit("10 per hour")
+@limiter.limit("10 per hour", methods=["POST"])
 def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip()
