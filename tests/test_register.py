@@ -32,3 +32,11 @@ def test_register_get_and_validation():
         assert post.status_code == 200
         text = post.data.decode("utf-8", errors="replace")
         assert "El nombre" in text or "Cédula" in text or "contrase" in text
+
+
+def test_registration_form_includes_number_field():
+    with app.test_client() as client:
+        r = client.get("/registro")
+        assert r.status_code == 200
+        html = r.data.decode("utf-8", errors="replace")
+        assert 'name="numero"' in html

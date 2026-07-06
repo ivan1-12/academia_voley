@@ -62,6 +62,11 @@
                             <label class="form-label">{{ _('Cédula') }}</label>
                             <input type="text" name="cedula" class="form-control" value="{{ usuario.cedula or '' }}">
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Número') }}</label>
+                            <input type="text" name="numero" class="form-control" inputmode="numeric" pattern="[0-9]*" value="{{ usuario.numero or '' }}">
+                            <div class="form-text">{{ _('Solo dígitos. Se mostrará en el perfil del jugador.') }}</div>
+                        </div>
                         {% endif %}
 
                         <div class="alert alert-info mt-3">

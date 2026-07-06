@@ -51,6 +51,7 @@ cols = [
     ("edad", "INT"),
     ("genero", "VARCHAR(20)"),
     ("cedula", "VARCHAR(50)"),
+    ("numero", "VARCHAR(50)"),
     ("descripcion", "TEXT"),
     ("link_facebook", "VARCHAR(255)"),
     ("link_instagram", "VARCHAR(255)"),

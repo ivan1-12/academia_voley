@@ -57,6 +57,17 @@
                                 <small class="text-muted">{{ _('Únicamente números') }}</small>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="numero" class="form-label">{{ _('Número') }}</label>
+                                <input type="text" class="form-control" id="numero" name="numero" inputmode="numeric" pattern="[0-9]*" value="{{ numero or '' }}">
+                                {% if form_errors and form_errors.get('numero') %}
+                                <div class="invalid-feedback d-block">{{ form_errors.get('numero')|join(', ') }}</div>
+                                {% endif %}
+                                <small class="text-muted">{{ _('Solo dígitos. Se mostrará en el perfil del jugador.') }}</small>
+                            </div>
+                        </div>
                         
                         <div class="mb-3">
                             <label for="email" class="form-label">{{ _('Correo Electrónico') }}</label>
@@ -135,6 +146,7 @@ document.getElementById('registroForm').addEventListener('submit', function(e) {
     const nombre = document.getElementById('nombre').value.trim();
     const apellido = document.getElementById('apellido').value.trim();
     const cedula = document.getElementById('cedula').value.trim();
+    const numero = document.getElementById('numero').value.trim();
     const password = document.getElementById('password').value;
     const confirm = document.getElementById('confirm_password').value;
     
@@ -151,6 +163,12 @@ document.getElementById('registroForm').addEventListener('submit', function(e) {
     if (!numbersOnlyRegex.test(cedula)) {
         e.preventDefault();
         alert('{{ _('El campo Cédula de Identidad debe contener única y estrictamente números.') }}');
+        return;
+    }
+    
+    if (numero && !numbersOnlyRegex.test(numero)) {
+        e.preventDefault();
+        alert('{{ _('El campo Número debe contener única y estrictamente números.') }}');
         return;
     }
     

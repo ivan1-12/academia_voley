@@ -146,6 +146,9 @@
                                                             {% if jugador.posicion %}
                                                                 · {{ _('Posición:') }} {{ jugador.posicion }}
                                                             {% endif %}
+                                                            {% if jugador.numero %}
+                                                                · {{ _('Número:') }} {{ jugador.numero }}
+                                                            {% endif %}
                                                         </div>
                                                         {% if jugador.altura_cm or jugador.peso_kg %}
                                                         <div class="small text-muted">

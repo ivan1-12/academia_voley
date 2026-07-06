@@ -695,12 +695,15 @@ def editar_usuario(usuario_id):
         fecha_nacimiento = request.form.get("fecha_nacimiento")
         genero = request.form.get("genero", "").strip()
         cedula = request.form.get("cedula", "").strip()
+        numero = request.form.get("numero", "").strip()
 
         errors = []
         if not nombre or not apellido:
             errors.append(_("Nombre y apellido son obligatorios."))
         if email and not validar_formato_email(email):
             errors.append(_("El correo electrónico no tiene un formato válido."))
+        if numero and not validar_campo_numerico(numero):
+            errors.append(_("El campo Número debe contener única y estrictamente números."))
 
         if errors:
             for err in errors:
@@ -745,7 +748,7 @@ def editar_usuario(usuario_id):
                 )
             else:
                 cur.execute(
-                    "UPDATE usuarios SET nombre = %s, apellido = %s, email = %s, fecha_nacimiento = %s, genero = %s, cedula = %s WHERE id = %s",
+                    "UPDATE usuarios SET nombre = %s, apellido = %s, email = %s, fecha_nacimiento = %s, genero = %s, cedula = %s, numero = %s WHERE id = %s",
                     (
                         nombre,
                         apellido,
@@ -753,6 +756,7 @@ def editar_usuario(usuario_id):
                         fecha_nacimiento or None,
                         genero,
                         cedula,
+                        numero or None,
                         usuario_id,
                     ),
                 )

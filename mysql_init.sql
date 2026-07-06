@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `edad` INT DEFAULT NULL,
   `genero` VARCHAR(50) DEFAULT NULL,
   `cedula` VARCHAR(100) DEFAULT NULL,
+  `numero` VARCHAR(50) DEFAULT NULL,
   `descripcion` TEXT NULL,
   `telefono` VARCHAR(100) DEFAULT NULL,
   `link_facebook` VARCHAR(255) NULL,

@@ -7,13 +7,14 @@ from functools import wraps
 
 
 class User(UserMixin):
-    def __init__(self, id, nombre, apellido, email, rol, permisos=None, telefono=None):
+    def __init__(self, id, nombre, apellido, email, rol, permisos=None, telefono=None, numero=None):
         self.id = id
         self.nombre = nombre
         self.apellido = apellido
         self.email = email
         self.rol = rol
         self.telefono = telefono
+        self.numero = numero
         self.permisos = permisos or set()
 
     def has_permission(self, permiso):
@@ -146,6 +147,7 @@ def load_user(user_id):
                 rol_actual,
                 permisos,
                 telefono=user.get("telefono"),
+                numero=user.get("numero"),
             )
 
         cur.close()
@@ -167,6 +169,8 @@ def load_user(user_id):
                     user["email"],
                     rol_actual,
                     permisos,
+                    telefono=user.get("telefono"),
+                    numero=user.get("numero"),
                 )
         except Exception:
             pass

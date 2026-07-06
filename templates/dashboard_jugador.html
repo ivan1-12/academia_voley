@@ -52,6 +52,7 @@
                     <p><strong>{{ _('Posición:') }}</strong> {{ perfil.posicion or _('No especificada') }}</p>
                     <p><strong>{{ _('Altura:') }}</strong> {{ perfil.altura_cm or _('No especificada') }} cm</p>
                     <p><strong>{{ _('Peso:') }}</strong> {{ perfil.peso_kg or _('No especificado') }} kg</p>
+                    <p><strong>{{ _('Número:') }}</strong> {{ current_user.numero or _('No especificado') }}</p>
                     {% else %}
                     <p class="text-muted">{{ _('Completa tu perfil haciendo clic en el botón de editar') }}</p>
                     {% endif %}
@@ -205,6 +206,11 @@
                         <label class="form-label">{{ _('Teléfono') }}</label>
                         <input type="text" name="telefono" class="form-control" inputmode="numeric" placeholder="0414-1234567" value="{{ current_user.telefono if current_user.telefono else '' }}">
                         <div class="form-text">{{ _('Separaremos los primeros 4 dígitos con un guion para identificar la línea.') }}</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Número') }}</label>
+                        <input type="text" name="numero" class="form-control" inputmode="numeric" pattern="[0-9]*" value="{{ current_user.numero if current_user.numero else '' }}">
+                        <div class="form-text">{{ _('Solo dígitos. Se mostrará en el perfil del jugador.') }}</div>
                     </div>
                 </div>
                 <div class="modal-footer">

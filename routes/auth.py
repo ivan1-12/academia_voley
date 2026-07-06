@@ -37,6 +37,7 @@ def registro():
         fecha_nacimiento = request.form.get("fecha_nacimiento")
         genero = request.form.get("genero")
         cedula = request.form.get("cedula", "").strip()
+        numero = request.form.get("numero", "").strip()
         entrenador_id = request.form.get("entrenador_id")
 
         # Validaciones estrictas del lado del servidor
@@ -50,6 +51,8 @@ def registro():
             errors.append(
                 _("El campo Cédula debe contener única y estrictamente números.")
             )
+        if numero and not validar_campo_numerico(numero):
+            errors.append(_("El campo Número debe contener única y estrictamente números."))
         p_valido, p_msg = validar_password_estricta(password)
         if not p_valido:
             errors.append(_(p_msg))
@@ -74,6 +77,8 @@ def registro():
                     form_errors.setdefault("apellido", []).append(err)
                 elif "cédula" in err.lower() or "cedula" in err.lower():
                     form_errors.setdefault("cedula", []).append(err)
+                elif "número" in err.lower() or "numero" in err.lower():
+                    form_errors.setdefault("numero", []).append(err)
                 elif "contrase" in err.lower() or "contraseñas" in err.lower():
                     form_errors.setdefault("password", []).append(err)
                     form_errors.setdefault("confirm_password", []).append(err)
@@ -97,6 +102,7 @@ def registro():
                 nombre=nombre,
                 apellido=apellido,
                 email=email,
+                numero=numero,
             )
 
         try:
@@ -200,7 +206,7 @@ def registro():
                 rol_id = rol_row["id"] if rol_row else None
                 idioma = session.get("lang", "es")
                 cur.execute(
-                    "INSERT INTO usuarios (nombre, apellido, email, password, rol, rol_id, fecha_nacimiento, edad, genero, cedula, idioma) VALUES (%s, %s, %s, %s, 'jugador', %s, %s, %s, %s, %s, %s)",
+                    "INSERT INTO usuarios (nombre, apellido, email, password, rol, rol_id, fecha_nacimiento, edad, genero, cedula, numero, idioma) VALUES (%s, %s, %s, %s, 'jugador', %s, %s, %s, %s, %s, %s, %s)",
                     (
                         nombre,
                         apellido,
@@ -211,6 +217,7 @@ def registro():
                         edad,
                         genero,
                         cedula,
+                        numero or None,
                         idioma,
                     ),
                 )
@@ -248,7 +255,7 @@ def registro():
                 ) if fn else None
 
                 cur.execute(
-                    "INSERT INTO usuarios (nombre, apellido, email, password, rol, rol_id, fecha_nacimiento, edad, genero, cedula, idioma, activo) VALUES (%s, %s, %s, %s, 'jugador', %s, %s, %s, %s, %s, %s, 0)",
+                    "INSERT INTO usuarios (nombre, apellido, email, password, rol, rol_id, fecha_nacimiento, edad, genero, cedula, numero, idioma, activo) VALUES (%s, %s, %s, %s, 'jugador', %s, %s, %s, %s, %s, %s, %s, 0)",
                     (
                         nombre,
                         apellido,
@@ -259,6 +266,7 @@ def registro():
                         edad,
                         genero,
                         cedula,
+                        numero or None,
                         idioma,
                     ),
                 )

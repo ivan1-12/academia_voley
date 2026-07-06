@@ -157,6 +157,15 @@ def editar_perfil_jugador():
     peso_kg = request.form.get("peso_kg")
     posicion = request.form.get("posicion", "").strip()
     telefono = normalizar_telefono(request.form.get("telefono", ""))
+    numero = request.form.get("numero", "").strip()
+
+    if numero and not numero.isdigit():
+        flash(_("El campo Número debe contener únicamente números."), "danger")
+        return redirect(
+            url_for("player.dashboard_jugador")
+            if current_user.rol == "jugador"
+            else url_for("trainer.dashboard_entrenador")
+        )
 
     # Convertir a tipos numéricos o None con validación
     try:
@@ -180,8 +189,8 @@ def editar_perfil_jugador():
         existente = cur.fetchone()
 
         cur.execute(
-            "UPDATE usuarios SET telefono = %s WHERE id = %s",
-            (telefono, target_usuario_id),
+            "UPDATE usuarios SET telefono = %s, numero = %s WHERE id = %s",
+            (telefono, numero or None, target_usuario_id),
         )
 
         if existente:
