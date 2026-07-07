@@ -5,10 +5,38 @@ import socket
 
 
 def validar_campo_numerico(valor):
-    """Permite única y estrictamente números (ej. teléfonos, documentos/cédula, edades)."""
-    if not valor:
+    """Permite única y estrictamente números (ej. documentos/cédula, edades, números de jugador)."""
+    if valor is None:
         return False
-    return str(valor).isdigit()
+    return str(valor).strip().isdigit()
+
+
+def validar_telefono(telefono):
+    """Valida un teléfono con dígitos opcionales y símbolos comunes como espacios y guiones."""
+    if not telefono:
+        return False
+    digitos = "".join(ch for ch in str(telefono) if ch.isdigit())
+    return 7 <= len(digitos) <= 15
+
+
+def normalizar_telefono(telefono):
+    """Normaliza el teléfono dejando solo dígitos y separando los primeros 4 con un guion."""
+    if telefono is None:
+        return ""
+    valor = "".join(ch for ch in str(telefono) if ch.isdigit())
+    if not valor:
+        return ""
+    if len(valor) <= 4:
+        return valor
+    return f"{valor[:4]}-{valor[4:]}"
+
+
+def validar_numero_jugador(valor):
+    """Valida el número de jugador: solo dígitos y máximo 3 caracteres."""
+    if not validar_campo_numerico(valor):
+        return False
+    digitos = str(valor).strip()
+    return 1 <= len(digitos) <= 3
 
 
 def validar_nombre_texto(valor):

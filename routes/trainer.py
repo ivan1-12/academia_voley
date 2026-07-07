@@ -8,6 +8,8 @@ from validators import (
     validar_descripcion_entrenador,
     validar_formato_email,
     validar_password_estricta,
+    validar_campo_numerico,
+    validar_numero_jugador,
 )
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -206,7 +208,7 @@ def jugadores_detalle():
     cur = db.cursor()
     try:
         cur.execute(
-            "SELECT u.id, u.nombre, u.apellido, u.email, u.genero, u.edad, u.activo, u.telefono, p.posicion "
+            "SELECT u.id, u.nombre, u.apellido, u.email, u.genero, u.edad, u.activo, u.telefono, u.numero, p.posicion "
             "FROM usuarios u LEFT JOIN perfiles_jugadores p ON u.id = p.usuario_id "
             "WHERE u.rol = 'jugador' "
             "ORDER BY u.apellido, u.nombre"
@@ -702,8 +704,8 @@ def editar_usuario(usuario_id):
             errors.append(_("Nombre y apellido son obligatorios."))
         if email and not validar_formato_email(email):
             errors.append(_("El correo electrónico no tiene un formato válido."))
-        if numero and not validar_campo_numerico(numero):
-            errors.append(_("El campo Número debe contener única y estrictamente números."))
+        if numero and not validar_numero_jugador(numero):
+            errors.append(_("El campo Número debe contener únicamente dígitos y hasta 3 caracteres."))
 
         if errors:
             for err in errors:

@@ -40,3 +40,54 @@ def test_registration_form_includes_number_field():
         assert r.status_code == 200
         html = r.data.decode("utf-8", errors="replace")
         assert 'name="numero"' in html
+
+
+def test_registration_rejects_invalid_number_field():
+    with app.test_client() as client:
+        r = client.get("/registro")
+        assert r.status_code == 200
+        html = r.data.decode("utf-8", errors="replace")
+        csrf = _extract_csrf(html)
+        post = client.post(
+            "/registro",
+            data={
+                "csrf_token": csrf,
+                "nombre": "Luis",
+                "apellido": "Perez",
+                "email": "luis.perez@example.com",
+                "password": "Testpass1!",
+                "confirm_password": "Testpass1!",
+                "fecha_nacimiento": "2000-01-01",
+                "genero": "M",
+                "cedula": "12345678",
+                "numero": "abc123",
+            },
+            follow_redirects=True,
+        )
+        assert post.status_code == 200
+        assert "El campo Número" in post.data.decode("utf-8", errors="replace")
+
+
+def test_login_rate_limit_per_device_agent():
+    with app.test_client() as client:
+        get = client.get("/login")
+        assert get.status_code == 200
+        csrf = _extract_csrf(get.data.decode("utf-8", errors="replace"))
+
+        headers_device_a = {"User-Agent": "DeviceA/1.0"}
+        headers_device_b = {"User-Agent": "DeviceB/1.0"}
+
+        for _ in range(10):
+            resp = client.post(
+                "/login",
+                headers=headers_device_a,
+                data={"email": "no-one@example.com", "password": "badpass", "csrf_token": csrf},
+            )
+            assert resp.status_code != 429
+
+        resp = client.post(
+            "/login",
+            headers=headers_device_b,
+            data={"email": "no-one@example.com", "password": "badpass", "csrf_token": csrf},
+        )
+        assert resp.status_code != 429

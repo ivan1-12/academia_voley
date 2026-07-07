@@ -2,23 +2,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_babel import gettext as _
 from flask_login import login_required, current_user
 from models import get_db, rol_requerido
+from validators import validar_telefono, validar_numero_jugador, normalizar_telefono
 from datetime import datetime
 from fpdf import FPDF
 import io
 
 player_bp = Blueprint("player", __name__)
-
-
-def normalizar_telefono(telefono):
-    if telefono is None:
-        return ""
-    valor = str(telefono).strip()
-    if not valor:
-        return ""
-    digitos = "".join(ch for ch in valor if ch.isdigit())
-    if len(digitos) <= 4:
-        return digitos
-    return f"{digitos[:4]}-{digitos[4:]}"
 
 
 @player_bp.route("/perfil_jugador/<int:usuario_id>")
@@ -156,16 +145,26 @@ def editar_perfil_jugador():
     altura_cm = request.form.get("altura_cm")
     peso_kg = request.form.get("peso_kg")
     posicion = request.form.get("posicion", "").strip()
-    telefono = normalizar_telefono(request.form.get("telefono", ""))
+    telefono = request.form.get("telefono", "")
     numero = request.form.get("numero", "").strip()
 
-    if numero and not numero.isdigit():
-        flash(_("El campo Número debe contener únicamente números."), "danger")
+    if telefono and not validar_telefono(telefono):
+        flash(_("El teléfono ingresado no tiene un formato válido."), "danger")
         return redirect(
             url_for("player.dashboard_jugador")
             if current_user.rol == "jugador"
             else url_for("trainer.dashboard_entrenador")
         )
+
+    if numero and not validar_numero_jugador(numero):
+        flash(_("El campo Número debe contener únicamente dígitos y hasta 3 caracteres."), "danger")
+        return redirect(
+            url_for("player.dashboard_jugador")
+            if current_user.rol == "jugador"
+            else url_for("trainer.dashboard_entrenador")
+        )
+
+    telefono = normalizar_telefono(telefono)
 
     # Convertir a tipos numéricos o None con validación
     try:

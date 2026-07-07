@@ -18,6 +18,7 @@
                                 <tr>
                                     <th>{{ _('Nombre') }}</th>
                                     <th>{{ _('Teléfono') }}</th>
+                                    <th>{{ _('Número') }}</th>
                                     <th>{{ _('Posición') }}</th>
                                     <th>{{ _('Edad') }}</th>
                                     <th>{{ _('Email') }}</th>
@@ -33,6 +34,7 @@
                                         </a>
                                     </td>
                                     <td>{{ jugador.telefono or '-' }}</td>
+                                    <td>{{ jugador.numero or '-' }}</td>
                                     <td>{{ jugador.posicion or _('No definida') }}</td>
                                     <td>{{ jugador.edad or '-' }}</td>
                                     <td>{{ jugador.email }}</td>
@@ -40,7 +42,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">{{ _('No hay jugadores registrados.') }}</td>
+                                    <td colspan="7" class="text-center text-muted">{{ _('No hay jugadores registrados.') }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

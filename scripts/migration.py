@@ -80,6 +80,7 @@ except Exception as e:
 for column_name, definition in [
     ("activo", "TINYINT(1) NOT NULL DEFAULT 1"),
     ("telefono", "VARCHAR(100) DEFAULT NULL"),
+    ("numero", "VARCHAR(50) DEFAULT NULL"),
     ("idioma", "VARCHAR(5) NOT NULL DEFAULT 'es'"),
     ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
 ]:

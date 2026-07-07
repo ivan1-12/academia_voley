@@ -6,6 +6,7 @@ from models import get_db, User, FALLBACK_PERMISOS
 from validators import (
     validar_nombre_texto,
     validar_campo_numerico,
+    validar_numero_jugador,
     validar_password_estricta,
     validar_formato_email,
     verificar_email_registro,
@@ -51,8 +52,8 @@ def registro():
             errors.append(
                 _("El campo Cédula debe contener única y estrictamente números.")
             )
-        if numero and not validar_campo_numerico(numero):
-            errors.append(_("El campo Número debe contener única y estrictamente números."))
+        if numero and not validar_numero_jugador(numero):
+            errors.append(_("El campo Número debe contener únicamente dígitos y hasta 3 caracteres."))
         p_valido, p_msg = validar_password_estricta(password)
         if not p_valido:
             errors.append(_(p_msg))

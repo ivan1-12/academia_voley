@@ -1,4 +1,4 @@
-from routes.player import normalizar_telefono
+from validators import normalizar_telefono
 
 
 def test_normalizar_telefono_formatea_primeros_cuatro_digitos():

@@ -25,10 +25,10 @@ def test_jugadores_detalle_shows_phone_from_db():
         rol_id = rol["id"] if rol else None
         cur.execute(
             """
-            INSERT INTO usuarios (nombre, apellido, email, password, rol, rol_id, activo, idioma, telefono)
-            VALUES (%s, %s, %s, %s, 'jugador', %s, 1, 'es', %s)
+            INSERT INTO usuarios (nombre, apellido, email, password, rol, rol_id, activo, idioma, telefono, numero)
+            VALUES (%s, %s, %s, %s, 'jugador', %s, 1, 'es', %s, %s)
             """,
-            ("Phone", "Detail", email, "hashed-password", rol_id, "0414-1234567"),
+            ("Phone", "Detail", email, "hashed-password", rol_id, "0414-1234567", "23"),
         )
         db.commit()
         cur.close()
@@ -49,6 +49,7 @@ def test_jugadores_detalle_shows_phone_from_db():
         resp = client.get("/jugadores_detalle")
         assert resp.status_code == 200
         assert b"0414-1234567" in resp.data
+        assert b"23" in resp.data
 
     with app.app_context():
         db = get_db()
